@@ -1,0 +1,30 @@
+{
+    "compileOnSave": false,
+    "compilerOptions": {
+        "baseUrl": ".",
+        "outDir": "./dist",
+        "sourceMap": true,
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "declaration": true,
+        "strict": true,
+        "strictPropertyInitialization": false,
+        "noImplicitAny": true,
+        "target": "es2015",
+        "lib": [
+            "es2015",
+            "es2017",
+            "es2018",
+            "esnext",
+            "dom"
+        ]
+    },
+    "include": [
+        "src"
+    ],
+    "exclude": [
+        "node_modules"
+    ]
+}

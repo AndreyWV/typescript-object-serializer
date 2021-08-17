@@ -1,0 +1,31 @@
+{
+    "name": "typescript-serialize-json",
+    "version": "0.0.0",
+    "description": "Powerful Scalable JSON Serializer for Typescript",
+    "scripts": {
+        "build": "tsc --project tsconfig.json",
+        "test": "jest"
+    },
+    "keywords": [
+        "typescript",
+        "json",
+        "serialize",
+        "api"
+    ],
+    "author": "andrey.w.v@gmail.com",
+    "license": "MIT",
+    "devDependencies": {
+        "@babel/core": "^7.15.0",
+        "@babel/preset-env": "^7.15.0",
+        "@babel/preset-typescript": "^7.15.0",
+        "@types/jest": "^27.0.1",
+        "babel-jest": "^27.0.6",
+        "jest": "^27.0.6",
+        "reflect-metadata": "^0.1.13",
+        "ts-node": "^10.2.0",
+        "typescript": "^4.3.5"
+    },
+    "peerDependencies": {
+        "reflect-metadata": "^0.1.13"
+    }
+}
