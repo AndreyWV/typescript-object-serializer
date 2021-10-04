@@ -1,6 +1,7 @@
 import { SerializableObject } from './serializable-object';
 import { ExtractorCamelCase } from './decorators/property/extractor-camel-case';
 import { property } from './decorators/property/property';
+import 'reflect-metadata';
 
 class A extends SerializableObject {
   @property()
@@ -20,17 +21,20 @@ class C extends SerializableObject {
   camelCaseTest: string;
 }
 
-test('test', () => {
-  const c = C.create();
-  c.camelCaseTest = '234234';
-  const d = c.serialize();
-  // console.log(d);
-  C.deserialize({
-    b: {
-      a: {
-        ad: '123'
+describe('test', () => {
+  // const c = C.create();
+  // c.camelCaseTest = '234234';
+  // const d = c.serialize();
+
+  it('expect', () => {
+    const c = C.deserialize({
+      b: {
+        a: {
+          ad: '123'
+        }
       }
-    }
+    });
+    expect(c.b.a.ad).toBe('123');
   });
-  expect(c.b.a).toBe('123');
 })
+
