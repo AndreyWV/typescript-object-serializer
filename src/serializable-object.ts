@@ -28,7 +28,7 @@ export class SerializableObject {
     data: SerializableObjectData<T> = {},
   ): InstanceType<T> {
     if (data instanceof this) {
-      return data.clone() as InstanceType<T>;
+      return this as InstanceType<T>;
     }
 
     const instance = new this() as InstanceType<T>;
@@ -140,7 +140,21 @@ export class SerializableObject {
   }
 
   public clone(): this {
-    return this;
+
+    const instance = (this.constructor as typeof SerializableObject).create();
+    Object.keys(this).forEach(
+      key => {
+        const value = this[key];
+        if (value instanceof SerializableObject) {
+          instance[key] = value.clone();
+        } else {
+          instance[key] = value;
+        }
+      },
+    );
+
+    return instance as this;
+
   }
 }
 

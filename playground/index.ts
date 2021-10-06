@@ -119,3 +119,8 @@ const deserialized = Data.deserialize({
 })
 console.log(deserialized);
 console.log(deserialized.data[0] instanceof A);
+
+const clone = deserialized.clone();
+console.log(clone.data[0] instanceof A);
+/* FIX */
+console.log(clone.data[0] === deserialized.data[0]);
