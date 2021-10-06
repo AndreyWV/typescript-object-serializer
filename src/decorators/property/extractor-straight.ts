@@ -1,6 +1,6 @@
 import { Extractor } from './extractor.base';
 
-export class ExtractorSimple extends Extractor {
+export class ExtractorStraight extends Extractor {
   public extract(data: any): any {
     if (typeof data !== 'object' || data === null) {
       return data;

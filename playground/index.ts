@@ -15,37 +15,107 @@ import { property } from '../src/decorators/property/property';
 //   a: number;
 // }
 
+// class A extends SerializableObject {
+//   @property()
+//   aaa: string;
+// }
+
+// class B extends SerializableObject {
+//   @property()
+//   a: A;
+// }
+
+// class C extends SerializableObject {
+//   @property()
+//   b: B;
+
+//   @property(ExtractorCamelCase)
+//   camelCaseTest: string;
+// }
+
+// const c = C.create();
+// c.b = {
+//   a: {
+//     b: '234234',
+//   },
+// } as any;
+// c.camelCaseTest = '234234';
+// const cDeserialized = C.create({
+//   b: {
+//   },
+//   camelCaseTest: '123123',
+// });
+// console.log(cDeserialized)
+// console.log(cDeserialized.b instanceof B);
+// console.log(cDeserialized.b.a === undefined);
+
+// class SuccessExample extends SerializableObject {
+
+// }
+
+// class ErrorExample extends SerializableObject {
+
+// }
+
+// class TestSuccessError extends SerializableObject {
+
+//   @property()
+//   @propertyType((data: any) => data?.success ? SuccessExample : ErrorExample)
+//   success: SuccessExample | ErrorExample;
+
+//   @property()
+//   @propertyType((data: any) => data?.success ? SuccessExample : ErrorExample)
+//   error: SuccessExample | ErrorExample;
+
+// }
+
+// const test = TestSuccessError.deserialize({
+//   success: {
+//     success: true,
+//   },
+//   error: {
+//     success: false,
+//   },
+// });
+
+// console.log(test.success instanceof SuccessExample);
+// console.log(test.error instanceof ErrorExample);
+
 class A extends SerializableObject {
+
   @property()
-  aaa: string;
+  data: string;
+
 }
 
-class B extends SerializableObject {
+
+class Data extends SerializableObject {
+
   @property()
-  a: A;
+  @propertyType(A)
+  data: A[];
+
 }
 
-class C extends SerializableObject {
-  @property()
-  b: B;
+// const data = Data.create({
+//   data: [
+//     {
+//       data: 'asd'
+//     }
+//   ]
+// });
 
-  @property(ExtractorCamelCase)
-  camelCaseTest: string;
-}
+// console.log(data.data[0] instanceof A);
 
-const c = C.create();
-c.b = {
-  a: {
-    b: '234234',
-  },
-} as any;
-c.camelCaseTest = '234234';
-const cDeserialized = C.create({
-  b: {
-  },
-  camelCaseTest: '123123',
-});
-console.log(cDeserialized)
-console.log(cDeserialized.b instanceof B);
-console.log(cDeserialized.b.a === undefined);
-
+const deserialized = Data.deserialize({
+  data: [
+    {
+      data: 'asd',
+    },
+    {
+      data: 'asd1',
+    }
+  ]
+})
+console.log(deserialized);
+console.log(deserialized.data[0] instanceof A);

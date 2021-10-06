@@ -1,11 +1,11 @@
 import 'reflect-metadata';
 import { Constructor } from '../../base-types/constructor';
 import { SERIALIZABLE_PROPERTIES_KEY } from '../../metadata-keys';
-import { ExtractorSimple } from './extractor-simple';
+import { ExtractorStraight } from './extractor-straight';
 import { Extractor } from './extractor.base';
 
 export function property(
-  extractor: Constructor<Extractor> = ExtractorSimple,
+  extractor: Constructor<Extractor> = ExtractorStraight,
 ): PropertyDecorator {
   return (target: any, propertyKey: string | symbol) => {
 

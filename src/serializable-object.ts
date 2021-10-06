@@ -1,6 +1,9 @@
 import 'reflect-metadata';
 import { Extractor } from './decorators/property/extractor.base';
-import { SERIALIZABLE_PROPERTIES_KEY, SERIALIZABLE_TYPES_KEY } from './metadata-keys';
+import {
+  SERIALIZABLE_PROPERTIES_KEY,
+  SERIALIZABLE_TYPES_KEY,
+} from './metadata-keys';
 
 type RecursivePartial<T> = {
   [K in keyof T]?: RecursivePartial<T[K]>;
@@ -32,17 +35,23 @@ export class SerializableObject {
 
     const keyTypes: Map<keyof InstanceType<T>, any> = Reflect.getMetadata(SERIALIZABLE_TYPES_KEY, instance);
 
-    (Object.keys(data) as Array<keyof InstanceType<T>>).forEach(
-      key => {
-        const keyType = keyTypes?.get(key) ||
-          Reflect.getMetadata('design:type', instance, key as string | symbol);
-        if (keyType?.prototype instanceof SerializableObject) {
-          instance[key] = keyType.create(data[key]);
-        } else {
-          instance[key] = data[key] as any;
+    (Object.keys(data) as Array<keyof InstanceType<T>>)
+      .forEach(
+        key => {
+          const keyType = keyTypes?.get(key) ||
+            Reflect.getMetadata('design:type', instance, key as string | symbol);
+          if (keyType?.prototype instanceof SerializableObject) {
+
+            if (Array.isArray(data[key])) {
+              instance[key] = (data[key] as Array<any>).map(item => keyType.create(item)) as any;
+            } else {
+              instance[key] = keyType.create(data[key]);
+            }
+          } else {
+            instance[key] = data[key] as any;
+          }
         }
-      }
-    )
+      )
 
     return instance;
 
@@ -66,15 +75,29 @@ export class SerializableObject {
 
           const extractor: Extractor | undefined = keys.get(key);
 
+          const objectData = extractor?.extract(data);
+
           if (keyType?.prototype instanceof SerializableObject) {
-            const objectData = extractor?.extract(data);
-            instance[key] = objectData && keyType.deserialize(objectData);
+            if (!objectData) {
+              /* null / undefined / 0 / '' / false */
+              instance[key] = objectData;
+            } else if (Array.isArray(objectData)) {
+              instance[key] = keyType.deserializeArray(objectData);
+            } else {
+              instance[key] = keyType.deserialize(objectData);
+            }
             return;
           } else if (typeof keyType === 'function') {
-            const objectData = extractor?.extract(data);
             const customKeyType = keyType(objectData);
             if (customKeyType?.prototype instanceof SerializableObject) {
-              instance[key] = objectData && customKeyType.deserialize(objectData);
+              if (!objectData) {
+                /* null / undefined / 0 / '' / false */
+                instance[key] = objectData;
+              } else if (Array.isArray(objectData)) {
+                instance[key] = customKeyType.deserializeArray(objectData);
+              } else {
+                instance[key] = customKeyType.deserialize(objectData);
+              }
               return;
             }
           }
@@ -93,7 +116,7 @@ export class SerializableObject {
     data: any[],
   ): InstanceType<T>[] {
     if (!Array.isArray(data)) {
-      return [];
+      throw new Error('Array data should be passed to deserializeArray method');
     }
     return data.map(data => this.deserialize(data));
   }
