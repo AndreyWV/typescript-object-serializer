@@ -41,7 +41,6 @@ export class SerializableObject {
           const keyType = keyTypes?.get(key) ||
             Reflect.getMetadata('design:type', instance, key as string | symbol);
           if (keyType?.prototype instanceof SerializableObject) {
-
             if (Array.isArray(data[key])) {
               instance[key] = (data[key] as Array<any>).map(item => keyType.create(item)) as any;
             } else {
@@ -70,39 +69,36 @@ export class SerializableObject {
       Array.from(keys.keys()).forEach(
         key => {
           const keyTypes: Map<keyof InstanceType<T>, any> = Reflect.getMetadata(SERIALIZABLE_TYPES_KEY, instance);
-          const keyType = keyTypes?.get(key) ||
+          const keyTypeFunctionOrConstructor = keyTypes?.get(key) ||
             Reflect.getMetadata('design:type', instance, key as string | symbol);
 
           const extractor: Extractor | undefined = keys.get(key);
 
           const objectData = extractor?.extract(data);
 
-          if (keyType?.prototype instanceof SerializableObject) {
-            if (!objectData) {
-              /* null / undefined / 0 / '' / false */
-              instance[key] = objectData;
-            } else if (Array.isArray(objectData)) {
-              instance[key] = keyType.deserializeArray(objectData);
-            } else {
-              instance[key] = keyType.deserialize(objectData);
-            }
+          if (!objectData) {
+            /* null / undefined / 0 / '' / false */
+            instance[key] = objectData;
             return;
-          } else if (typeof keyType === 'function') {
-            const customKeyType = keyType(objectData);
-            if (customKeyType?.prototype instanceof SerializableObject) {
-              if (!objectData) {
-                /* null / undefined / 0 / '' / false */
-                instance[key] = objectData;
-              } else if (Array.isArray(objectData)) {
-                instance[key] = customKeyType.deserializeArray(objectData);
-              } else {
-                instance[key] = customKeyType.deserialize(objectData);
-              }
-              return;
-            }
           }
 
-          instance[key] = extractor?.extract(data);
+          const keyType = keyTypeFunctionOrConstructor?.prototype instanceof SerializableObject ?
+            keyTypeFunctionOrConstructor :
+            typeof keyTypeFunctionOrConstructor === 'function' && keyTypeFunctionOrConstructor(objectData) instanceof SerializableObject ?
+              keyTypeFunctionOrConstructor(objectData) :
+              undefined;
+
+          if (!keyType) {
+            instance[key] = extractor?.extract(data);
+            return;
+          }
+
+          if (Array.isArray(objectData)) {
+            instance[key] = keyType.deserializeArray(objectData);
+            return;
+          }
+
+          instance[key] = keyType.deserialize(objectData);
         }
       )
     }
@@ -141,17 +137,23 @@ export class SerializableObject {
 
   public clone(): this {
 
-    const instance = (this.constructor as typeof SerializableObject).create();
-    Object.keys(this).forEach(
-      key => {
-        const value = this[key];
-        if (value instanceof SerializableObject) {
-          instance[key] = value.clone();
-        } else {
-          instance[key] = value;
-        }
-      },
-    );
+    const instance = (this.constructor as typeof SerializableObject).create() as this;
+
+    const cloneValue = (value: any): any => {
+      if (Array.isArray(value)) {
+        return value.map(v => cloneValue(v));
+      } else if (value instanceof SerializableObject) {
+        return value.clone();
+      }
+      return value;
+    }
+
+    const self = this;
+
+    (Object.keys(self) as Array<keyof this>)
+      .forEach(
+        key => instance[key] = cloneValue(self[key]),
+      );
 
     return instance as this;
 
