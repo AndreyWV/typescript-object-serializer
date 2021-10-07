@@ -95,6 +95,9 @@ class Data extends SerializableObject {
   @propertyType(A)
   data: A[];
 
+  @property()
+  testString: string = '123213131';
+
 }
 
 // const data = Data.create({
@@ -123,3 +126,7 @@ console.log(deserialized.data[0] instanceof A);
 const clone = deserialized.clone();
 console.log(clone.data[0] instanceof A);
 console.log(clone.data[0] === deserialized.data[0]);
+console.log(clone.serialize());
+
+const testInstance = Data.create();
+console.log(testInstance);

@@ -63,47 +63,54 @@ export class SerializableObject {
 
     const instance = new this() as InstanceType<T>;
 
-    const keys: Map<keyof InstanceType<T>, Extractor> = Reflect.getMetadata(SERIALIZABLE_PROPERTIES_KEY, instance);
+    const props: Map<keyof InstanceType<T>, Extractor> = Reflect.getMetadata(SERIALIZABLE_PROPERTIES_KEY, instance);
 
-    if (keys) {
-      Array.from(keys.keys()).forEach(
-        key => {
-          const keyTypes: Map<keyof InstanceType<T>, any> = Reflect.getMetadata(SERIALIZABLE_TYPES_KEY, instance);
-          const keyTypeFunctionOrConstructor = keyTypes?.get(key) ||
-            Reflect.getMetadata('design:type', instance, key as string | symbol);
-
-          const extractor: Extractor | undefined = keys.get(key);
-
-          const objectData = extractor?.extract(data);
-
-          if (!objectData) {
-            /* null / undefined / 0 / '' / false */
-            instance[key] = objectData;
-            return;
-          }
-
-          const keyType = keyTypeFunctionOrConstructor?.prototype instanceof SerializableObject ?
-            keyTypeFunctionOrConstructor :
-            typeof keyTypeFunctionOrConstructor === 'function' && keyTypeFunctionOrConstructor(objectData) instanceof SerializableObject ?
-              keyTypeFunctionOrConstructor(objectData) :
-              undefined;
-
-          if (!keyType) {
-            instance[key] = extractor?.extract(data);
-            return;
-          }
-
-          if (Array.isArray(objectData)) {
-            instance[key] = keyType.deserializeArray(objectData);
-            return;
-          }
-
-          instance[key] = keyType.deserialize(objectData);
-        }
-      )
+    if (!props) {
+      return instance;
     }
 
+    Array.from(props.keys()).forEach(
+      key => {
+        const keyTypes: Map<keyof InstanceType<T>, any> = Reflect.getMetadata(SERIALIZABLE_TYPES_KEY, instance);
+        const keyTypeFunctionOrConstructor = keyTypes?.get(key) ||
+          Reflect.getMetadata('design:type', instance, key as string | symbol);
+
+        const extractor: Extractor | undefined = props.get(key);
+
+        const objectData = extractor?.extract(data);
+
+        if (!objectData) {
+          /* If objectData === undefined than instance[key] should have default value from class description */
+          if (objectData !== undefined) {
+            /* null / 0 / '' / false */
+            instance[key] = objectData;
+          }
+
+          return;
+        }
+
+        const keyType = keyTypeFunctionOrConstructor?.prototype instanceof SerializableObject ?
+          keyTypeFunctionOrConstructor :
+          typeof keyTypeFunctionOrConstructor === 'function' && keyTypeFunctionOrConstructor(objectData) instanceof SerializableObject ?
+            keyTypeFunctionOrConstructor(objectData) :
+            undefined;
+
+        if (!keyType) {
+          instance[key] = extractor?.extract(data);
+          return;
+        }
+
+        if (Array.isArray(objectData)) {
+          instance[key] = keyType.deserializeArray(objectData);
+          return;
+        }
+
+        instance[key] = keyType.deserialize(objectData);
+      }
+    );
+
     return instance;
+
   }
 
 
