@@ -23,7 +23,8 @@
     },
     "include": [
         "src",
-        "playground"
+        "playground",
+        "spec"
     ],
     "exclude": [
         "node_modules"
