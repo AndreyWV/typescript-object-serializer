@@ -1,3 +1,4 @@
+import { propertyType } from '../src/decorators/property-type/type';
 import { property } from '../src/decorators/property/property';
 import { SerializableObject } from '../src/serializable-object';
 
@@ -115,8 +116,74 @@ describe('Instance create', () => {
       public nestedProperty: NestedProperty;
     }
 
-    describe('should create ', () => {
+    it('should create instance with deep declaration', () => {
+      const instance = Test.create({
+        nestedProperty: {
+          deepNestedProperty: {
+            test: 78,
+          },
+        },
+      });
 
+      expect(instance.nestedProperty.deepNestedProperty.test).toBe(78);
+      expect(instance.nestedProperty.deepNestedProperty).toBeInstanceOf(DeepNestedProperty);
+      expect(instance.nestedProperty).toBeInstanceOf(NestedProperty);
+    });
+
+    it('should create instance without property if property value not passed', () => {
+      const instance = Test.create({});
+      expect(instance.nestedProperty).toBeUndefined();
+    });
+
+    it('should create instance with default property value if value not passed', () => {
+      class Parent extends SerializableObject {
+        @property()
+        public test = Test.create();
+      }
+
+      const instance = Parent.create();
+      expect(instance.test).toBeInstanceOf(Test);
+    });
+
+    it('should create different instances of nested serializable property every time', () => {
+      class Parent extends SerializableObject {
+        @property()
+        public test = Test.create();
+      }
+
+      const instance1 = Parent.create();
+      const instance2 = Parent.create();
+      expect(instance1.test !== instance2.test);
+
+    });
+
+  });
+
+  describe('class with nested serializable array property', () => {
+    class ArrayItem extends SerializableObject {
+      @property()
+      public test: string;
+    }
+    class Test extends SerializableObject {
+      @property()
+      @propertyType(ArrayItem)
+      public array: ArrayItem[];
+    }
+
+    it('should create instance with serializable array property', () => {
+      const instance = Test.create({
+        array: [
+          {
+            test: '123',
+          },
+          {
+            test: '321',
+          },
+        ],
+      });
+      expect(instance.array.length).toBe(2);
+      expect(instance.array[0]).toBeInstanceOf(ArrayItem);
+      expect(instance.array[0].test).toBe('123');
     });
 
   });

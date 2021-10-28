@@ -12,6 +12,8 @@ type RecursivePartial<T> = {
 type RecursiveWithoutBase<T> = {
   [K in keyof T]: T[K] extends SerializableObject ?
   SerializableObjectWithoutBase<T[K]> :
+  T[K] extends Array<SerializableObject> ?
+  Array<SerializableObjectWithoutBase<T[K][number]>> :
   T[K];
 };
 
