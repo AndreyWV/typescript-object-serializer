@@ -31,6 +31,13 @@ describe('Deserialize', () => {
       expect(deserialized.stringProperty).toBe('test');
     });
 
+    it('should apply default value of property if it defined and value of serialized property is undefined', () => {
+      const deserialized = Test.deserialize({
+        stringProperty: undefined,
+      });
+      expect(deserialized.stringProperty).toBe('test');
+    });
+
     it('should apply null value of property if default value defined and value of serialized property passed as null', () => {
       const deserialized = Test.deserialize({
         stringProperty: null,
@@ -137,6 +144,29 @@ describe('Deserialize', () => {
         property: null,
       });
       expect(deserialized.property).toBe(null);
+    });
+
+  });
+
+  describe('array', () => {
+
+    class Test extends SerializableObject {
+      @property()
+      public property: string;
+    }
+
+    it('should deserialize array of serializable items', () => {
+      const deserialized = Test.deserializeArray([
+        {
+          property: 'test 1',
+        },
+        {
+          property: 'test 2',
+        },
+      ]);
+      expect(deserialized.length).toBe(2);
+      expect(deserialized[0]).toBeInstanceOf(Test);
+      expect(deserialized[0].property).toBe('test 1');
     });
 
   });

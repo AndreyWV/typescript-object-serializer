@@ -137,7 +137,9 @@ export class SerializableObject {
         const serializedValue = value instanceof SerializableObject ?
           value.serialize() :
           value;
-        extractor?.apply(data, serializedValue);
+        if (serializedValue !== undefined) {
+          extractor?.apply(data, serializedValue);
+        }
       },
     );
 
