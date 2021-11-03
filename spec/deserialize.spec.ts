@@ -12,6 +12,8 @@ describe('Deserialize', () => {
 
       @property()
       public numberProperty: number;
+
+      public nonSerializableProperty: string;
     }
 
     it('should deserialize data', () => {
@@ -43,6 +45,15 @@ describe('Deserialize', () => {
         stringProperty: null,
       });
       expect(deserialized.stringProperty).toBe(null);
+    });
+
+    it('should not deserialize non-serializable properties', () => {
+      const deserialized = Test.deserialize({
+        stringProperty: 'test',
+        numberProperty: 123,
+        nonSerializableProperty: 'aaa',
+      });
+      expect(deserialized.nonSerializableProperty).toBeUndefined();
     });
 
   });

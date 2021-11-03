@@ -12,6 +12,8 @@ describe('Serialize', () => {
 
       @property()
       public numberProperty: number | null;
+
+      public nonSerializableProperty: string;
     }
 
     it('should serialize data', () => {
@@ -45,6 +47,17 @@ describe('Serialize', () => {
       expect(serialized).toEqual({
         stringProperty: 'test',
       });
+    });
+
+    it('should not serialize non-serializable properties', () => {
+      const instance = Test.create({
+        numberProperty: undefined,
+        stringProperty: 'test',
+        nonSerializableProperty: 'aaa',
+      });
+      expect(instance.nonSerializableProperty).toBe('aaa');
+      const serialized = instance.serialize();
+      expect(serialized.nonSerializableProperty).toBeUndefined();
     });
 
   });

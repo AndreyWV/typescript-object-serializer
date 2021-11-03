@@ -30,7 +30,7 @@ export class SerializableObject {
     data: SerializableObjectData<T> = {},
   ): InstanceType<T> {
     if (data instanceof this) {
-      return this as InstanceType<T>;
+      return data.clone() as InstanceType<T>;
     }
 
     const instance = new this() as InstanceType<T>;

@@ -188,4 +188,36 @@ describe('Instance create', () => {
 
   });
 
+  describe('called with serializable class instance', () => {
+
+    class Property extends SerializableObject {
+      @property()
+      public deepProperty: string;
+    }
+
+    class Test extends SerializableObject {
+      @property()
+      public property: Property;
+    }
+
+    it('should return clone of instance', () => {
+
+      const instance1 = Test.create({
+        property: {
+          deepProperty: 'test',
+        },
+      });
+
+      const instance2 = Test.create(instance1);
+
+      expect(instance2).toBeInstanceOf(Test);
+      expect(instance2).not.toBe(instance1);
+      expect(instance2.property.deepProperty).toBe('test');
+      expect(instance2.property).toBeInstanceOf(Property);
+      expect(instance2.property).not.toBe(instance1.property);
+
+    });
+
+  });
+
 });
