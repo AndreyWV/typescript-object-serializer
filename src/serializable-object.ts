@@ -91,19 +91,31 @@ export class SerializableObject {
           return;
         }
 
+        if (Array.isArray(objectData)) {
+          if (keyTypeFunctionOrConstructor?.prototype instanceof SerializableObject) {
+            instance[key] = objectData.map(item => keyTypeFunctionOrConstructor.deserialize(item)) as any;
+          } else if (typeof keyTypeFunctionOrConstructor === 'function') {
+            instance[key] = objectData.map(item => {
+              const itemType = keyTypeFunctionOrConstructor(item);
+              if (!itemType || !(itemType?.prototype instanceof SerializableObject)) {
+                return item;
+              }
+              return itemType.deserialize(item);
+            }) as any;
+          } else {
+            instance[key] = objectData as any;
+          }
+          return;
+        }
+
         const keyType = keyTypeFunctionOrConstructor?.prototype instanceof SerializableObject ?
           keyTypeFunctionOrConstructor :
-          typeof keyTypeFunctionOrConstructor === 'function' && keyTypeFunctionOrConstructor(objectData) instanceof SerializableObject ?
+          typeof keyTypeFunctionOrConstructor === 'function' && keyTypeFunctionOrConstructor(objectData)?.prototype instanceof SerializableObject ?
             keyTypeFunctionOrConstructor(objectData) :
             undefined;
 
         if (!keyType) {
           instance[key] = extractor?.extract(data);
-          return;
-        }
-
-        if (Array.isArray(objectData)) {
-          instance[key] = keyType.deserializeArray(objectData);
           return;
         }
 
