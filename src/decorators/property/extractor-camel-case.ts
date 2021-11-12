@@ -1,6 +1,6 @@
 import { Extractor } from './extractor.base';
 
-export class ExtractorCamelCase extends Extractor {
+export class ExtractorCamelCase<T> extends Extractor<T> {
 
   private static camelCaseToSnakeCase(key: string): string {
     return key.replace(
@@ -18,7 +18,7 @@ export class ExtractorCamelCase extends Extractor {
     }
   }
 
-  public extract(data: any): any {
+  public extract(data: any): T | undefined {
     if (typeof data !== 'object' || data === null) {
       return data;
     }
@@ -26,11 +26,16 @@ export class ExtractorCamelCase extends Extractor {
       return;
     }
 
-    return data[ExtractorCamelCase.camelCaseToSnakeCase(this.key)];
+    const value = data[ExtractorCamelCase.camelCaseToSnakeCase(this.key)];
+
+    return this.transformOnDeserialize ?
+      this.transformOnDeserialize(value) :
+      value;
   }
 
-  public apply(applyObject: any, value: any): void {
-    console.log(ExtractorCamelCase.camelCaseToSnakeCase(this.key));
-    applyObject[ExtractorCamelCase.camelCaseToSnakeCase(this.key)] = value;
+  public apply(applyObject: any, value: T): void {
+    applyObject[ExtractorCamelCase.camelCaseToSnakeCase(this.key)] = this.transformOnSerialize ?
+      this.transformOnSerialize(value) :
+      value;
   }
 }
