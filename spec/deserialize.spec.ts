@@ -1,6 +1,9 @@
 import { propertyType } from '../src/decorators/property-type/type';
 import { property } from '../src/decorators/property/property';
-import { SerializableObject } from '../src/serializable-object';
+import {
+  NonArrayDataError,
+  SerializableObject,
+} from '../src/serializable-object';
 
 describe('Deserialize', () => {
 
@@ -96,7 +99,7 @@ describe('Deserialize', () => {
 
     it('should apply default value of property if it defined and value of serialized property not passed', () => {
       const deserialized = Test.deserialize({
-        nestedProperty: { }
+        nestedProperty: {}
       });
       expect(deserialized.nestedProperty.deepNestedPropertyWithDefaultValue).toBeInstanceOf(DeepNestedProperty);
       expect(deserialized.nestedProperty.deepNestedPropertyWithDefaultValue.property).toBe('default');
@@ -159,6 +162,30 @@ describe('Deserialize', () => {
 
   });
 
+  describe('class with nested array of non-serializable items property', () => {
+
+    class Test extends SerializableObject {
+      @property()
+      public property: any[];
+    }
+
+    it('should deserialize array data directly', () => {
+      const deserialized = Test.deserialize({
+        property: [
+          'test',
+          {
+            test: 2,
+          },
+        ],
+      });
+
+      expect(deserialized.property.length).toBe(2);
+      expect(deserialized.property[0]).toBe('test');
+      expect(deserialized.property[1].test).toBe(2);
+    });
+
+  });
+
   describe('array', () => {
 
     class Test extends SerializableObject {
@@ -178,6 +205,14 @@ describe('Deserialize', () => {
       expect(deserialized.length).toBe(2);
       expect(deserialized[0]).toBeInstanceOf(Test);
       expect(deserialized[0].property).toBe('test 1');
+    });
+
+    it('should throw error if passed non-array data', () => {
+
+      expect(() => {
+        return Test.deserializeArray({} as any);
+      }).toThrowError(NonArrayDataError);
+
     });
 
   });

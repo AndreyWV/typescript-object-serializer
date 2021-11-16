@@ -23,6 +23,12 @@ export type SerializableObjectWithoutBase<T extends Partial<SerializableObject>>
 type SerializableObjectData<T extends typeof SerializableObject, I = InstanceType<T>> =
   RecursivePartial<SerializableObjectWithoutBase<I>>;
 
+export class NonArrayDataError extends Error {
+  constructor() {
+    super('Array data should be passed to deserializeArray method');
+  }
+}
+
 export class SerializableObject {
 
   public static create<T extends typeof SerializableObject>(
@@ -133,7 +139,7 @@ export class SerializableObject {
     data: any[],
   ): InstanceType<T>[] {
     if (!Array.isArray(data)) {
-      throw new Error('Array data should be passed to deserializeArray method');
+      throw new NonArrayDataError();
     }
     return data.map(data => this.deserialize(data));
   }
