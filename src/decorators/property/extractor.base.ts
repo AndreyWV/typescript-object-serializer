@@ -1,17 +1,18 @@
+import { Constructor } from '../../base-types/constructor';
+
 export abstract class Extractor<T = any> {
 
-  public static transform<U, E extends typeof Extractor>(
+  public static transform<U, E extends Constructor<Extractor<U>>>(
     this: E,
     transformMethods: {
       onDeserialize?: (value: any) => U,
       onSerialize?: (value: U) => any,
     },
   ): E {
-    abstract class C extends this {
+    return class extends (this as any) {
       protected transformOnDeserialize = transformMethods.onDeserialize;
       protected transformOnSerialize = transformMethods.onSerialize;
-    };
-    return C;
+    } as any;
   }
 
   protected transformOnDeserialize?: (value: any) => T;

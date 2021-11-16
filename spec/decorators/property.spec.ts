@@ -1,4 +1,5 @@
-import { ExtractorCamelCase } from '../../src/decorators/property/extractor-camel-case';
+import { ExtractorCamelCase, NotStringPropertyKeyError } from '../../src/decorators/property/extractor-camel-case';
+import { ExtractorStraight } from '../../src/decorators/property/extractor-straight';
 import { property } from '../../src/decorators/property/property';
 import { SerializableObject } from '../../src/serializable-object';
 
@@ -30,7 +31,40 @@ describe('Decorator @property', () => {
       expect(deserialized.test).toBe('aaa');
 
     });
+  });
 
+  describe('with Straight Extractor', () => {
+
+    describe('with value transformation', () => {
+
+      class Test extends SerializableObject {
+        @property(ExtractorStraight.transform({
+          onDeserialize: (value: any) => value && Number(value),
+          onSerialize: (value: number) => value && String(value)
+        }))
+        public test: number;
+      }
+
+      it('should transform property on serialize', () => {
+
+        const instance = Test.create({
+          test: 123,
+        });
+
+        const serialized = instance.serialize();
+        expect(serialized.test).toBe('123');
+
+      });
+
+      it('should transform property on deserialize', () => {
+
+        const deserialized = Test.deserialize({
+          test: '123',
+        });
+        expect(deserialized.test).toBe(123);
+
+      });
+    });
   });
 
   describe('with extractor camelCase', () => {
@@ -62,6 +96,50 @@ describe('Decorator @property', () => {
       expect(deserialized.testProperty).toBe('aaa');
       expect(deserialized).not.toHaveProperty('test_property');
 
+    });
+
+    it('should throw error if property decorator assigned to non-string property key', () => {
+
+      const symbolKey = Symbol('property');
+
+      expect(() => {
+        class Test extends SerializableObject {
+          @property(ExtractorCamelCase)
+          public [symbolKey]: string;
+        }
+      }).toThrowError(new NotStringPropertyKeyError(symbolKey));
+
+    });
+
+    describe('with value transformation', () => {
+
+      class Test extends SerializableObject {
+        @property(ExtractorCamelCase.transform({
+          onDeserialize: (value: any) => value && Number(value),
+          onSerialize: (value: number) => value && String(value)
+        }))
+        public testProperty: number;
+      }
+
+      it('should transform property on serialize', () => {
+
+        const instance = Test.create({
+          testProperty: 123,
+        });
+
+        const serialized = instance.serialize();
+        expect(serialized.test_property).toBe('123');
+
+      });
+
+      it('should transform property on deserialize', () => {
+
+        const deserialized = Test.deserialize({
+          test_property: '123',
+        });
+        expect(deserialized.testProperty).toBe(123);
+
+      });
     });
 
   });

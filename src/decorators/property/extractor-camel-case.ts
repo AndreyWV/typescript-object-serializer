@@ -1,5 +1,13 @@
 import { Extractor } from './extractor.base';
 
+export class NotStringPropertyKeyError extends Error {
+  constructor(
+    propertyKey: any,
+  ) {
+    super(`ExtractorCamelCase should be used with object key type "string": ${String(propertyKey)}`);
+  }
+}
+
 export class ExtractorCamelCase<T> extends Extractor<T> {
 
   private static camelCaseToSnakeCase(key: string): string {
@@ -14,7 +22,7 @@ export class ExtractorCamelCase<T> extends Extractor<T> {
   ) {
     super(key);
     if (typeof key !== 'string') {
-      throw new Error('ExtractorCamelCase should be used with object key type `string`')
+      throw new NotStringPropertyKeyError(key);
     }
   }
 
