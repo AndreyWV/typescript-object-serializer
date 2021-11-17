@@ -34,16 +34,14 @@ export class ExtractorCamelCase<T> extends Extractor<T> {
       return;
     }
 
-    const value = data[ExtractorCamelCase.camelCaseToSnakeCase(this.key)];
-
-    return this.transformOnDeserialize ?
-      this.transformOnDeserialize(value) :
-      value;
+    return this.transformBeforeExtract(
+      data[ExtractorCamelCase.camelCaseToSnakeCase(this.key)],
+    );
   }
 
   public apply(applyObject: any, value: T): void {
-    applyObject[ExtractorCamelCase.camelCaseToSnakeCase(this.key)] = this.transformOnSerialize ?
-      this.transformOnSerialize(value) :
-      value;
+    applyObject[
+      ExtractorCamelCase.camelCaseToSnakeCase(this.key)
+    ] = this.transformBeforeApply(value);
   }
 }

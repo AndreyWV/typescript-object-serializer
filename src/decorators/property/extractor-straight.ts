@@ -8,14 +8,10 @@ export class ExtractorStraight<T> extends Extractor<T> {
     if (Array.isArray(data)) {
       return;
     }
-    return this.transformOnDeserialize ?
-      this.transformOnDeserialize(data[this.key]) :
-      data[this.key];
+    return this.transformBeforeExtract(data[this.key]);
   }
 
   public apply(applyObject: any, value: T): void {
-    applyObject[this.key] = this.transformOnSerialize ?
-      this.transformOnSerialize(value) :
-      value;
+    applyObject[this.key] = this.transformBeforeApply(value);
   }
 }
