@@ -1,6 +1,6 @@
 {
-    "name": "typescript-serialize-json",
-    "version": "0.0.0",
+    "name": "typescript-object-serializer",
+    "version": "0.0.1",
     "description": "Powerful Scalable JSON Serializer for Typescript",
     "scripts": {
         "build": "tsc --project prod.tsconfig.json",
