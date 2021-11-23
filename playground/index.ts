@@ -21,6 +21,7 @@ import { SerializableObject } from '../src/serializable-object';
     name: 'John',
     last_name: 'Doe',
   });
+
   console.log(person instanceof Person); // true
   console.log(person.name); // "John"
   console.log(person.lastName); // "Doe"
@@ -56,8 +57,8 @@ import { SerializableObject } from '../src/serializable-object';
       last_name: 'Doe',
     },
   });
-  console.log(employee.person.name); // "John"
-  console.log(employee.person.lastName); // "Doe"
+
+  console.log(employee.person); // Person { name: "John", lastName: "Doe" }
 })();
 
 // Handle arrays of data
@@ -109,6 +110,7 @@ import { SerializableObject } from '../src/serializable-object';
       },
     },
   ]);
+
   console.log(employees.length); // 2
   console.log(employees[0]); // Employee { id: 1, person: Person { name: "John", lastName: "Doe" } }
 
@@ -131,6 +133,7 @@ import { SerializableObject } from '../src/serializable-object';
       },
     ],
   });
+
   console.log(department); // Department { title: "Department title", employees [ Employee { id: 1, person: Person { name: "John", lastName: "Doe" } }, Employee { id: 2, person: Person { name: "Jane", lastName: "Doe" } } ] }
 })();
 
@@ -150,6 +153,7 @@ import { SerializableObject } from '../src/serializable-object';
     name: 'John',
     lastName: 'Doe',
   });
+
   console.log(person); // Person {name: "John", lastName: "Doe"}
 })();
 
@@ -169,6 +173,7 @@ import { SerializableObject } from '../src/serializable-object';
     name: 'John',
     last_name: 'Doe',
   });
+
   console.log(person); // Person {name: "John", lastName: "Doe"}
 })();
 
@@ -266,3 +271,98 @@ import { SerializableObject } from '../src/serializable-object';
 
 })();
 
+// Clone serializable object
+(() => {
+  class Person extends SerializableObject {
+
+    @property()
+    public lastName: string;
+
+    @property()
+    public firstName: string;
+
+  }
+
+  const person = Person.create({
+    firstName: 'John',
+    lastName: 'Doe',
+  });
+
+  const personClone = person.clone();
+
+  console.log(personClone); // Person { firstName: "John", lastName: "Doe" }
+  console.log(person === personClone); // false
+})();
+
+// Serialize serializable object
+(() => {
+  class Person extends SerializableObject {
+
+    @property(ExtractorCamelCase)
+    public lastName: string;
+
+    @property(ExtractorCamelCase)
+    public firstName: string;
+
+  }
+
+  const person = Person.create({
+    firstName: 'John',
+    lastName: 'Doe',
+  });
+
+  console.log(person.serialize()); // { first_name: "John", last_name: "Doe" }
+})();
+
+// Transform property value (wrong type)
+(() => {
+  class Person extends SerializableObject {
+
+    @property(ExtractorStraight.transform({
+      onDeserialize: value => Number(value),
+      onSerialize: value => String(value),
+    }))
+    public age: number;
+
+  }
+
+  const person = Person.deserialize({
+    age: '25',
+  });
+
+  console.log(person); // Person { age: 25 }
+  console.log(typeof person.age); // number;
+  console.log(person.serialize()); // { age: "25" }
+})();
+
+// Transform property value (class or any other type)
+(() => {
+
+  class DepartmentId {
+
+    constructor(
+      public value: string,
+    ) {
+    }
+
+    // Some DepartmentId logic
+
+  }
+
+  class Department extends SerializableObject {
+
+    @property(ExtractorStraight.transform({
+      onDeserialize: value => new DepartmentId(value),
+      onSerialize: (value: DepartmentId) => value?.value,
+    }))
+    public id: DepartmentId; // <- Non-serializable object type
+
+  }
+
+  const department = Department.deserialize({
+    id: '1',
+  });
+
+  console.log(department); // Department { id: DepartmentId { value: "1" } }
+  console.log(department.serialize()); // { id: "1" }
+})();

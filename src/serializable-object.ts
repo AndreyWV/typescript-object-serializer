@@ -114,11 +114,19 @@ export class SerializableObject {
           return;
         }
 
+        const getKeyTypeFromFunction = () => {
+          try {
+            const typeFromFunction = keyTypeFunctionOrConstructor(objectData);
+            if (typeFromFunction.prototype instanceof SerializableObject) {
+              return typeFromFunction;
+            }
+          } catch {
+          }
+        }
+
         const keyType = keyTypeFunctionOrConstructor?.prototype instanceof SerializableObject ?
           keyTypeFunctionOrConstructor :
-          typeof keyTypeFunctionOrConstructor === 'function' && keyTypeFunctionOrConstructor(objectData)?.prototype instanceof SerializableObject ?
-            keyTypeFunctionOrConstructor(objectData) :
-            undefined;
+          getKeyTypeFromFunction();
 
         if (!keyType) {
           instance[key] = extractor?.extract(data);

@@ -142,6 +142,49 @@ describe('Decorator @property', () => {
       });
     });
 
+    describe('with non-serializable class value transformation', () => {
+
+      class DepartmentId {
+        constructor(
+          public value: string,
+        ) {
+        }
+      }
+
+      class Department extends SerializableObject {
+
+        @property(ExtractorStraight.transform({
+          onDeserialize: value => new DepartmentId(value),
+          onSerialize: (value: DepartmentId) => value.value,
+        }))
+        public id: DepartmentId;
+
+      }
+
+      it('should transform property on serialize', () => {
+
+        const instance = Department.create({
+          id: new DepartmentId('123'),
+        });
+
+        const serialized = instance.serialize();
+        expect(serialized.id).toBe('123');
+
+      });
+
+      it('should transform property on deserialize', () => {
+
+        const deserialized = Department.deserialize({
+          id: '123',
+        });
+        expect(deserialized.id).toBeInstanceOf(DepartmentId);
+        expect(deserialized.id.value).toBe('123');
+
+      });
+    });
+
+
+
   });
 
 });
