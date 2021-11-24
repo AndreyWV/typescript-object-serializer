@@ -1,5 +1,5 @@
-import { ExtractorCamelCase } from '../src/decorators/property/extractor-camel-case';
-import { Extractor } from '../src/decorators/property/extractor.base';
+import { SnakeCaseExtractor } from '../src/decorators/property/snake-case-extractor';
+import { Extractor } from '../src/decorators/property/base-extractor';
 import { property } from '../src/decorators/property/property';
 import { SerializableObject } from '../src/serializable-object';
 
@@ -164,13 +164,13 @@ describe('Custom extractor', () => {
 
   describe('Only deserialize property', () => {
 
-    class OnlyDeserializeExtractorCamelCase<T> extends ExtractorCamelCase<T> {
+    class OnlyDeserializeSnakeCaseExtractor<T> extends SnakeCaseExtractor<T> {
       public apply(applyObject: any, value: T): void {
       }
     }
 
     class Test extends SerializableObject {
-      @property(OnlyDeserializeExtractorCamelCase)
+      @property(OnlyDeserializeSnakeCaseExtractor)
       public id: number;
     }
 

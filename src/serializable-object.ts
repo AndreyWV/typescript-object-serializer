@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { Extractor } from './decorators/property/extractor.base';
+import { Extractor } from './decorators/property/base-extractor';
 import {
   SERIALIZABLE_PROPERTIES_KEY,
   SERIALIZABLE_TYPES_KEY,

@@ -1,6 +1,6 @@
-import { Extractor } from './extractor.base';
+import { Extractor } from './base-extractor';
 
-export class ExtractorStraight<T> extends Extractor<T> {
+export class StraightExtractor<T> extends Extractor<T> {
   public extract(data: any): T | undefined {
     if (typeof data !== 'object' || data === null) {
       return data;

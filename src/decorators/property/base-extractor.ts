@@ -19,7 +19,7 @@ export abstract class Extractor<T = any> {
   protected transformOnSerialize?: (value: T) => any;
 
   constructor(
-    protected key: string | symbol,
+    protected key: string,
   ) {
   }
 

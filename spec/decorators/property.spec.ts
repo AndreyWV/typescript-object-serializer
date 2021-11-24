@@ -1,7 +1,8 @@
-import { ExtractorCamelCase, NotStringPropertyKeyError } from '../../src/decorators/property/extractor-camel-case';
-import { ExtractorStraight } from '../../src/decorators/property/extractor-straight';
+import { SnakeCaseExtractor, NotStringPropertyKeyError } from '../../src/decorators/property/snake-case-extractor';
+import { StraightExtractor } from '../../src/decorators/property/straight-extractor';
 import { property } from '../../src/decorators/property/property';
 import { SerializableObject } from '../../src/serializable-object';
+import { OverrideNameExtractor } from '../../src/decorators/property/override-name-extractor';
 
 describe('Decorator @property', () => {
 
@@ -38,7 +39,7 @@ describe('Decorator @property', () => {
     describe('with value transformation', () => {
 
       class Test extends SerializableObject {
-        @property(ExtractorStraight.transform({
+        @property(StraightExtractor.transform({
           onDeserialize: (value: any) => value && Number(value),
           onSerialize: (value: number) => value && String(value)
         }))
@@ -71,7 +72,7 @@ describe('Decorator @property', () => {
 
     class Test extends SerializableObject {
 
-      @property(ExtractorCamelCase)
+      @property(SnakeCaseExtractor)
       public testProperty: string;
 
     }
@@ -104,7 +105,7 @@ describe('Decorator @property', () => {
 
       expect(() => {
         class Test extends SerializableObject {
-          @property(ExtractorCamelCase)
+          @property(SnakeCaseExtractor)
           public [symbolKey]: string;
         }
       }).toThrowError(new NotStringPropertyKeyError(symbolKey));
@@ -114,7 +115,7 @@ describe('Decorator @property', () => {
     describe('with value transformation', () => {
 
       class Test extends SerializableObject {
-        @property(ExtractorCamelCase.transform({
+        @property(SnakeCaseExtractor.transform({
           onDeserialize: (value: any) => value && Number(value),
           onSerialize: (value: number) => value && String(value)
         }))
@@ -153,7 +154,7 @@ describe('Decorator @property', () => {
 
       class Department extends SerializableObject {
 
-        @property(ExtractorStraight.transform({
+        @property(StraightExtractor.transform({
           onDeserialize: value => new DepartmentId(value),
           onSerialize: (value: DepartmentId) => value.value,
         }))
@@ -183,7 +184,67 @@ describe('Decorator @property', () => {
       });
     });
 
+  });
 
+  describe('with extractor override-name', () => {
+
+    class Department extends SerializableObject {
+
+      @property(OverrideNameExtractor.use('department_id'))
+      public id: string;
+
+    }
+
+    it('should serialize property to passed name', () => {
+
+      const instance = Department.create({
+        id: '123',
+      });
+
+      const serialized = instance.serialize();
+      expect(serialized.department_id).toBe('123');
+
+    });
+
+    it('should deserialize property from passed name', () => {
+
+      const deserialized = Department.deserialize({
+        department_id: '123',
+      });
+      expect(deserialized.id).toBe('123');
+
+    });
+
+    describe('with value transformation', () => {
+
+      class Department extends SerializableObject {
+        @property(OverrideNameExtractor.use('department_id').transform({
+          onDeserialize: (value: any) => value && Number(value),
+          onSerialize: (value: number) => value && String(value)
+        }))
+        public id: number;
+      }
+
+      it('should transform property on serialize', () => {
+
+        const instance = Department.create({
+          id: 123,
+        });
+
+        const serialized = instance.serialize();
+        expect(serialized.department_id).toBe('123');
+
+      });
+
+      it('should transform property on deserialize', () => {
+
+        const deserialized = Department.deserialize({
+          department_id: '123',
+        });
+        expect(deserialized.id).toBe(123);
+
+      });
+    });
 
   });
 

@@ -1,16 +1,16 @@
-import { Extractor } from './extractor.base';
+import { Extractor } from './base-extractor';
 
 export class NotStringPropertyKeyError extends Error {
   constructor(
     propertyKey: any,
   ) {
-    super(`ExtractorCamelCase should be used with object key type "string": ${String(propertyKey)}`);
+    super(`SnakeCaseExtractor should be used with object key type "string": ${String(propertyKey)}`);
   }
 }
 
-export class ExtractorCamelCase<T> extends Extractor<T> {
+export class SnakeCaseExtractor<T> extends Extractor<T> {
 
-  private static camelCaseToSnakeCase(key: string): string {
+  protected static camelCaseToSnakeCase(key: string): string {
     return key.replace(
       /[A-Z\d]/g,
       letter => `_${letter.toLowerCase()}`,
@@ -35,13 +35,13 @@ export class ExtractorCamelCase<T> extends Extractor<T> {
     }
 
     return this.transformBeforeExtract(
-      data[ExtractorCamelCase.camelCaseToSnakeCase(this.key)],
+      data[SnakeCaseExtractor.camelCaseToSnakeCase(this.key)],
     );
   }
 
   public apply(applyObject: any, value: T): void {
     applyObject[
-      ExtractorCamelCase.camelCaseToSnakeCase(this.key)
+      SnakeCaseExtractor.camelCaseToSnakeCase(this.key)
     ] = this.transformBeforeApply(value);
   }
 }
