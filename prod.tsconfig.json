@@ -1,9 +1,14 @@
 {
     "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "sourceMap": false
+    },
     "include": [
         "src"
     ],
     "exclude": [
-        "playground"
+        "playground",
+        "node_modules",
+        "spec"
     ]
 }
