@@ -1,4 +1,3 @@
-import 'reflect-metadata';
 import { Extractor } from './decorators/property/base-extractor';
 import {
   SERIALIZABLE_PROPERTIES_KEY,
@@ -29,6 +28,9 @@ export class NonArrayDataError extends Error {
   }
 }
 
+/**
+ * SerializableObject - basic class for serializable descendants
+ */
 export class SerializableObject {
 
   public static create<T extends typeof SerializableObject>(
@@ -64,6 +66,11 @@ export class SerializableObject {
 
   }
 
+  /**
+   * @method deserialize Deserialize object to class
+   * @param data { any } Object of serialized data
+   * @returns Instance of current Serializable class
+   */
   public static deserialize<T extends typeof SerializableObject>(
     this: T,
     data: any,
@@ -141,7 +148,11 @@ export class SerializableObject {
 
   }
 
-
+  /**
+   * @method deserialize Deserialize array of objects
+   * @param data { Array } Array of serialized data
+   * @returns Array of current Serializable class items
+   */
   public static deserializeArray<T extends typeof SerializableObject>(
     this: T,
     data: any[],
@@ -152,6 +163,10 @@ export class SerializableObject {
     return data.map(data => this.deserialize(data));
   }
 
+  /**
+   * @method serialize Serialize current instance
+   * @returns { any } Object of serialized data
+   */
   public serialize(): any {
     const data = {};
 
@@ -172,6 +187,10 @@ export class SerializableObject {
     return data;
   }
 
+  /**
+   * @method clone Create same object as current (including deep serializable instances)
+   * @returns New instance of current instance class
+   */
   public clone(): this {
 
     const instance = (this.constructor as typeof SerializableObject).create() as this;

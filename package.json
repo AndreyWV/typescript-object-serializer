@@ -1,7 +1,7 @@
 {
     "name": "typescript-object-serializer",
     "version": "0.0.1",
-    "description": "Powerful Scalable JSON Serializer for Typescript",
+    "description": "Powerful Scalable Typescript object serializer",
     "scripts": {
         "build": "tsc --project prod.tsconfig.json",
         "test": "jest",
@@ -9,7 +9,8 @@
     },
     "keywords": [
         "typescript",
-        "json",
+        "class",
+        "object",
         "serialize",
         "api"
     ],

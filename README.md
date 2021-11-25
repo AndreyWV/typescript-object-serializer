@@ -599,3 +599,60 @@ console.log(person); // Person { lastName: "John", id: 123, age: 25, firstName:
 
 console.log(person.serialize()); // { id : 123, data: { person: {age: "25", last_name: "John", first_name: "Doe" } } }
 ```
+
+### Only deserializable property
+**Example 1**: Using custom extractor
+```typescript
+import {
+  SerializableObject,
+  property,
+  StraightExtractor,
+} from 'typescript-object-serializer';
+
+class OnlyDeserializeStraightExtractor<T> extends StraightExtractor<T> {
+  public apply(applyObject: any, value: T): void {
+  }
+}
+
+class Department extends SerializableObject {
+  @property(OnlyDeserializeStraightExtractor)
+  public id: number;
+
+  @property()
+  public title: string;
+}
+
+const department = Department.deserialize({
+  id: 123,
+  title: 'Department title',
+});
+console.log(department); // Department { id: 123, title: "Department title" }
+
+console.log(department.serialize()); // { title: "Department title" }
+```
+**Example 2**: Using custom transformation
+```typescript
+import {
+  SerializableObject,
+  property,
+  StraightExtractor,
+} from 'typescript-object-serializer';
+
+class Department extends SerializableObject {
+  @property(StraightExtractor.transform({
+    onSerialize: () => {},
+  }))
+  public id: number;
+
+  @property()
+  public title: string;
+}
+
+const department = Department.deserialize({
+  id: 123,
+  title: 'Department title',
+});
+console.log(department); // Department { id: 123, title: "Department title" }
+
+console.log(department.serialize()); // { title: "Department title" }
+```

@@ -1,5 +1,21 @@
 import { Constructor } from '../../base-types/constructor';
 
+/**
+ * @class Extractor
+ * @description Basic abstract class for declaring serialize/deserialize rules
+ * @example
+ *  class SomeExtractor<T = any> extends Extractor<T> {
+ *
+ *    public extract(data: any): T | undefined {
+ *      // Some extract logic
+ *    }
+ *
+ *    public apply(applyObject: any, value: T): void {
+ *      // Some apply logic
+ *    }
+ *
+ * }
+ */
 export abstract class Extractor<T = any> {
 
   public static transform<U, E extends Constructor<Extractor<U>>>(

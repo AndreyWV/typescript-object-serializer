@@ -1,9 +1,19 @@
-import 'reflect-metadata';
 import { Constructor } from '../../base-types/constructor';
 import { SERIALIZABLE_PROPERTIES_KEY } from '../../metadata-keys';
 import { StraightExtractor } from './straight-extractor';
 import { Extractor } from './base-extractor';
 
+/**
+ * @function property Declares serialize/deserialize rules for current property
+ * @param extractor { Extractor } Extractor that extracts data from serialized data and applies data to serialized data
+ * @example
+ * class SomeClass extends SerializableObject {
+ *
+ *   @property()
+ *   public id: string;
+ *
+ * }
+ */
 export function property(
   extractor: Constructor<Extractor> = StraightExtractor,
 ): PropertyDecorator {

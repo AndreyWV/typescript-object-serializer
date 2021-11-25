@@ -1,11 +1,10 @@
 import { propertyType } from '../src/decorators/property-type/type';
+import { Extractor } from '../src/decorators/property/base-extractor';
+import { OverrideNameExtractor } from '../src/decorators/property/override-name-extractor';
+import { property } from '../src/decorators/property/property';
 import { SnakeCaseExtractor } from '../src/decorators/property/snake-case-extractor';
 import { StraightExtractor } from '../src/decorators/property/straight-extractor';
-import { property } from '../src/decorators/property/property';
 import { SerializableObject } from '../src/serializable-object';
-import { Extractor } from '../src/decorators/property/base-extractor';
-import { Constructor } from '../src/base-types/constructor';
-import { OverrideNameExtractor } from '../src/decorators/property/override-name-extractor';
 
 // Basic usage
 (() => {
@@ -499,5 +498,54 @@ import { OverrideNameExtractor } from '../src/decorators/property/override-name-
   console.log(person); // Person { lastName: "John", id: 123, age: 25, firstName: "Doe" }
 
   console.log(person.serialize()); // { id : 123, data: { person: {age: "25", last_name: "John", first_name: "Doe" } } }
+
+})();
+
+// Only deserializable property by extractor
+(() => {
+
+  class OnlyDeserializeStraightExtractor<T> extends StraightExtractor<T> {
+    public apply(applyObject: any, value: T): void {
+    }
+  }
+
+  class Department extends SerializableObject {
+    @property(OnlyDeserializeStraightExtractor)
+    public id: number;
+
+    @property()
+    public title: string;
+  }
+
+  const department = Department.deserialize({
+    id: 123,
+    title: 'Department title',
+  });
+  console.log(department); // Department { id: 123, title: "Department title" }
+
+  console.log(department.serialize()); // { title: "Department title" }
+
+})();
+
+// Only deserializable property by transformation
+(() => {
+
+  class Department extends SerializableObject {
+    @property(StraightExtractor.transform({
+      onSerialize: () => {},
+    }))
+    public id: number;
+
+    @property()
+    public title: string;
+  }
+
+  const department = Department.deserialize({
+    id: 123,
+    title: 'Department title',
+  });
+  console.log(department); // Department { id: 123, title: "Department title" }
+
+  console.log(department.serialize()); // { title: "Department title" }
 
 })();

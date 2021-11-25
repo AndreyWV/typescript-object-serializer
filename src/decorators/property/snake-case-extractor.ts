@@ -8,6 +8,17 @@ export class NotStringPropertyKeyError extends Error {
   }
 }
 
+/**
+ * @class SnakeCaseExtractor
+ * @description Extract/apply property by transforming current property name to `snake_case`
+ * @example
+ * class SomeClass extends SerializableObject {
+ *
+ *   @property(SnakeCaseExtractor)
+ *   public id: string;
+ *
+ * }
+ */
 export class SnakeCaseExtractor<T> extends Extractor<T> {
 
   protected static camelCaseToSnakeCase(key: string): string {
