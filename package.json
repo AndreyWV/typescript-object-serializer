@@ -1,9 +1,9 @@
 {
     "name": "typescript-object-serializer",
-    "version": "0.0.1",
+    "version": "0.0.3",
     "description": "Powerful Scalable Typescript object serializer",
     "scripts": {
-        "build": "tsc --project prod.tsconfig.json",
+        "build": "parcel build src/index.ts && tsc --project prod.tsconfig.json --emitDeclarationOnly",
         "test": "jest",
         "playground": "parcel playground/index.html"
     },
@@ -14,6 +14,14 @@
         "serialize",
         "api"
     ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/AndreyWV/typescript-object-serializer.git"
+    },
+    "bugs": {
+        "url": "https://github.com/AndreyWV/typescript-object-serializer/issues"
+    },
+    "homepage": "https://github.com/AndreyWV/typescript-object-serializer",
     "author": "andrey.w.v@gmail.com",
     "license": "MIT",
     "devDependencies": {
@@ -34,5 +42,9 @@
     },
     "peerDependencies": {
         "reflect-metadata": "^0.1.13"
-    }
+    },
+    "source": "src/index.ts",
+    "main": "src/index.ts",
+    "module": "dist/index.js",
+    "types": "dist/index.d.ts"
 }

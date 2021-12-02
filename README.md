@@ -18,6 +18,11 @@ Required configure `tsconfig.json`:
 }
 ```
 
+install peer dependency `reflect-metadata`
+```sh
+npm install reflect-metadata
+```
+
 ## Usage
 ### Basic usage
 ```typescript
