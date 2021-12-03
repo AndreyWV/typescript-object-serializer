@@ -29,7 +29,7 @@ npm install reflect-metadata
 import {
   SerializableObject,
   property,
-  CamelCaseExtractor,
+  SnakeCaseExtractor,
 } from 'typescript-object-serializer';
 
 class Person extends SerializableObject {
@@ -37,7 +37,7 @@ class Person extends SerializableObject {
   @property()
   public name: string;
   
-  @property(CamelCaseExtractor)
+  @property(SnakeCaseExtractor)
   public lastName: string;
   
 }
@@ -57,7 +57,7 @@ console.log(person.serialize()) // { name: "John", last_name: "Doe" }
 import {
   SerializableObject,
   property,
-  CamelCaseExtractor,
+  SnakeCaseExtractor,
 } from 'typescript-object-serializer';
 
 class Person extends SerializableObject {
@@ -65,7 +65,7 @@ class Person extends SerializableObject {
   @property()
   public name: string;
   
-  @property(CamelCaseExtractor)
+  @property(SnakeCaseExtractor)
   public lastName: string;
   
 }
@@ -96,7 +96,7 @@ console.log(employee.person); // Person { name: "John", lastName: "Doe" }
 import {
   SerializableObject,
   property,
-  CamelCaseExtractor,
+  SnakeCaseExtractor,
   propertyType,
 } from 'typescript-object-serializer';
 
@@ -105,7 +105,7 @@ class Person extends SerializableObject {
   @property()
   public name: string;
   
-  @property(CamelCaseExtractor)
+  @property(SnakeCaseExtractor)
   public lastName: string;
   
 }
@@ -198,13 +198,13 @@ const person = Person.deserialize({
 });
 console.log(person); // Person {name: "John", lastName: "Doe"}
 ```
-#### CamelCaseExtractor
+#### SnakeCaseExtractor
 Extracts property by name transformed from `camelCase` to `snake_case`
 ```typescript
 import {
   SerializableObject,
   property,
-  CamelCaseExtractor,
+  SnakeCaseExtractor,
 } from 'typescript-object-serializer';
 
 class Person extends SerializableObject {
@@ -212,7 +212,7 @@ class Person extends SerializableObject {
   @property()
   public name: string;
   
-  @property(CamelCaseExtractor)
+  @property(SnakeCaseExtractor)
   public lastName: string;
   
 }
@@ -388,15 +388,15 @@ Serialize object and all nested serializable objects to simple javascript object
 import {
   SerializableObject,
   property,
-  CamelCaseExtractor,
+  SnakeCaseExtractor,
 } from 'typescript-object-serializer';
 
 class Person extends SerializableObject {
 
-  @property(CamelCaseExtractor)
+  @property(SnakeCaseExtractor)
   public lastName: string;
 
-  @property(CamelCaseExtractor)
+  @property(SnakeCaseExtractor)
   public firstName: string;
 
 }
@@ -477,16 +477,16 @@ console.log(department.serialize()); // { id: "1" }
 ## Advanced usage
 ### Custom extractor
 It is possible to develop your own extractor according to your needs
-**Example 1**: `PrivateCamelCaseExtractor`. Extracts `snake_case` property to `camelCase` property with leading `_`
+**Example 1**: `PrivateSnakeCaseExtractor`. Extracts `snake_case` property to `camelCase` property with leading `_`
 ```typescript
 import {
   SerializableObject,
   property,
-  CamelCaseExtractor,
+  SnakeCaseExtractor,
 } from 'typescript-object-serializer';
 
 /* Extract value from `snake_case` property to private camelCase property  */
-class PrivateCamelCaseExtractor<T> extends CamelCaseExtractor<T> {
+class PrivateSnakeCaseExtractor<T> extends SnakeCaseExtractor<T> {
   constructor(
     key: string,
   ) {
@@ -496,7 +496,7 @@ class PrivateCamelCaseExtractor<T> extends CamelCaseExtractor<T> {
 
 class Department extends SerializableObject {
 
-  @property(PrivateCamelCaseExtractor)
+  @property(PrivateSnakeCaseExtractor)
   private _departmentId: string;
 
 }
