@@ -28,16 +28,11 @@ export function propertyType<T extends typeof SerializableObject>(
 ): PropertyDecorator {
   return (target: any, propertyKey: string | symbol) => {
 
-    if (!Reflect.hasMetadata(SERIALIZABLE_TYPES_KEY, target)) {
-      Reflect.defineMetadata(
-        SERIALIZABLE_TYPES_KEY,
-        new Map<string | symbol, any>(),
-        target,
-      );
+    if (!target.constructor[SERIALIZABLE_TYPES_KEY]) {
+      target.constructor[SERIALIZABLE_TYPES_KEY] = new Map<string | symbol, any>();
     }
 
-    const typesStore: Map<string | symbol, any> =
-      Reflect.getMetadata(SERIALIZABLE_TYPES_KEY, target);
+    const typesStore: Map<string | symbol, any> = target.constructor[SERIALIZABLE_TYPES_KEY];
 
     typesStore.set(propertyKey, defineType);
 

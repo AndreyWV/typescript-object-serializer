@@ -1,7 +1,7 @@
-import 'reflect-metadata';
-export * from './metadata-keys';
+// import 'reflect-metadata';
+import './metadata-keys';
+import './base-types/constructor';
 export * from './serializable-object';
-export * from './base-types/constructor';
 export * from './decorators/property/base-extractor';
 export * from './decorators/property/override-name-extractor';
 export * from './decorators/property/property';

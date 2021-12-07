@@ -43,13 +43,16 @@ export class SerializableObject {
 
     const instance = new this() as InstanceType<T>;
 
-    const keyTypes: Map<keyof InstanceType<T>, any> = Reflect.getMetadata(SERIALIZABLE_TYPES_KEY, instance);
+    const keyTypes: Map<keyof InstanceType<T>, any> = (this as any)[SERIALIZABLE_TYPES_KEY];
 
     (Object.keys(data) as Array<keyof InstanceType<T>>)
       .forEach(
         key => {
           const keyType = keyTypes?.get(key) ||
-            Reflect.getMetadata('design:type', instance, key as string | symbol);
+            (
+              (Reflect as any).getMetadata &&
+              (Reflect as any).getMetadata('design:type', instance, key as string | symbol)
+            );
           if (keyType?.prototype instanceof SerializableObject) {
             if (Array.isArray(data[key])) {
               instance[key] = (data[key] as Array<any>).map(item => keyType.create(item)) as any;
@@ -78,7 +81,7 @@ export class SerializableObject {
 
     const instance = new this() as InstanceType<T>;
 
-    const props: Map<keyof InstanceType<T>, Extractor> = Reflect.getMetadata(SERIALIZABLE_PROPERTIES_KEY, instance);
+    const props: Map<keyof InstanceType<T>, Extractor> = (this as any)[SERIALIZABLE_PROPERTIES_KEY];
 
     if (!props) {
       return instance;
@@ -86,9 +89,12 @@ export class SerializableObject {
 
     Array.from(props.keys()).forEach(
       key => {
-        const keyTypes: Map<keyof InstanceType<T>, any> = Reflect.getMetadata(SERIALIZABLE_TYPES_KEY, instance);
+        const keyTypes: Map<keyof InstanceType<T>, any> = (this as any)[SERIALIZABLE_TYPES_KEY];
         const keyTypeFunctionOrConstructor = keyTypes?.get(key) ||
-          Reflect.getMetadata('design:type', instance, key as string | symbol);
+          (
+            (Reflect as any).getMetadata &&
+            (Reflect as any).getMetadata('design:type', instance, key as string | symbol)
+          );
 
         const extractor: Extractor | undefined = props.get(key);
 
@@ -170,7 +176,7 @@ export class SerializableObject {
   public serialize(): any {
     const data = {};
 
-    const keys: Map<keyof this, Extractor> = Reflect.getMetadata(SERIALIZABLE_PROPERTIES_KEY, this);
+    const keys: Map<keyof this, Extractor> = (this as any).constructor[SERIALIZABLE_PROPERTIES_KEY];
     Array.from(keys.keys()).forEach(
       key => {
         const extractor = keys.get(key);

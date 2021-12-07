@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import { propertyType } from '../src/decorators/property-type/type';
 import { Extractor } from '../src/decorators/property/base-extractor';
 import { OverrideNameExtractor } from '../src/decorators/property/override-name-extractor';
@@ -47,6 +48,7 @@ import { SerializableObject } from '../src/serializable-object';
     id: number;
 
     @property()
+    @propertyType(Person)
     public person: Person;
 
   }
@@ -60,6 +62,52 @@ import { SerializableObject } from '../src/serializable-object';
   });
 
   console.log(employee.person); // Person { name: "John", lastName: "Doe" }
+})();
+
+// Extend serializable class
+(() => {
+  class Person extends SerializableObject {
+    @property()
+    public name: string;
+  }
+
+  class Employee extends Person {
+    @property()
+    id: number;
+  }
+
+  const employee = Employee.deserialize({
+    id: 1,
+    name: 'John',
+  });
+
+  console.log(employee); // Employee { name: "John", id: 1 }
+})();
+
+// Auto-detect property types
+(() => {
+
+  class Person extends SerializableObject {
+    @property()
+    public name: string;
+  }
+
+  class Employee extends SerializableObject {
+    @property()
+    public id: number;
+
+    @property()
+    public person: Person; // <- Type will be extracted from property metadata
+  }
+
+  const employee = Employee.deserialize({
+    id: 1,
+    person: {
+      name: 'John',
+    },
+  });
+
+  console.log(employee); // Employee { id: 1, person: Person { name: 'John' } }
 })();
 
 // Handle arrays of data
@@ -80,6 +128,7 @@ import { SerializableObject } from '../src/serializable-object';
     id: number;
 
     @property()
+    @propertyType(Person)
     public person: Person;
 
   }
@@ -212,7 +261,7 @@ import { SerializableObject } from '../src/serializable-object';
     id: number;
 
     @property()
-    @propertyType(Person) // <- Not required since possible to detect type from property declaration
+    @propertyType(Person) // <- Not required if auto-detection types enabled
     public person: Person;
 
   }

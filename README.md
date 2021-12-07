@@ -5,22 +5,36 @@ Typescript library to convert javascript object to typescript class and vice ver
 ```sh
 npm install typescript-object-serializer
 ```
-
 Required configure `tsconfig.json`:
 ```json
 {
     "compilerOptions": {
         // ...
-        "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
         // ...
     }
 }
 ```
-
-install peer dependency `reflect-metadata`
+And it is ready to use!
+**If neccessarry enable auto-detection types of serializable properties:** - required additional configuration:
+1. Install `reflect-metadata` dependency:
 ```sh
 npm install reflect-metadata
+```
+2. Configure `tsconfig.json`:
+```json
+{
+    "compilerOptions": {
+        // ...
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        // ...
+    }
+}
+```
+3. Import `reflect-metadata` in `polyfills.ts` or in top of `index.ts` file
+```typescript
+import 'reflect-metadata';
 ```
 
 ## Usage
@@ -76,6 +90,7 @@ class Employee extends SerializableObject {
   id: number;
 
   @property()
+  @propertyType(Person)
   public person: Person;
 
 }
@@ -89,6 +104,61 @@ const employee = Employee.deserialize({
 });
 
 console.log(employee.person); // Person { name: "John", lastName: "Doe" }
+```
+
+### Extend serializable class
+```typescript
+import {
+  SerializableObject,
+  property,
+} from 'typescript-object-serializer';
+
+class Person extends SerializableObject {
+  @property()
+  public name: string;
+}
+
+class Employee extends Person {
+  @property()
+  id: number;
+}
+
+const employee = Employee.deserialize({
+  id: 1,
+  name: 'John',
+});
+
+console.log(employee); // Employee { name: "John", id: 1 }
+```
+
+### Auto-detect property types
+```typescript
+import {
+  SerializableObject,
+  property,
+} from 'typescript-object-serializer';
+
+class Person extends SerializableObject {
+  @property()
+  public name: string;
+}
+
+class Employee extends SerializableObject {
+  @property()
+  public id: number;
+
+  @property()
+  public person: Person; // <- Type will be extracted from property metadata
+}
+
+const employee = Employee.deserialize({
+  id: 1,
+  person: {
+    name: 'John',
+  },
+});
+
+console.log(employee); // Employee { id: 1, person: Person { name: 'John' } }
 ```
 
 ### Handle arrays of data
@@ -116,6 +186,7 @@ class Employee extends SerializableObject {
   id: number;
   
   @property()
+  @propertyType(Person)
   public person: Person;
   
 }
@@ -269,7 +340,7 @@ class Employee extends SerializableObject {
   id: number;
 
   @property()
-  @propertyType(Person) // <- Not required since possible to detect type from property declaration
+  @propertyType(Person) // <- Not required if auto-detection types enabled
   public person: Person;
 
 }

@@ -11,6 +11,7 @@ describe('Clone', () => {
 
   class Test extends SerializableObject {
     @property()
+    @propertyType(Property)
     public property: Property;
 
     @property()

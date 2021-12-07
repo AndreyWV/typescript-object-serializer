@@ -70,9 +70,11 @@ describe('Deserialize', () => {
 
     class NestedProperty extends SerializableObject {
       @property()
+      @propertyType(DeepNestedProperty)
       public deepNestedProperty: DeepNestedProperty;
 
       @property()
+      @propertyType(DeepNestedProperty)
       public deepNestedPropertyWithDefaultValue: DeepNestedProperty = DeepNestedProperty.create({
         property: 'default',
       });
@@ -80,6 +82,7 @@ describe('Deserialize', () => {
 
     class Test extends SerializableObject {
       @property()
+      @propertyType(NestedProperty)
       public nestedProperty: NestedProperty;
     }
 

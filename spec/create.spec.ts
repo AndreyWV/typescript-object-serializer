@@ -108,11 +108,13 @@ describe('Instance create', () => {
 
     class NestedProperty extends SerializableObject {
       @property()
+      @propertyType(DeepNestedProperty)
       public deepNestedProperty: DeepNestedProperty;
     }
 
     class Test extends SerializableObject {
       @property()
+      @propertyType(NestedProperty)
       public nestedProperty: NestedProperty;
     }
 
@@ -197,6 +199,7 @@ describe('Instance create', () => {
 
     class Test extends SerializableObject {
       @property()
+      @propertyType(Property)
       public property: Property;
     }
 
