@@ -1,12 +1,11 @@
+import { RecursivePartial } from './base-types/recursive-partial';
 import { Extractor } from './decorators/property/base-extractor';
 import {
   SERIALIZABLE_PROPERTIES_KEY,
   SERIALIZABLE_TYPES_KEY,
 } from './metadata-keys';
-
-type RecursivePartial<T> = {
-  [K in keyof T]?: RecursivePartial<T[K]>;
-}
+import { clone } from './methods/clone';
+import { create } from './methods/create';
 
 type RecursiveWithoutBase<T> = {
   [K in keyof T]: T[K] extends SerializableObject ?
@@ -33,40 +32,16 @@ export class NonArrayDataError extends Error {
  */
 export class SerializableObject {
 
+  /**
+   * @method create Create SerializableObject instance
+   * @param data Plain object structured as current class
+   * @returns Instance of current class
+   */
   public static create<T extends typeof SerializableObject>(
     this: T,
     data: SerializableObjectData<T> = {},
   ): InstanceType<T> {
-    if (data instanceof this) {
-      return data.clone() as InstanceType<T>;
-    }
-
-    const instance = new this() as InstanceType<T>;
-
-    const keyTypes: Map<keyof InstanceType<T>, any> = (this as any)[SERIALIZABLE_TYPES_KEY];
-
-    (Object.keys(data) as Array<keyof InstanceType<T>>)
-      .forEach(
-        key => {
-          const keyType = keyTypes?.get(key) ||
-            (
-              (Reflect as any).getMetadata &&
-              (Reflect as any).getMetadata('design:type', instance, key as string | symbol)
-            );
-          if (keyType?.prototype instanceof SerializableObject) {
-            if (Array.isArray(data[key])) {
-              instance[key] = (data[key] as Array<any>).map(item => keyType.create(item)) as any;
-            } else {
-              instance[key] = keyType.create(data[key]);
-            }
-          } else {
-            instance[key] = data[key] as any;
-          }
-        }
-      )
-
-    return instance;
-
+    return create(this as any, data);
   }
 
   /**
@@ -198,28 +173,6 @@ export class SerializableObject {
    * @returns New instance of current instance class
    */
   public clone(): this {
-
-    const instance = (this.constructor as typeof SerializableObject).create() as this;
-
-    const cloneValue = (value: any): any => {
-      if (Array.isArray(value)) {
-        return value.map(v => cloneValue(v));
-      } else if (value instanceof SerializableObject) {
-        return value.clone();
-      }
-      return value;
-    }
-
-    const self = this;
-
-    (Object.keys(self) as Array<keyof this>)
-      .forEach(
-        key => instance[key] = cloneValue(self[key]),
-      );
-
-    return instance as this;
-
+    return clone(this);
   }
 }
-
-
