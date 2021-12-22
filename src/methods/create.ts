@@ -1,10 +1,10 @@
-import { SerializableObjectWithoutBase } from '../serializable-object';
 import { Constructor } from '../base-types/constructor';
 import { RecursivePartial } from '../base-types/recursive-partial';
 import {
   SERIALIZABLE_PROPERTIES_KEY,
   SERIALIZABLE_TYPES_KEY,
 } from '../metadata-keys';
+import { SerializableObjectWithoutBase } from '../serializable-object';
 import { clone } from './clone';
 
 export function create<T>(
@@ -31,7 +31,7 @@ export function create<T>(
           if (Array.isArray(data[key])) {
             instance[key] = (data[key] as Array<any>).map(item => create(keyType, item)) as any;
           } else {
-            instance[key] = keyType.create(data[key]);
+            instance[key] = create(keyType, data[key] as any);
           }
         } else {
           instance[key] = data[key] as any;
