@@ -1,29 +1,57 @@
-import { property, SerializableObject } from '../src';
+import { property } from '../src/decorators/property/property';
+import { deserialize } from '../src/methods/deserialize';
+import { serialize } from '../src/methods/serialize';
+import { SerializableObject } from '../src/serializable-object';
 
 describe('Serializable class constructor', () => {
 
-  it('should extend serializable properties from parent', () => {
+  describe('should extend serializable properties from parent', () => {
 
-    class Person extends SerializableObject {
-      @property()
-      public name: string;
-    }
+    it('descendant of SerializableObject', () => {
+      class Person extends SerializableObject {
+        @property()
+        public name: string;
+      }
 
-    class User extends Person {
-      @property()
-      public id: number;
-    }
+      class User extends Person {
+        @property()
+        public id: number;
+      }
 
-    const user = User.deserialize({
-      name: 'John',
-      id: 1,
+      const user = User.deserialize({
+        name: 'John',
+        id: 1,
+      });
+
+      expect(user.name).toBe('John');
+
+      const serialized = user.serialize();
+
+      expect(serialized).toEqual({ name: 'John', id: 1 });
     });
 
-    expect(user.name).toBe('John');
+    it('simple class', () => {
+      class Person {
+        @property()
+        public name: string;
+      }
 
-    const serialized = user.serialize();
+      class User extends Person {
+        @property()
+        public id: number;
+      }
 
-    expect(serialized).toEqual({name: 'John', id: 1});
+      const user = deserialize(User, {
+        name: 'John',
+        id: 1,
+      });
+
+      expect(user.name).toBe('John');
+
+      const serialized = serialize(user);
+
+      expect(serialized).toEqual({ name: 'John', id: 1 });
+    });
 
   });
 
