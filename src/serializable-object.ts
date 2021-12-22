@@ -1,11 +1,8 @@
 import { RecursivePartial } from './base-types/recursive-partial';
-import { Extractor } from './decorators/property/base-extractor';
-import {
-  SERIALIZABLE_PROPERTIES_KEY,
-  SERIALIZABLE_TYPES_KEY,
-} from './metadata-keys';
 import { clone } from './methods/clone';
 import { create } from './methods/create';
+import { deserialize } from './methods/deserialize';
+import { serialize } from './methods/serialize';
 
 type RecursiveWithoutBase<T> = {
   [K in keyof T]: T[K] extends SerializableObject ?
@@ -54,78 +51,7 @@ export class SerializableObject {
     data: any,
   ): InstanceType<T> {
 
-    const instance = new this() as InstanceType<T>;
-
-    const props: Map<keyof InstanceType<T>, Extractor> = (this as any)[SERIALIZABLE_PROPERTIES_KEY];
-
-    if (!props) {
-      return instance;
-    }
-
-    Array.from(props.keys()).forEach(
-      key => {
-        const keyTypes: Map<keyof InstanceType<T>, any> = (this as any)[SERIALIZABLE_TYPES_KEY];
-        const keyTypeFunctionOrConstructor = keyTypes?.get(key) ||
-          (
-            (Reflect as any).getMetadata &&
-            (Reflect as any).getMetadata('design:type', instance, key as string | symbol)
-          );
-
-        const extractor: Extractor | undefined = props.get(key);
-
-        const objectData = extractor?.extract(data);
-
-        if (!objectData) {
-          /* If objectData === undefined than instance[key] should have default value from class description */
-          if (objectData !== undefined) {
-            /* null / 0 / '' / false */
-            instance[key] = objectData;
-          }
-
-          return;
-        }
-
-        if (Array.isArray(objectData)) {
-          if (keyTypeFunctionOrConstructor?.prototype instanceof SerializableObject) {
-            instance[key] = objectData.map(item => keyTypeFunctionOrConstructor.deserialize(item)) as any;
-          } else if (typeof keyTypeFunctionOrConstructor === 'function') {
-            instance[key] = objectData.map(item => {
-              const itemType = keyTypeFunctionOrConstructor(item);
-              if (!itemType || !(itemType?.prototype instanceof SerializableObject)) {
-                return item;
-              }
-              return itemType.deserialize(item);
-            }) as any;
-          } else {
-            instance[key] = objectData as any;
-          }
-          return;
-        }
-
-        const getKeyTypeFromFunction = () => {
-          try {
-            const typeFromFunction = keyTypeFunctionOrConstructor(objectData);
-            if (typeFromFunction.prototype instanceof SerializableObject) {
-              return typeFromFunction;
-            }
-          } catch {
-          }
-        }
-
-        const keyType = keyTypeFunctionOrConstructor?.prototype instanceof SerializableObject ?
-          keyTypeFunctionOrConstructor :
-          getKeyTypeFromFunction();
-
-        if (!keyType) {
-          instance[key] = extractor?.extract(data);
-          return;
-        }
-
-        instance[key] = keyType.deserialize(objectData);
-      }
-    );
-
-    return instance;
+    return deserialize(this, data) as InstanceType<T>;
 
   }
 
@@ -141,7 +67,7 @@ export class SerializableObject {
     if (!Array.isArray(data)) {
       throw new NonArrayDataError();
     }
-    return data.map(data => this.deserialize(data));
+    return data.map(data => deserialize(this, data)) as InstanceType<T>[];
   }
 
   /**
@@ -149,23 +75,9 @@ export class SerializableObject {
    * @returns { any } Object of serialized data
    */
   public serialize(): any {
-    const data = {};
 
-    const keys: Map<keyof this, Extractor> = (this as any).constructor[SERIALIZABLE_PROPERTIES_KEY];
-    Array.from(keys.keys()).forEach(
-      key => {
-        const extractor = keys.get(key);
-        const value = this[key];
-        const serializedValue = value instanceof SerializableObject ?
-          value.serialize() :
-          value;
-        if (serializedValue !== undefined) {
-          extractor?.apply(data, serializedValue);
-        }
-      },
-    );
+    return serialize(this);
 
-    return data;
   }
 
   /**
