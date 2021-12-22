@@ -416,4 +416,19 @@ describe('Deserialize', () => {
 
   });
 
+  it('should return basic class instance if passed not-serializable class constructor', () => {
+
+    class Test {
+      public property: string;
+    }
+
+    const instance = deserialize(Test, {
+      property: 'value',
+    });
+
+    expect(instance).toEqual(new Test());
+    expect(instance.property).toBeUndefined();
+
+  });
+
 });

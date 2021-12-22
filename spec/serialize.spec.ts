@@ -304,4 +304,18 @@ describe('Serialize', () => {
 
   });
 
+  it('should return empty object if object hasn\'t serializable properties', () => {
+
+    class Test {
+      public property: string;
+    }
+
+    const instance = create(Test, {
+      property: 'value',
+    });
+
+    expect(serialize(instance)).toEqual({});
+
+  });
+
 });
