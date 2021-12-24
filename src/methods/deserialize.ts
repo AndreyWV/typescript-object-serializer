@@ -7,7 +7,12 @@ import {
 } from '../metadata-keys';
 
 export function deserialize<T>(constructor: Constructor<T>, data: any): T {
-  const instance = new constructor();
+  let instance: T;
+  try {
+    instance = new constructor();
+  } catch {
+    return data;
+  }
 
   const props: Map<keyof T, Extractor> = (constructor as any)[SERIALIZABLE_PROPERTIES_KEY];
 
@@ -38,20 +43,28 @@ export function deserialize<T>(constructor: Constructor<T>, data: any): T {
         return;
       }
 
+      const isConstructor = (isConstructorSomething: any): boolean => {
+        if (typeof isConstructorSomething !== 'function') {
+          return false;
+        }
+        try {
+          keyTypeFunctionOrConstructor();
+          return false;
+        } catch {
+          return true;
+        }
+      }
+
       if (Array.isArray(objectData)) {
-        const isSerializableObject = keyTypeFunctionOrConstructor?.prototype instanceof SerializableObject ||
-          keyTypeFunctionOrConstructor?.[SERIALIZABLE_PROPERTIES_KEY];
-        if (isSerializableObject) {
+        if (isConstructor(keyTypeFunctionOrConstructor)) {
           instance[key] = objectData.map(item => deserialize(keyTypeFunctionOrConstructor, item)) as any;
         } else if (typeof keyTypeFunctionOrConstructor === 'function') {
           instance[key] = objectData.map(item => {
             const itemType = keyTypeFunctionOrConstructor(item);
-            const isSerializableItemType = itemType?.prototype instanceof SerializableObject ||
-              itemType?.[SERIALIZABLE_PROPERTIES_KEY];
-            if (!itemType || !(isSerializableItemType)) {
-              return item;
+            if (itemType !== undefined) {
+              return deserialize(itemType, item);
             }
-            return deserialize(itemType, item);
+            return item;
           }) as any;
         } else {
           instance[key] = objectData as any;
@@ -61,20 +74,12 @@ export function deserialize<T>(constructor: Constructor<T>, data: any): T {
 
       const getKeyTypeFromFunction = () => {
         try {
-          const typeFromFunction = keyTypeFunctionOrConstructor(objectData);
-          const isSerializableObject = typeFromFunction?.prototype instanceof SerializableObject ||
-            typeFromFunction?.[SERIALIZABLE_PROPERTIES_KEY];
-          if (isSerializableObject) {
-            return typeFromFunction;
-          }
+          return keyTypeFunctionOrConstructor(objectData);
         } catch {
         }
       }
 
-      const isSerializableKeyType = keyTypeFunctionOrConstructor?.prototype instanceof SerializableObject ||
-        keyTypeFunctionOrConstructor?.[SERIALIZABLE_PROPERTIES_KEY];
-
-      const keyType = isSerializableKeyType ?
+      const keyType = isConstructor(keyTypeFunctionOrConstructor) ?
         keyTypeFunctionOrConstructor :
         getKeyTypeFromFunction();
 
