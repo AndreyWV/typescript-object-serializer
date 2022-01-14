@@ -1,6 +1,11 @@
 import { SERIALIZABLE_PROPERTIES_KEY } from '../metadata-keys';
 import { create } from './create';
 
+/**
+ * @method clone Create same object as passed (including deep serializable instances)
+ * @param data Serializable class instance
+ * @returns New instance of passed object
+ */
 export function clone<T>(data: T): T {
   const instance = create((data as any).constructor) as T;
 

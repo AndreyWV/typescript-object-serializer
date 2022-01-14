@@ -1,6 +1,3 @@
-// import 'reflect-metadata';
-import './metadata-keys';
-import './base-types/constructor';
 export * from './serializable-object';
 export * from './decorators/property/base-extractor';
 export * from './decorators/property/override-name-extractor';

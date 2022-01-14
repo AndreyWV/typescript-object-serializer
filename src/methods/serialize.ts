@@ -2,6 +2,11 @@ import { Extractor } from '../decorators/property/base-extractor';
 import { SERIALIZABLE_PROPERTIES_KEY } from '../metadata-keys';
 import { SerializableObject } from '../serializable-object';
 
+/**
+ * @method serialize Serialize instance date
+ * @param object Serializable object instance
+ * @returns { any } Object of serialized data
+ */
 export function serialize<T extends Object>(object: T): any {
   const data = {};
 

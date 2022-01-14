@@ -1,15 +1,24 @@
 import 'reflect-metadata';
-import { propertyType } from '../src/decorators/property-type/type';
-import { Extractor } from '../src/decorators/property/base-extractor';
-import { OverrideNameExtractor } from '../src/decorators/property/override-name-extractor';
+import {
+  Extractor,
+  OverrideNameExtractor,
+  propertyType,
+  SerializableObject,
+  SnakeCaseExtractor,
+} from '../src';
 import { property } from '../src/decorators/property/property';
-import { SnakeCaseExtractor } from '../src/decorators/property/snake-case-extractor';
 import { StraightExtractor } from '../src/decorators/property/straight-extractor';
-import { SerializableObject } from '../src/serializable-object';
+import { clone } from '../src/methods/clone';
+import { create } from '../src/methods/create';
+import { deserialize } from '../src/methods/deserialize';
+import { serialize } from '../src/methods/serialize';
 
 // Basic usage
 (() => {
-  class Person extends SerializableObject {
+
+  console.log('Basic usage');
+
+  class Person {
 
     @property()
     public name: string;
@@ -19,7 +28,7 @@ import { SerializableObject } from '../src/serializable-object';
 
   }
 
-  const person = Person.deserialize({
+  const person = deserialize(Person, {
     name: 'John',
     last_name: 'Doe',
   });
@@ -27,12 +36,15 @@ import { SerializableObject } from '../src/serializable-object';
   console.log(person instanceof Person); // true
   console.log(person.name); // "John"
   console.log(person.lastName); // "Doe"
-  console.log(person.serialize()) // { name: "John", last_name: "Doe" }
+  console.log(serialize(person)) // { name: "John", last_name: "Doe" }
 })();
 
 // Deep serializable property
 (() => {
-  class Person extends SerializableObject {
+
+  console.log(' Deep serializable property');
+
+  class Person {
 
     @property()
     public name: string;
@@ -42,7 +54,7 @@ import { SerializableObject } from '../src/serializable-object';
 
   }
 
-  class Employee extends SerializableObject {
+  class Employee {
 
     @property()
     id: number;
@@ -53,7 +65,7 @@ import { SerializableObject } from '../src/serializable-object';
 
   }
 
-  const employee = Employee.deserialize({
+  const employee = deserialize(Employee, {
     id: 1,
     person: {
       name: 'John',
@@ -66,7 +78,10 @@ import { SerializableObject } from '../src/serializable-object';
 
 // Extend serializable class
 (() => {
-  class Person extends SerializableObject {
+
+  console.log('Extend serializable class');
+
+  class Person {
     @property()
     public name: string;
   }
@@ -76,7 +91,7 @@ import { SerializableObject } from '../src/serializable-object';
     id: number;
   }
 
-  const employee = Employee.deserialize({
+  const employee = deserialize(Employee, {
     id: 1,
     name: 'John',
   });
@@ -87,12 +102,14 @@ import { SerializableObject } from '../src/serializable-object';
 // Auto-detect property types
 (() => {
 
-  class Person extends SerializableObject {
+  console.log('Auto-detect property types');
+
+  class Person {
     @property()
     public name: string;
   }
 
-  class Employee extends SerializableObject {
+  class Employee {
     @property()
     public id: number;
 
@@ -100,7 +117,7 @@ import { SerializableObject } from '../src/serializable-object';
     public person: Person; // <- Type will be extracted from property metadata
   }
 
-  const employee = Employee.deserialize({
+  const employee = deserialize(Employee, {
     id: 1,
     person: {
       name: 'John',
@@ -112,7 +129,10 @@ import { SerializableObject } from '../src/serializable-object';
 
 // Handle arrays of data
 (() => {
-  class Person extends SerializableObject {
+
+  console.log('Handle arrays of data');
+
+  class Person {
 
     @property()
     public name: string;
@@ -122,7 +142,7 @@ import { SerializableObject } from '../src/serializable-object';
 
   }
 
-  class Employee extends SerializableObject {
+  class Employee {
 
     @property()
     id: number;
@@ -133,7 +153,7 @@ import { SerializableObject } from '../src/serializable-object';
 
   }
 
-  class Department extends SerializableObject {
+  class Department {
 
     @property()
     public title: string;
@@ -144,7 +164,7 @@ import { SerializableObject } from '../src/serializable-object';
 
   }
 
-  const employees = Employee.deserializeArray([
+  const employees = [
     {
       id: 1,
       person: {
@@ -159,12 +179,12 @@ import { SerializableObject } from '../src/serializable-object';
         last_name: 'Doe',
       },
     },
-  ]);
+  ].map(e => deserialize(Employee, e));
 
   console.log(employees.length); // 2
   console.log(employees[0]); // Employee { id: 1, person: Person { name: "John", lastName: "Doe" } }
 
-  const department = Department.deserialize({
+  const department = deserialize(Department, {
     title: 'Department title',
     employees: [
       {
@@ -189,7 +209,10 @@ import { SerializableObject } from '../src/serializable-object';
 
 // StraightExtractor [Default]
 (() => {
-  class Person extends SerializableObject {
+
+  console.log('StraightExtractor [Default]');
+
+  class Person {
 
     @property()
     public name: string;
@@ -199,7 +222,7 @@ import { SerializableObject } from '../src/serializable-object';
 
   }
 
-  const person = Person.deserialize({
+  const person = deserialize(Person, {
     name: 'John',
     lastName: 'Doe',
   });
@@ -209,7 +232,10 @@ import { SerializableObject } from '../src/serializable-object';
 
 // SnakeCaseExtractor
 (() => {
-  class Person extends SerializableObject {
+
+  console.log('SnakeCaseExtractor');
+
+  class Person {
 
     @property()
     public name: string;
@@ -219,7 +245,7 @@ import { SerializableObject } from '../src/serializable-object';
 
   }
 
-  const person = Person.deserialize({
+  const person = deserialize(Person, {
     name: 'John',
     last_name: 'Doe',
   });
@@ -229,14 +255,17 @@ import { SerializableObject } from '../src/serializable-object';
 
 // OverrideNameExtractor
 (() => {
-  class Department extends SerializableObject {
+
+  console.log('OverrideNameExtractor');
+
+  class Department {
 
     @property(OverrideNameExtractor.use('department_id'))
     public id: string;
 
   }
 
-  const department = Department.deserialize({
+  const department = deserialize(Department, {
     department_id: '123',
   });
 
@@ -245,7 +274,10 @@ import { SerializableObject } from '../src/serializable-object';
 
 // Property type basic
 (() => {
-  class Person extends SerializableObject {
+
+  console.log('Property type basic');
+
+  class Person {
 
     @property()
     public name: string;
@@ -255,7 +287,7 @@ import { SerializableObject } from '../src/serializable-object';
 
   }
 
-  class Employee extends SerializableObject {
+  class Employee {
 
     @property()
     id: number;
@@ -266,7 +298,7 @@ import { SerializableObject } from '../src/serializable-object';
 
   }
 
-  class Department extends SerializableObject {
+  class Department {
 
     @property()
     @propertyType(Employee) // <- Required because not possible to detect type from property declaration (property metadata seems like Array)
@@ -277,16 +309,19 @@ import { SerializableObject } from '../src/serializable-object';
 
 // Conditional property type
 (() => {
-  class SuccessResult extends SerializableObject {
+
+  console.log('Conditional property type');
+
+  class SuccessResult {
     @property()
     public data: any;
   }
-  class FailedResult extends SerializableObject {
+  class FailedResult {
     @property()
     public error: string;
   }
 
-  class Response extends SerializableObject {
+  class Response {
 
     @property()
     @propertyType(value => value?.is_success ? SuccessResult : FailedResult)
@@ -294,7 +329,7 @@ import { SerializableObject } from '../src/serializable-object';
 
   }
 
-  const response = Response.deserialize({
+  const response = deserialize(Response, {
     results: [
       {
         is_success: true,
@@ -316,7 +351,9 @@ import { SerializableObject } from '../src/serializable-object';
 // Create serializable object
 (() => {
 
-  class Person extends SerializableObject {
+  console.log('Create serializable object');
+
+  class Person {
 
     @property()
     public lastName: string;
@@ -326,10 +363,10 @@ import { SerializableObject } from '../src/serializable-object';
 
   }
 
-  const person = Person.create();
+  const person = create(Person);
   console.log(person); // Person { }
 
-  const personWithData = Person.create({
+  const personWithData = create(Person, {
     firstName: 'John',
     lastName: 'Doe',
   });
@@ -339,7 +376,10 @@ import { SerializableObject } from '../src/serializable-object';
 
 // Clone serializable object
 (() => {
-  class Person extends SerializableObject {
+
+  console.log('Clone serializable object');
+
+  class Person {
 
     @property()
     public lastName: string;
@@ -349,12 +389,12 @@ import { SerializableObject } from '../src/serializable-object';
 
   }
 
-  const person = Person.create({
+  const person = create(Person, {
     firstName: 'John',
     lastName: 'Doe',
   });
 
-  const personClone = person.clone();
+  const personClone = clone(person);
 
   console.log(personClone); // Person { firstName: "John", lastName: "Doe" }
   console.log(person === personClone); // false
@@ -362,7 +402,10 @@ import { SerializableObject } from '../src/serializable-object';
 
 // Serialize serializable object
 (() => {
-  class Person extends SerializableObject {
+
+  console.log('Serialize serializable object');
+
+  class Person {
 
     @property(SnakeCaseExtractor)
     public lastName: string;
@@ -372,17 +415,20 @@ import { SerializableObject } from '../src/serializable-object';
 
   }
 
-  const person = Person.create({
+  const person = create(Person, {
     firstName: 'John',
     lastName: 'Doe',
   });
 
-  console.log(person.serialize()); // { first_name: "John", last_name: "Doe" }
+  console.log(serialize(person)); // { first_name: "John", last_name: "Doe" }
 })();
 
-// Transform property value (wrong type)
+// Transform property value (type mismatch)
 (() => {
-  class Person extends SerializableObject {
+
+  console.log('Transform property value (type mismatch)');
+
+  class Person {
 
     @property(StraightExtractor.transform({
       onDeserialize: value => Number(value),
@@ -392,17 +438,19 @@ import { SerializableObject } from '../src/serializable-object';
 
   }
 
-  const person = Person.deserialize({
+  const person = deserialize(Person, {
     age: '25',
   });
 
   console.log(person); // Person { age: 25 }
   console.log(typeof person.age); // number;
-  console.log(person.serialize()); // { age: "25" }
+  console.log(serialize(person)); // { age: "25" }
 })();
 
 // Transform property value (class or any other type)
 (() => {
+
+  console.log('Transform property value (class or any other type)');
 
   class DepartmentId {
 
@@ -415,7 +463,7 @@ import { SerializableObject } from '../src/serializable-object';
 
   }
 
-  class Department extends SerializableObject {
+  class Department {
 
     @property(StraightExtractor.transform({
       onDeserialize: value => new DepartmentId(value),
@@ -425,16 +473,18 @@ import { SerializableObject } from '../src/serializable-object';
 
   }
 
-  const department = Department.deserialize({
+  const department = deserialize(Department, {
     id: '1',
   });
 
   console.log(department); // Department { id: DepartmentId { value: "1" } }
-  console.log(department.serialize()); // { id: "1" }
+  console.log(serialize(department)); // { id: "1" }
 })();
 
 // Custom extractor
 (() => {
+
+  console.log('Custom extractor');
 
   /* Extract value from `snake_case` property to "private" `camelCase` property  */
   class PrivateSnakeCaseExtractor<T> extends SnakeCaseExtractor<T> {
@@ -445,20 +495,20 @@ import { SerializableObject } from '../src/serializable-object';
     }
   }
 
-  class Department extends SerializableObject {
+  class Department {
 
     @property(PrivateSnakeCaseExtractor)
     private _departmentId: string;
 
   }
 
-  const department = Department.deserialize({
+  const department = deserialize(Department, {
     department_id: '123',
   });
 
   console.log(department); // Department { _departmentId: "123" }
 
-  /* Extract value from deep object */
+  /* Extract value from deep object (transform to plane object) */
   class DeepExtractor<T = any> extends Extractor<T> {
 
     public static byPath<C extends typeof DeepExtractor>(path: string): C {
@@ -514,7 +564,7 @@ import { SerializableObject } from '../src/serializable-object';
 
   }
 
-  class Person extends SerializableObject {
+  class Person {
 
     @property()
     public id: number;
@@ -533,7 +583,7 @@ import { SerializableObject } from '../src/serializable-object';
 
   }
 
-  const person = Person.deserialize({
+  const person = deserialize(Person, {
     id: 123,
     data: {
       person: {
@@ -546,19 +596,21 @@ import { SerializableObject } from '../src/serializable-object';
 
   console.log(person); // Person { lastName: "John", id: 123, age: 25, firstName: "Doe" }
 
-  console.log(person.serialize()); // { id : 123, data: { person: {age: "25", last_name: "John", first_name: "Doe" } } }
+  console.log(serialize(person)); // { id : 123, data: { person: {age: "25", last_name: "John", first_name: "Doe" } } }
 
 })();
 
 // Only deserializable property by extractor
 (() => {
 
+  console.log('Only deserializable property by extractor');
+
   class OnlyDeserializeStraightExtractor<T> extends StraightExtractor<T> {
     public apply(applyObject: any, value: T): void {
     }
   }
 
-  class Department extends SerializableObject {
+  class Department {
     @property(OnlyDeserializeStraightExtractor)
     public id: number;
 
@@ -566,20 +618,22 @@ import { SerializableObject } from '../src/serializable-object';
     public title: string;
   }
 
-  const department = Department.deserialize({
+  const department = deserialize(Department, {
     id: 123,
     title: 'Department title',
   });
   console.log(department); // Department { id: 123, title: "Department title" }
 
-  console.log(department.serialize()); // { title: "Department title" }
+  console.log(serialize(department)); // { title: "Department title" }
 
 })();
 
 // Only deserializable property by transformation
 (() => {
 
-  class Department extends SerializableObject {
+  console.log('Only deserializable property by transformation');
+
+  class Department {
     @property(StraightExtractor.transform({
       onSerialize: () => { },
     }))
@@ -589,12 +643,50 @@ import { SerializableObject } from '../src/serializable-object';
     public title: string;
   }
 
-  const department = Department.deserialize({
+  const department = deserialize(Department, {
     id: 123,
     title: 'Department title',
   });
   console.log(department); // Department { id: 123, title: "Department title" }
 
-  console.log(department.serialize()); // { title: "Department title" }
+  console.log(serialize(department)); // { title: "Department title" }
+
+})();
+
+// Syntactic sugar - SerializableObject class
+(() => {
+
+  console.log('Syntactic sugar - SerializableObject class');
+
+  class Item extends SerializableObject {
+    @property()
+    public id: number;
+    @property()
+    public title: string;
+  }
+
+  const items = Item.deserializeArray([
+    {
+      id: 1,
+      title: 'First item',
+    },
+    {
+      id: 2,
+      title: 'Second item',
+    },
+  ]);
+  console.log(items); // [ Item { id: 1, title: "First item" }, Item { id: 2, title: "Second item" } ]
+
+  const firstItem = items[0];
+  const firstItemClone = firstItem.clone();
+  console.log(firstItemClone); // Item { id: 1, title: "First item" }
+  console.log(firstItemClone === firstItem); // false
+  console.log(firstItemClone.serialize()); // { id: 1, title: 'First item' }
+
+  const newItem = Item.create({
+    id: 3,
+    title: 'New item',
+  });
+  console.log(newItem); // Item { id: 3, title: "New item" }
 
 })();

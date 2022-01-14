@@ -1,4 +1,3 @@
-import { SerializableObject } from '..';
 import { Constructor } from '../base-types/constructor';
 import { Extractor } from '../decorators/property/base-extractor';
 import {
@@ -6,6 +5,12 @@ import {
   SERIALIZABLE_TYPES_KEY,
 } from '../metadata-keys';
 
+/**
+ * @method deserialize Deserialize object to class
+ * @param constructor { Constructor<T> } Constructor of serializable class
+ * @param data { any } Object of serialized data
+ * @returns Instance of serializable class constructor
+ */
 export function deserialize<T>(constructor: Constructor<T>, data: any): T {
   let instance: T;
   try {
@@ -84,11 +89,16 @@ export function deserialize<T>(constructor: Constructor<T>, data: any): T {
         getKeyTypeFromFunction();
 
       if (!keyType) {
-        instance[key] = extractor?.extract(data);
+        instance[key] = objectData;
         return;
       }
 
-      instance[key] = deserialize(keyType, objectData);
+      if (keyType[SERIALIZABLE_PROPERTIES_KEY]) {
+        instance[key] = deserialize(keyType, objectData);
+      } else {
+        instance[key] = objectData;
+      }
+
     }
   );
 

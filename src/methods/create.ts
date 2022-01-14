@@ -7,6 +7,12 @@ import {
 import { SerializableObjectWithoutBase } from '../serializable-object';
 import { clone } from './clone';
 
+/**
+ * @function create Create Serializable class instance
+ * @param constructor Constructor of serializable class
+ * @param data Plain object structured as current class
+ * @returns Instance of serializable class constructor
+ */
 export function create<T>(
   constructor: Constructor<T>,
   data: RecursivePartial<SerializableObjectWithoutBase<T>> = {},
