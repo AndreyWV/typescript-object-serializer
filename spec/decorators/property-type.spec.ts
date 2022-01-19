@@ -12,8 +12,14 @@ describe('Decorator @propertyType', () => {
       public value: string;
     }
 
-    class SuccessResult extends SerializableObject { }
-    class FailedResult extends SerializableObject { }
+    class SuccessResult extends SerializableObject {
+      @property()
+      public data?: any;
+    }
+    class FailedResult extends SerializableObject {
+      @property()
+      public error?: string;
+    }
 
     class Test extends SerializableObject {
 
@@ -116,8 +122,14 @@ describe('Decorator @propertyType', () => {
       public value: string;
     }
 
-    class SuccessResult { }
-    class FailedResult { }
+    class SuccessResult {
+      @property()
+      public data?: any;
+    }
+    class FailedResult {
+      @property()
+      public error?: string;
+    }
 
     class Test {
 
