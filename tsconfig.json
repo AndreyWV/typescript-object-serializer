@@ -5,6 +5,7 @@
         "outDir": "./dist",
         "sourceMap": true,
         "moduleResolution": "node",
+        "module": "CommonJS",
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
         "declaration": true,
