@@ -1,6 +1,6 @@
 {
     "name": "typescript-object-serializer",
-    "version": "0.2.2",
+    "version": "0.2.3",
     "description": "Powerful Scalable Typescript object serializer",
     "scripts": {
         "build": "parcel build src/index.ts && tsc --project prod.tsconfig.json --emitDeclarationOnly",

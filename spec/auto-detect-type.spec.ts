@@ -10,6 +10,8 @@ describe('Property type auto-detection', () => {
   describe('descendant of SerializableObject', () => {
 
     class Property extends SerializableObject {
+      @property()
+      public data: any;
     }
 
     class Test extends SerializableObject {
@@ -33,6 +35,8 @@ describe('Property type auto-detection', () => {
   describe('simple class', () => {
 
     class Property {
+      @property()
+      public data: any;
     }
 
     class Test {
