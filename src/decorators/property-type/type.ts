@@ -1,5 +1,6 @@
-import { SerializableObject } from '../../serializable-object';
+import { Constructor } from '../../base-types/constructor';
 import { SERIALIZABLE_TYPES_KEY } from '../../metadata-keys';
+import { SerializableObject } from '../../serializable-object';
 
 /**
  * @function property Declares type for current property
@@ -23,8 +24,8 @@ import { SERIALIZABLE_TYPES_KEY } from '../../metadata-keys';
  *
  * }
  */
-export function propertyType<T extends typeof SerializableObject>(
-  defineType: T | ((data: any) => T | undefined),
+export function propertyType<T extends typeof SerializableObject, U = Constructor<any>>(
+  defineType: T | ((data: any) => T | undefined) | U | ((data: any) => U | undefined),
 ): PropertyDecorator {
   return (target: any, propertyKey: string | symbol) => {
 

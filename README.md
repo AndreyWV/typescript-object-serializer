@@ -16,7 +16,7 @@ Required configure `tsconfig.json`:
 }
 ```
 And it is ready to use!
-**If neccessarry enable auto-detection types of serializable properties:** - required additional configuration:
+**If necessary enable auto-detection types of serializable properties:** - required additional configuration:
 1. Install `reflect-metadata` dependency:
 ```sh
 npm install reflect-metadata
@@ -41,50 +41,52 @@ import 'reflect-metadata';
 ### Basic usage
 ```typescript
 import {
-  SerializableObject,
+  deserialize,
+  serialize,
   property,
   SnakeCaseExtractor,
 } from 'typescript-object-serializer';
 
-class Person extends SerializableObject {
+class Person {
 
   @property()
   public name: string;
-  
+
   @property(SnakeCaseExtractor)
   public lastName: string;
-  
+
 }
 
-const person = Person.deserialize({
+const person = deserialize(Person, {
   name: 'John',
   last_name: 'Doe',
 });
+
 console.log(person instanceof Person); // true
 console.log(person.name); // "John"
 console.log(person.lastName); // "Doe"
-console.log(person.serialize()) // { name: "John", last_name: "Doe" }
+console.log(serialize(person)) // { name: "John", last_name: "Doe" }
 ```
 
 ### Deep serializable property
 ```typescript
 import {
-  SerializableObject,
+  deserialize,
   property,
   SnakeCaseExtractor,
 } from 'typescript-object-serializer';
 
-class Person extends SerializableObject {
+class Person {
 
   @property()
   public name: string;
-  
+
   @property(SnakeCaseExtractor)
   public lastName: string;
-  
+
 }
 
-class Employee extends SerializableObject {
+class Employee {
 
   @property()
   id: number;
@@ -95,7 +97,7 @@ class Employee extends SerializableObject {
 
 }
 
-const employee = Employee.deserialize({
+const employee = deserialize(Employee, {
   id: 1,
   person: {
     name: 'John',
@@ -109,11 +111,11 @@ console.log(employee.person); // Person { name: "John", lastName: "Doe" }
 ### Extend serializable class
 ```typescript
 import {
-  SerializableObject,
+  deserialize,
   property,
 } from 'typescript-object-serializer';
 
-class Person extends SerializableObject {
+class Person {
   @property()
   public name: string;
 }
@@ -123,7 +125,7 @@ class Employee extends Person {
   id: number;
 }
 
-const employee = Employee.deserialize({
+const employee = deserialize(Employee, {
   id: 1,
   name: 'John',
 });
@@ -134,16 +136,16 @@ console.log(employee); // Employee { name: "John", id: 1 }
 ### Auto-detect property types
 ```typescript
 import {
-  SerializableObject,
+  deserialize,
   property,
 } from 'typescript-object-serializer';
 
-class Person extends SerializableObject {
+class Person {
   @property()
   public name: string;
 }
 
-class Employee extends SerializableObject {
+class Employee {
   @property()
   public id: number;
 
@@ -151,7 +153,7 @@ class Employee extends SerializableObject {
   public person: Person; // <- Type will be extracted from property metadata
 }
 
-const employee = Employee.deserialize({
+const employee = deserialize(Employee, {
   id: 1,
   person: {
     name: 'John',
@@ -164,45 +166,45 @@ console.log(employee); // Employee { id: 1, person: Person { name: 'John' } }
 ### Handle arrays of data
 ```typescript
 import {
-  SerializableObject,
+  deserialize,
   property,
   SnakeCaseExtractor,
   propertyType,
 } from 'typescript-object-serializer';
 
-class Person extends SerializableObject {
+class Person {
 
   @property()
   public name: string;
-  
+
   @property(SnakeCaseExtractor)
   public lastName: string;
-  
+
 }
 
-class Employee extends SerializableObject {
+class Employee {
 
   @property()
   id: number;
-  
+
   @property()
   @propertyType(Person)
   public person: Person;
-  
+
 }
 
-class Department extends SerializableObject {
+class Department {
 
   @property()
   public title: string;
-  
+
   @property()
   @propertyType(Employee)
   public employees: Employee[];
-  
+
 }
 
-const employees = Employee.deserializeArray([
+const employees = [
   {
     id: 1,
     person: {
@@ -217,11 +219,12 @@ const employees = Employee.deserializeArray([
       last_name: 'Doe',
     },
   },
-]);
+].map(e => deserialize(Employee, e));
+
 console.log(employees.length); // 2
 console.log(employees[0]); // Employee { id: 1, person: Person { name: "John", lastName: "Doe" } }
 
-const department = Department.deserialize({
+const department = deserialize(Department, {
   title: 'Department title',
   employees: [
     {
@@ -240,6 +243,7 @@ const department = Department.deserialize({
     },
   ],
 });
+
 console.log(department); // Department { title: "Department title", employees [ Employee { id: 1, person: Person { name: "John", lastName: "Doe" } }, Employee { id: 2, person: Person { name: "Jane", lastName: "Doe" } } ] }
 ```
 
@@ -248,69 +252,71 @@ console.log(department); // Department { title: "Department title", employees [ 
 Extracts property with same name
 ```typescript
 import {
-  SerializableObject,
+  deserialize,
   property,
   StraightExtractor,
 } from 'typescript-object-serializer';
 
-class Person extends SerializableObject {
+class Person {
 
   @property()
   public name: string;
-  
+
   @property(StraightExtractor) // Same as @property()
   public lastName: string;
-  
+
 }
 
-const person = Person.deserialize({
+const person = deserialize(Person, {
   name: 'John',
   lastName: 'Doe',
 });
-console.log(person); // Person {name: "John", lastName: "Doe"}
+
+console.log(person); // Person { name: "John", lastName: "Doe" }
 ```
 #### SnakeCaseExtractor
 Extracts property by name transformed from `camelCase` to `snake_case`
 ```typescript
 import {
-  SerializableObject,
+  deserialize,
   property,
   SnakeCaseExtractor,
 } from 'typescript-object-serializer';
 
-class Person extends SerializableObject {
+class Person {
 
   @property()
   public name: string;
-  
+
   @property(SnakeCaseExtractor)
   public lastName: string;
-  
+
 }
 
-const person = Person.deserialize({
+const person = deserialize(Person, {
   name: 'John',
   last_name: 'Doe',
 });
-console.log(person); // Person {name: "John", lastName: "Doe"}
+
+console.log(person); // Person { name: "John", lastName: "Doe" }
 ```
 #### OverrideNameExtractor
 Extracts property by name passed to `use` static method
 ```typescript
 import {
-  SerializableObject,
+  deserialize,
   property,
   OverrideNameExtractor,
 } from 'typescript-object-serializer';
 
-class Department extends SerializableObject {
+class Department {
 
   @property(OverrideNameExtractor.use('department_id'))
   public id: string;
 
 }
 
-const department = Department.deserialize({
+const department = deserialize(Department, {
   department_id: '123',
 });
 
@@ -322,19 +328,21 @@ Declares type for property. Required if not possible to detect type from propert
 #### Property type basic
 ```typescript
 import {
-  SerializableObject,
   property,
   propertyType,
 } from 'typescript-object-serializer';
 
-class Person extends SerializableObject {
+class Person {
 
   @property()
   public name: string;
 
+  @property(SnakeCaseExtractor)
+  public lastName: string;
+
 }
 
-class Employee extends SerializableObject {
+class Employee {
 
   @property()
   id: number;
@@ -345,7 +353,7 @@ class Employee extends SerializableObject {
 
 }
 
-class Department extends SerializableObject {
+class Department {
 
   @property()
   @propertyType(Employee) // <- Required because not possible to detect type from property declaration (property metadata seems like Array)
@@ -357,21 +365,21 @@ class Department extends SerializableObject {
 #### Conditional property type
 ```typescript
 import {
-  SerializableObject,
+  deserialize,
   property,
   propertyType,
 } from 'typescript-object-serializer';
 
-class SuccessResult extends SerializableObject {
+class SuccessResult {
   @property()
   public data: any;
 }
-class FailedResult extends SerializableObject {
+class FailedResult {
   @property()
   public error: string;
 }
 
-class Response extends SerializableObject {
+class Response {
 
   @property()
   @propertyType(value => value?.is_success ? SuccessResult : FailedResult)
@@ -379,7 +387,7 @@ class Response extends SerializableObject {
 
 }
 
-const response = Response.deserialize({
+const response = deserialize(Response, {
   results: [
     {
       is_success: true,
@@ -395,17 +403,17 @@ const response = Response.deserialize({
 });
 
 console.log(response.results[0]); // SuccessResult { data: { some_data: "data" } }
-console.log(response.results[1]); // FailedResult { error: "result error" } 
+console.log(response.results[1]); // FailedResult { error: "result error" }
 ```
 
 ### Create serializable object
 ```typescript
 import {
-  SerializableObject,
+  create,
   property,
 } from 'typescript-object-serializer';
 
-class Person extends SerializableObject {
+class Person {
 
   @property()
   public lastName: string;
@@ -415,10 +423,10 @@ class Person extends SerializableObject {
 
 }
 
-const person = Person.create();
+const person = create(Person);
 console.log(person); // Person { }
 
-const personWithData = Person.create({
+const personWithData = create(Person, {
   firstName: 'John',
   lastName: 'Doe',
 });
@@ -428,11 +436,12 @@ console.log(personWithData); // Person { firstName: "John", lastName: "Doe" }
 ### Clone serializable object
 ```typescript
 import {
-  SerializableObject,
+  create,
+  clone,
   property,
 } from 'typescript-object-serializer';
 
-class Person extends SerializableObject {
+class Person {
 
   @property()
   public lastName: string;
@@ -442,12 +451,12 @@ class Person extends SerializableObject {
 
 }
 
-const person = Person.create({
+const person = create(Person, {
   firstName: 'John',
   lastName: 'Doe',
 });
 
-const personClone = person.clone();
+const personClone = clone(person);
 
 console.log(personClone); // Person { firstName: "John", lastName: "Doe" }
 console.log(person === personClone); // false
@@ -457,12 +466,13 @@ console.log(person === personClone); // false
 Serialize object and all nested serializable objects to simple javascript object
 ```typescript
 import {
-  SerializableObject,
+  create,
+  serialize,
   property,
   SnakeCaseExtractor,
 } from 'typescript-object-serializer';
 
-class Person extends SerializableObject {
+class Person {
 
   @property(SnakeCaseExtractor)
   public lastName: string;
@@ -472,25 +482,26 @@ class Person extends SerializableObject {
 
 }
 
-const person = Person.create({
+const person = create(Person, {
   firstName: 'John',
   lastName: 'Doe',
 });
 
-console.log(person.serialize()); // { first_name: "John", last_name: "Doe" }
+console.log(serialize(person)); // { first_name: "John", last_name: "Doe" }
 ```
 
 ### Transform property value
 In case
-1. Property value has wrong type (`string` or `null` when expected `number`)
+1. Property value has type mismatch (`string` or `null` when expected `number`)
 ```typescript
 import {
-  SerializableObject,
+  deserialize,
+  serialize,
   property,
   StraightExtractor,
 } from 'typescript-object-serializer';
 
-class Person extends SerializableObject {
+class Person {
 
   @property(StraightExtractor.transform({
     onDeserialize: value => Number(value),
@@ -500,23 +511,24 @@ class Person extends SerializableObject {
 
 }
 
-const person = Person.deserialize({
+const person = deserialize(Person, {
   age: '25',
 });
 
 console.log(person); // Person { age: 25 }
 console.log(typeof person.age); // number;
-console.log(person.serialize()); // { age: "25" }
+console.log(serialize(person)); // { age: "25" }
 ```
 2. Need transform value to non-serializable and non-basic type
 ```typescript
 import {
-  SerializableObject,
+  serialize,
+  deserialize,
   property,
   StraightExtractor,
 } from 'typescript-object-serializer';
 
-class DepartmentId {
+ class DepartmentId {
 
   constructor(
     public value: string,
@@ -527,22 +539,22 @@ class DepartmentId {
 
 }
 
-class Department extends SerializableObject {
+class Department {
 
   @property(StraightExtractor.transform({
     onDeserialize: value => new DepartmentId(value),
     onSerialize: (value: DepartmentId) => value?.value,
   }))
-  public id: DepartmentId;  // <- Non-serializable object type
+  public id: DepartmentId; // <- Non-serializable object type
 
 }
 
-const department = Department.deserialize({
+const department = deserialize(Department, {
   id: '1',
 });
 
 console.log(department); // Department { id: DepartmentId { value: "1" } }
-console.log(department.serialize()); // { id: "1" }
+console.log(serialize(department)); // { id: "1" }
 ```
 
 ## Advanced usage
@@ -551,12 +563,12 @@ It is possible to develop your own extractor according to your needs
 **Example 1**: `PrivateSnakeCaseExtractor`. Extracts `snake_case` property to `camelCase` property with leading `_`
 ```typescript
 import {
-  SerializableObject,
+  deserialize,
   property,
   SnakeCaseExtractor,
 } from 'typescript-object-serializer';
 
-/* Extract value from `snake_case` property to private camelCase property  */
+/* Extract value from `snake_case` property to "private" `camelCase` property  */
 class PrivateSnakeCaseExtractor<T> extends SnakeCaseExtractor<T> {
   constructor(
     key: string,
@@ -565,14 +577,14 @@ class PrivateSnakeCaseExtractor<T> extends SnakeCaseExtractor<T> {
   }
 }
 
-class Department extends SerializableObject {
+class Department {
 
   @property(PrivateSnakeCaseExtractor)
   private _departmentId: string;
 
 }
 
-const department = Department.deserialize({
+const department = deserialize(Department, {
   department_id: '123',
 });
 
@@ -581,11 +593,13 @@ console.log(department); // Department { _departmentId: "123" }
 **Example 2**: `DeepExtractor`. Extracts value from deep object
 ```typescript
 import {
-  SerializableObject,
+  deserialize,
+  serialize,
   property,
   Extractor,
 } from 'typescript-object-serializer';
 
+/* Extract value from deep object (transform to plane object) */
 class DeepExtractor<T = any> extends Extractor<T> {
 
   public static byPath<C extends typeof DeepExtractor>(path: string): C {
@@ -641,7 +655,7 @@ class DeepExtractor<T = any> extends Extractor<T> {
 
 }
 
-class Person extends SerializableObject {
+class Person {
 
   @property()
   public id: number;
@@ -660,7 +674,7 @@ class Person extends SerializableObject {
 
 }
 
-const person = Person.deserialize({
+const person = deserialize(Person, {
   id: 123,
   data: {
     person: {
@@ -673,14 +687,15 @@ const person = Person.deserialize({
 
 console.log(person); // Person { lastName: "John", id: 123, age: 25, firstName: "Doe" }
 
-console.log(person.serialize()); // { id : 123, data: { person: {age: "25", last_name: "John", first_name: "Doe" } } }
+console.log(serialize(person)); // { id : 123, data: { person: {age: "25", last_name: "John", first_name: "Doe" } } }
 ```
 
 ### Only deserializable property
 **Example 1**: Using custom extractor
 ```typescript
 import {
-  SerializableObject,
+  deserialize,
+  serialize,
   property,
   StraightExtractor,
 } from 'typescript-object-serializer';
@@ -690,7 +705,7 @@ class OnlyDeserializeStraightExtractor<T> extends StraightExtractor<T> {
   }
 }
 
-class Department extends SerializableObject {
+class Department {
   @property(OnlyDeserializeStraightExtractor)
   public id: number;
 
@@ -698,25 +713,26 @@ class Department extends SerializableObject {
   public title: string;
 }
 
-const department = Department.deserialize({
+const department = deserialize(Department, {
   id: 123,
   title: 'Department title',
 });
 console.log(department); // Department { id: 123, title: "Department title" }
 
-console.log(department.serialize()); // { title: "Department title" }
+console.log(serialize(department)); // { title: "Department title" }
 ```
 **Example 2**: Using custom transformation
 ```typescript
 import {
-  SerializableObject,
+  deserialize,
+  serialize,
   property,
   StraightExtractor,
 } from 'typescript-object-serializer';
 
-class Department extends SerializableObject {
+class Department {
   @property(StraightExtractor.transform({
-    onSerialize: () => {},
+    onSerialize: () => { },
   }))
   public id: number;
 
@@ -724,11 +740,51 @@ class Department extends SerializableObject {
   public title: string;
 }
 
-const department = Department.deserialize({
+const department = deserialize(Department, {
   id: 123,
   title: 'Department title',
 });
 console.log(department); // Department { id: 123, title: "Department title" }
 
-console.log(department.serialize()); // { title: "Department title" }
+console.log(serialize(department)); // { title: "Department title" }
+```
+
+# Syntactic sugar: `SerializableObject`
+Class `SerializebleObject` for easy access to serializer methods like `serialize`, `deserialize`, `create`, `clone`, `deserializeArray`. it makes possible to import `'typescript-object-serializer'` only at class declaration file but not to import it where serialization/deserialization used.
+```typescript
+import {
+  SerializableObject,
+  property,
+} from 'typescript-object-serializer';
+
+class Item extends SerializableObject {
+  @property()
+  public id: number;
+  @property()
+  public title: string;
+}
+
+const items = Item.deserializeArray([
+  {
+    id: 1,
+    title: 'First item',
+  },
+  {
+    id: 2,
+    title: 'Second item',
+  },
+]);
+console.log(items); // [ Item { id: 1, title: "First item" }, Item { id: 2, title: "Second item" } ]
+
+const firstItem = items[0];
+const firstItemClone = firstItem.clone();
+console.log(firstItemClone); // Item { id: 1, title: "First item" }
+console.log(firstItemClone === firstItem); // false
+console.log(firstItemClone.serialize()); // { id: 1, title: 'First item' }
+
+const newItem = Item.create({
+  id: 3,
+  title: 'New item',
+});
+console.log(newItem); // Item { id: 3, title: "New item" }
 ```

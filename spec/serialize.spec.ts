@@ -1,150 +1,320 @@
 import { propertyType } from '../src/decorators/property-type/type';
 import { property } from '../src/decorators/property/property';
+import { create } from '../src/methods/create';
+import { serialize } from '../src/methods/serialize';
 import { SerializableObject } from '../src/serializable-object';
 
 describe('Serialize', () => {
 
-  describe('simple class', () => {
+  describe('class without nested serializable properties', () => {
 
-    class Test extends SerializableObject {
-      @property()
-      public stringProperty: string;
+    describe('class descendant of SerializableObject', () => {
 
-      @property()
-      public numberProperty: number | null;
+      class Test extends SerializableObject {
+        @property()
+        public stringProperty: string;
 
-      public nonSerializableProperty: string;
-    }
+        @property()
+        public numberProperty: number | null;
 
-    it('should serialize data', () => {
+        public nonSerializableProperty: string;
+      }
 
-      const instance = Test.create({
-        numberProperty: 5,
-        stringProperty: 'value',
+      it('should serialize data', () => {
+
+        const instance = Test.create({
+          numberProperty: 5,
+          stringProperty: 'value',
+        });
+        const serialized = instance.serialize();
+        expect(serialized).toEqual({
+          numberProperty: 5,
+          stringProperty: 'value',
+        });
+
       });
-      const serialized = instance.serialize();
-      expect(serialized).toEqual({
-        numberProperty: 5,
-        stringProperty: 'value',
+
+      it('should serialize null value of serializable property', () => {
+        const instance = Test.create({
+          numberProperty: null,
+        });
+        const serialized = instance.serialize();
+        expect(serialized.numberProperty).toBeNull();
       });
 
+      it('should not apply property to serializable object if property is undefined', () => {
+        const instance = Test.create({
+          numberProperty: undefined,
+          stringProperty: 'test',
+        });
+        const serialized = instance.serialize();
+        expect(serialized).toEqual({
+          stringProperty: 'test',
+        });
+      });
+
+      it('should not serialize non-serializable properties', () => {
+        const instance = Test.create({
+          numberProperty: undefined,
+          stringProperty: 'test',
+          nonSerializableProperty: 'aaa',
+        });
+        expect(instance.nonSerializableProperty).toBe('aaa');
+        const serialized = instance.serialize();
+        expect(serialized.nonSerializableProperty).toBeUndefined();
+      });
     });
 
-    it('should serialize null value of serializable property', () => {
-      const instance = Test.create({
-        numberProperty: null,
-      });
-      const serialized = instance.serialize();
-      expect(serialized.numberProperty).toBeNull();
-    });
+    describe('simple class', () => {
 
-    it('should not apply property to serializable object if property is undefined', () => {
-      const instance = Test.create({
-        numberProperty: undefined,
-        stringProperty: 'test',
-      });
-      const serialized = instance.serialize();
-      expect(serialized).toEqual({
-        stringProperty: 'test',
-      });
-    });
+      class Test {
+        @property()
+        public stringProperty: string;
 
-    it('should not serialize non-serializable properties', () => {
-      const instance = Test.create({
-        numberProperty: undefined,
-        stringProperty: 'test',
-        nonSerializableProperty: 'aaa',
+        @property()
+        public numberProperty: number | null;
+
+        public nonSerializableProperty: string;
+      }
+
+      it('should serialize data', () => {
+
+        const instance = create(Test, {
+          numberProperty: 5,
+          stringProperty: 'value',
+        });
+        const serialized = serialize(instance);
+        expect(serialized).toEqual({
+          numberProperty: 5,
+          stringProperty: 'value',
+        });
+
       });
-      expect(instance.nonSerializableProperty).toBe('aaa');
-      const serialized = instance.serialize();
-      expect(serialized.nonSerializableProperty).toBeUndefined();
+
+      it('should serialize null value of serializable property', () => {
+        const instance = create(Test, {
+          numberProperty: null,
+        });
+        const serialized = serialize(instance);
+        expect(serialized.numberProperty).toBeNull();
+      });
+
+      it('should not apply property to serializable object if property is undefined', () => {
+        const instance = create(Test, {
+          numberProperty: undefined,
+          stringProperty: 'test',
+        });
+        const serialized = serialize(instance);
+        expect(serialized).toEqual({
+          stringProperty: 'test',
+        });
+      });
+
+      it('should not serialize non-serializable properties', () => {
+        const instance = create(Test, {
+          numberProperty: undefined,
+          stringProperty: 'test',
+          nonSerializableProperty: 'aaa',
+        });
+        expect(instance.nonSerializableProperty).toBe('aaa');
+        const serialized = serialize(instance);
+        expect(serialized.nonSerializableProperty).toBeUndefined();
+      });
     });
 
   });
 
   describe('class with nested serializable property', () => {
 
-    class DeepNestedProperty extends SerializableObject {
-      @property()
-      public property: string;
-    }
+    describe('class descendant of SerializableObject', () => {
 
-    class NestedProperty extends SerializableObject {
-      @property()
-      public deepNestedProperty: DeepNestedProperty;
-    }
+      class DeepNestedProperty extends SerializableObject {
+        @property()
+        public property: string;
+      }
 
-    class Test extends SerializableObject {
-      @property()
-      public nestedProperty: NestedProperty;
-    }
+      class NestedProperty extends SerializableObject {
+        @property()
+        public deepNestedProperty: DeepNestedProperty;
+      }
 
-    it('should serialize data', () => {
-      const instance = Test.create({
-        nestedProperty: {
-          deepNestedProperty: {
-            property: 'test',
+      class Test extends SerializableObject {
+        @property()
+        public nestedProperty: NestedProperty;
+      }
+
+      it('should serialize data', () => {
+        const instance = Test.create({
+          nestedProperty: {
+            deepNestedProperty: {
+              property: 'test',
+            },
           },
-        },
+        });
+
+        const serialized = instance.serialize();
+        expect(serialized).toEqual({
+          nestedProperty: {
+            deepNestedProperty: {
+              property: 'test',
+            },
+          },
+        });
       });
 
-      const serialized = instance.serialize();
-      expect(serialized).toEqual({
-        nestedProperty: {
-          deepNestedProperty: {
-            property: 'test',
+    });
+
+    describe('simple class', () => {
+
+      class DeepNestedProperty {
+        @property()
+        public property: string;
+      }
+
+      class NestedProperty {
+        @property()
+        public deepNestedProperty: DeepNestedProperty;
+      }
+
+      class Test {
+        @property()
+        public nestedProperty: NestedProperty;
+      }
+
+      it('should serialize data', () => {
+        const instance = create(Test, {
+          nestedProperty: {
+            deepNestedProperty: {
+              property: 'test',
+            },
           },
-        },
+        });
+
+        const serialized = serialize(instance);
+        expect(serialized).toEqual({
+          nestedProperty: {
+            deepNestedProperty: {
+              property: 'test',
+            },
+          },
+        });
       });
+
     });
 
   });
 
   describe('class with nested array of serializable items property', () => {
 
-    class ArrayItem extends SerializableObject {
-      @property()
-      public value: number;
-    }
+    describe('class descendant of SerializableObject', () => {
 
-    const defaultArray: ArrayItem[] = [];
+      class ArrayItem extends SerializableObject {
+        @property()
+        public value: number;
+      }
 
-    class Test extends SerializableObject {
-      @property()
-      @propertyType(ArrayItem)
-      public property: ArrayItem[] = defaultArray;
-    }
+      const defaultArray: ArrayItem[] = [];
 
-    describe('should serialize data', () => {
-      const instance = Test.create({
-        property: [
-          {
-            value: 1,
-          },
-          {
-            value: 3,
-          },
-          {
-            value: 5,
-          },
-        ],
+      class Test extends SerializableObject {
+        @property()
+        @propertyType(ArrayItem)
+        public property: ArrayItem[] = defaultArray;
+      }
+
+      describe('should serialize data', () => {
+        const instance = Test.create({
+          property: [
+            {
+              value: 1,
+            },
+            {
+              value: 3,
+            },
+            {
+              value: 5,
+            },
+          ],
+        });
+
+        const serialized = instance.serialize();
+        expect(serialized).toEqual({
+          property: [
+            {
+              value: 1,
+            },
+            {
+              value: 3,
+            },
+            {
+              value: 5,
+            },
+          ],
+        });
       });
 
-      const serialized = instance.serialize();
-      expect(serialized).toEqual({
-        property: [
-          {
-            value: 1,
-          },
-          {
-            value: 3,
-          },
-          {
-            value: 5,
-          },
-        ],
-      });
     });
+
+    describe('simple class', () => {
+
+      class ArrayItem {
+        @property()
+        public value: number;
+      }
+
+      const defaultArray: ArrayItem[] = [];
+
+      class Test {
+        @property()
+        @propertyType(ArrayItem)
+        public property: ArrayItem[] = defaultArray;
+      }
+
+      describe('should serialize data', () => {
+        const instance = create(Test, {
+          property: [
+            {
+              value: 1,
+            },
+            {
+              value: 3,
+            },
+            {
+              value: 5,
+            },
+          ],
+        });
+
+        const serialized = serialize(instance);
+        expect(serialized).toEqual({
+          property: [
+            {
+              value: 1,
+            },
+            {
+              value: 3,
+            },
+            {
+              value: 5,
+            },
+          ],
+        });
+      });
+
+    });
+
+  });
+
+  it('should return empty object if object hasn\'t serializable properties', () => {
+
+    class Test {
+      public property: string;
+    }
+
+    const instance = create(Test, {
+      property: 'value',
+    });
+
+    expect(serialize(instance)).toEqual({});
 
   });
 
