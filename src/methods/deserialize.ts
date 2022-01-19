@@ -53,7 +53,7 @@ export function deserialize<T>(constructor: Constructor<T>, data: any): T {
           return false;
         }
         try {
-          keyTypeFunctionOrConstructor();
+          isConstructorSomething();
           return false;
         } catch {
           return true;
@@ -96,7 +96,11 @@ export function deserialize<T>(constructor: Constructor<T>, data: any): T {
       if (keyType[SERIALIZABLE_PROPERTIES_KEY]) {
         instance[key] = deserialize(keyType, objectData);
       } else {
-        instance[key] = objectData;
+        if (isConstructor(keyType)) {
+          instance[key] = new keyType();
+        } else {
+          instance[key] = objectData;
+        }
       }
 
     }
