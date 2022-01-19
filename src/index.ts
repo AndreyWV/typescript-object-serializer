@@ -5,3 +5,7 @@ export * from './decorators/property/property';
 export * from './decorators/property/snake-case-extractor';
 export * from './decorators/property/straight-extractor';
 export * from './decorators/property-type/type';
+export * from './methods/clone';
+export * from './methods/create';
+export * from './methods/deserialize';
+export * from './methods/serialize';
