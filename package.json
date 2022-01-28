@@ -3,9 +3,9 @@
     "version": "0.2.3",
     "description": "Powerful Scalable Typescript object serializer",
     "scripts": {
-        "build": "parcel build src/index.ts && tsc --project prod.tsconfig.json --emitDeclarationOnly",
+        "build": "webpack",
         "test": "jest",
-        "playground": "parcel playground/index.html"
+        "playground": "webpack serve ./playground.webpack.config.js"
     },
     "keywords": [
         "typescript",
@@ -25,20 +25,18 @@
     "author": "andrey.w.v@gmail.com",
     "license": "MIT",
     "devDependencies": {
-        "@babel/core": "^7.15.0",
-        "@babel/plugin-proposal-class-properties": "^7.14.5",
-        "@babel/plugin-proposal-decorators": "^7.14.5",
-        "@babel/preset-env": "^7.15.0",
-        "@babel/preset-typescript": "^7.15.0",
-        "@parcel/source-map": "^2.0.0-rc.7",
         "@types/jest": "^27.0.1",
-        "babel-jest": "^27.0.6",
+        "html-webpack-plugin": "^5.5.0",
         "jest": "^27.0.6",
-        "parcel-bundler": "^1.12.5",
+        "path-browserify": "^1.0.1",
         "reflect-metadata": "^0.1.13",
         "ts-jest": "^27.0.7",
+        "ts-loader": "^9.2.6",
         "ts-node": "^10.2.1",
-        "typescript": "^4.3.5"
+        "typescript": "^4.3.5",
+        "webpack": "^5.67.0",
+        "webpack-cli": "^4.9.2",
+        "webpack-dev-server": "^4.7.3"
     },
     "source": "src/index.ts",
     "main": "src/index.ts",
