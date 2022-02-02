@@ -5,7 +5,7 @@
     "scripts": {
         "build": "webpack",
         "test": "jest",
-        "playground": "webpack serve ./playground.webpack.config.js"
+        "playground": "webpack serve -c ./playground-webpack.config.js"
     },
     "keywords": [
         "typescript",
