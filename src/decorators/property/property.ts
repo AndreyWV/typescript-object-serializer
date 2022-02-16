@@ -1,8 +1,8 @@
 import { Constructor } from '../../base-types/constructor';
 import { SERIALIZABLE_PROPERTIES_KEY } from '../../metadata-keys';
-import { StraightExtractor } from './straight-extractor';
+import { getConstructorPropertyName } from '../../utils/get-constructor-property-name';
 import { Extractor } from './base-extractor';
-import { SerializableObject } from '../..';
+import { StraightExtractor } from './straight-extractor';
 
 /**
  * @function property Declares serialize/deserialize rules for current property
@@ -17,16 +17,31 @@ import { SerializableObject } from '../..';
  */
 export function property(
   extractor: Constructor<Extractor> = StraightExtractor,
-): PropertyDecorator {
-  return (target: any, propertyKey: string | symbol) => {
+)/* : PropertyDecorator | ParameterDecorator */ {
+  return (target: any, propertyKey: string | symbol, index?: number) => {
 
-    if (!target.constructor[SERIALIZABLE_PROPERTIES_KEY]) {
-      target.constructor[SERIALIZABLE_PROPERTIES_KEY] =
+    let ctor;
+
+    if (propertyKey === undefined && target['prototype'] && index !== undefined) {
+      const extractedPropertyKey = getConstructorPropertyName(target['prototype'].constructor, index as number);
+      if (!extractedPropertyKey) {
+        return;
+      }
+      propertyKey = extractedPropertyKey;
+      ctor = target['prototype'].constructor;
+    }
+
+    if (!ctor) {
+      ctor = target.constructor;
+    }
+
+    if (!ctor[SERIALIZABLE_PROPERTIES_KEY]) {
+      ctor[SERIALIZABLE_PROPERTIES_KEY] =
         new Map<string | symbol, Extractor>();
     }
 
     const keysStore: Map<string | symbol, Extractor> =
-      target.constructor[SERIALIZABLE_PROPERTIES_KEY];
+      ctor[SERIALIZABLE_PROPERTIES_KEY];
 
     keysStore.set(propertyKey, new extractor(propertyKey));
 

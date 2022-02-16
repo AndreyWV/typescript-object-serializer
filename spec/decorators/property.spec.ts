@@ -1,3 +1,4 @@
+import { propertyType } from '../../src';
 import { OverrideNameExtractor } from '../../src/decorators/property/override-name-extractor';
 import { property } from '../../src/decorators/property/property';
 import {
@@ -502,6 +503,42 @@ describe('Decorator @property', () => {
 
     });
 
+  });
+
+  describe('should handle property as constructor argument', () => {
+    class Test {
+      constructor(
+        @property(SnakeCaseExtractor)
+        public someValue: string,
+      ) {
+      }
+    }
+
+    class TestParent {
+      constructor(
+        @property(SnakeCaseExtractor)
+        @propertyType(Test)
+        public testProperty: Test,
+      ) {
+      }
+    }
+
+    const deserialized = deserialize(TestParent, {
+      test_property: {
+        some_value: 'value',
+      },
+    });
+
+    expect(deserialized).toBeInstanceOf(TestParent);
+    expect(deserialized.testProperty).toBeInstanceOf(Test);
+    expect(deserialized.testProperty.someValue).toBe('value');
+
+    const serialized = serialize(deserialized);
+    expect(serialized).toMatchObject({
+      test_property: {
+        some_value: 'value',
+      },
+    });
   });
 
 });
