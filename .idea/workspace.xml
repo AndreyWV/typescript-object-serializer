@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="418907b2-6062-403b-800c-1b5e0746256b" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/playground/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/playground/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/spec/serialize.spec.ts" beforeDir="false" afterPath="$PROJECT_DIR$/spec/serialize.spec.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/methods/serialize.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/methods/serialize.ts" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectId" id="268paczpf4V0R2v3KQYMlrj483k" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="nodejs.jest.jest_package" value="" />
+    <property name="nodejs_package_manager_path" value="npm" />
+    <property name="ts.external.directory.path" value="C:\Users\79811\WebstormProjects\typescript-object-serializer\node_modules\typescript\lib" />
+    <property name="vue.rearranger.settings.migration" value="true" />
+  </component>
+  <component name="RunManager" selected="npm.test">
+    <configuration name="Serialize" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
+      <node-interpreter value="project" />
+      <node-options value="" />
+      <jest-package value="" />
+      <working-dir value="$PROJECT_DIR$" />
+      <envs />
+      <scope-kind value="SUITE" />
+      <test-file value="$PROJECT_DIR$/spec/serialize.spec.ts" />
+      <test-names>
+        <test-name value="Serialize" />
+      </test-names>
+      <method v="2" />
+    </configuration>
+    <configuration name="Serialize.class with nested array of serializable items property" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
+      <node-interpreter value="project" />
+      <node-options value="" />
+      <jest-package value="" />
+      <working-dir value="$PROJECT_DIR$" />
+      <envs />
+      <scope-kind value="SUITE" />
+      <test-file value="$PROJECT_DIR$/spec/serialize.spec.ts" />
+      <test-names>
+        <test-name value="Serialize" />
+        <test-name value="class with nested array of serializable items property" />
+      </test-names>
+      <method v="2" />
+    </configuration>
+    <configuration name="Serialize.class with nested array of serializable items property.class descendant of SerializableObject.should serialize data" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
+      <node-interpreter value="project" />
+      <node-options value="" />
+      <jest-package value="" />
+      <working-dir value="$PROJECT_DIR$" />
+      <envs />
+      <scope-kind value="SUITE" />
+      <test-file value="$PROJECT_DIR$/spec/serialize.spec.ts" />
+      <test-names>
+        <test-name value="Serialize" />
+        <test-name value="class with nested array of serializable items property" />
+        <test-name value="class descendant of SerializableObject" />
+        <test-name value="should serialize data" />
+      </test-names>
+      <method v="2" />
+    </configuration>
+    <configuration name="playground" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="playground" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <configuration name="test" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="test" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="npm.test" />
+        <item itemvalue="npm.playground" />
+        <item itemvalue="Jest.Serialize.class with nested array of serializable items property.class descendant of SerializableObject.should serialize data" />
+        <item itemvalue="Jest.Serialize" />
+        <item itemvalue="Jest.Serialize.class with nested array of serializable items property" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="418907b2-6062-403b-800c-1b5e0746256b" name="Changes" comment="" />
+      <created>1646815132336</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1646815132336</updated>
+      <workItem from="1646815134519" duration="719000" />
+      <workItem from="1646816337594" duration="1562000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>

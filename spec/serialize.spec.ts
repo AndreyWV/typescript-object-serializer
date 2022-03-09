@@ -3,6 +3,7 @@ import { property } from '../src/decorators/property/property';
 import { create } from '../src/methods/create';
 import { serialize } from '../src/methods/serialize';
 import { SerializableObject } from '../src/serializable-object';
+import { SnakeCaseExtractor } from '../src';
 
 describe('Serialize', () => {
 
@@ -209,8 +210,8 @@ describe('Serialize', () => {
     describe('class descendant of SerializableObject', () => {
 
       class ArrayItem extends SerializableObject {
-        @property()
-        public value: number;
+        @property(SnakeCaseExtractor)
+        public valueNumber: number;
       }
 
       const defaultArray: ArrayItem[] = [];
@@ -225,13 +226,13 @@ describe('Serialize', () => {
         const instance = Test.create({
           property: [
             {
-              value: 1,
+              valueNumber: 1,
             },
             {
-              value: 3,
+              valueNumber: 3,
             },
             {
-              value: 5,
+              valueNumber: 5,
             },
           ],
         });
@@ -240,13 +241,13 @@ describe('Serialize', () => {
         expect(serialized).toEqual({
           property: [
             {
-              value: 1,
+              value_number: 1,
             },
             {
-              value: 3,
+              value_number: 3,
             },
             {
-              value: 5,
+              value_number: 5,
             },
           ],
         });
