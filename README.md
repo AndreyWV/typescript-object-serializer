@@ -245,6 +245,7 @@ const department = deserialize(Department, {
 });
 
 console.log(department); // Department { title: "Department title", employees [ Employee { id: 1, person: Person { name: "John", lastName: "Doe" } }, Employee { id: 2, person: Person { name: "Jane", lastName: "Doe" } } ] }
+console.log('serialized department', serialize(department)); // {title: "Department title", employees: [ { id: 1, person: { name: "John", last_name: "Doe" } }, { id: 2, person: { name: "Jane", last_name: "Doe" } } ] }
 ```
 
 ### Property extractor
