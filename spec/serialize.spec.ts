@@ -1,4 +1,7 @@
-import { SnakeCaseExtractor } from '../src';
+import {
+  SnakeCaseExtractor,
+  StraightExtractor,
+} from '../src';
 import { propertyType } from '../src/decorators/property-type/type';
 import { property } from '../src/decorators/property/property';
 import { create } from '../src/methods/create';
@@ -43,7 +46,7 @@ describe('Serialize', () => {
         expect(serialized.numberProperty).toBeNull();
       });
 
-      it('should apply property to serializable object if property is undefined', () => {
+      it('should not include property to serializable object if property is undefined', () => {
         const instance = Test.create({
           numberProperty: undefined,
           stringProperty: 'test',
@@ -51,8 +54,8 @@ describe('Serialize', () => {
         const serialized = instance.serialize();
         expect(serialized).toEqual({
           stringProperty: 'test',
-          numberProperty: undefined,
         });
+        expect(serialized).not.toHaveProperty('numberProperty');
       });
 
       it('should not serialize non-serializable properties', () => {
@@ -65,6 +68,23 @@ describe('Serialize', () => {
         const serialized = instance.serialize();
         expect(serialized.nonSerializableProperty).toBeUndefined();
       });
+
+      it('should include property to serializable object if property is undefined ' +
+        'but has value from transformer', () => {
+          class A extends SerializableObject {
+            @property(StraightExtractor.transform({
+              onSerialize: (value) => value ?? null,
+            }))
+            public property: string;
+          }
+          const instance = A.create({
+            property: undefined,
+          });
+          const serialized = instance.serialize();
+          expect(serialized).toEqual({
+            property: null,
+          });
+        });
     });
 
     describe('simple class', () => {
@@ -101,7 +121,7 @@ describe('Serialize', () => {
         expect(serialized.numberProperty).toBeNull();
       });
 
-      it('should not property to serializable object if property is undefined', () => {
+      it('should not include property to serializable object if property is undefined', () => {
         const instance = create(Test, {
           numberProperty: undefined,
           stringProperty: 'test',
@@ -109,8 +129,8 @@ describe('Serialize', () => {
         const serialized = serialize(instance);
         expect(serialized).toEqual({
           stringProperty: 'test',
-          numberProperty: undefined,
         });
+        expect(serialized).not.toHaveProperty('numberProperty');
       });
 
       it('should not serialize non-serializable properties', () => {
@@ -123,6 +143,23 @@ describe('Serialize', () => {
         const serialized = serialize(instance);
         expect(serialized.nonSerializableProperty).toBeUndefined();
       });
+
+      it('should include property to serializable object if property is undefined ' +
+        'but has value from transformer', () => {
+          class A {
+            @property(StraightExtractor.transform({
+              onSerialize: (value) => value ?? null,
+            }))
+            public property: string;
+          }
+          const instance = create(A, {
+            property: undefined,
+          });
+          const serialized = serialize(instance);
+          expect(serialized).toEqual({
+            property: null,
+          });
+        });
     });
 
   });

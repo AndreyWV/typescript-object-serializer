@@ -1,6 +1,7 @@
 import { Extractor } from '../decorators/property/base-extractor';
 import { SERIALIZABLE_PROPERTIES_KEY } from '../metadata-keys';
 import { SerializableObject } from '../serializable-object';
+import { deleteUndefinedRecursive } from '../utils/delete-undefined';
 
 /**
  * @method serialize Serialize instance date
@@ -32,6 +33,5 @@ export function serialize<T extends Object>(object: T): any {
     );
   }
 
-
-  return data;
+  return deleteUndefinedRecursive(data);
 }
