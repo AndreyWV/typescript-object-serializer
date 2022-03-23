@@ -27,9 +27,7 @@ export function serialize<T extends Object>(object: T): any {
             value;
         }
 
-        if (serializedValue !== undefined) {
-          extractor?.apply(data, serializedValue);
-        }
+        extractor?.apply(data, serializedValue);
       },
     );
   }
