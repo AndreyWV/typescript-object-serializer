@@ -1,9 +1,9 @@
+import { SnakeCaseExtractor } from '../src';
 import { propertyType } from '../src/decorators/property-type/type';
 import { property } from '../src/decorators/property/property';
 import { create } from '../src/methods/create';
 import { serialize } from '../src/methods/serialize';
 import { SerializableObject } from '../src/serializable-object';
-import { SnakeCaseExtractor } from '../src';
 
 describe('Serialize', () => {
 
@@ -43,7 +43,7 @@ describe('Serialize', () => {
         expect(serialized.numberProperty).toBeNull();
       });
 
-      it('should not apply property to serializable object if property is undefined', () => {
+      it('should apply property to serializable object if property is undefined', () => {
         const instance = Test.create({
           numberProperty: undefined,
           stringProperty: 'test',
@@ -51,6 +51,7 @@ describe('Serialize', () => {
         const serialized = instance.serialize();
         expect(serialized).toEqual({
           stringProperty: 'test',
+          numberProperty: undefined,
         });
       });
 
@@ -100,7 +101,7 @@ describe('Serialize', () => {
         expect(serialized.numberProperty).toBeNull();
       });
 
-      it('should not apply property to serializable object if property is undefined', () => {
+      it('should not property to serializable object if property is undefined', () => {
         const instance = create(Test, {
           numberProperty: undefined,
           stringProperty: 'test',
@@ -108,6 +109,7 @@ describe('Serialize', () => {
         const serialized = serialize(instance);
         expect(serialized).toEqual({
           stringProperty: 'test',
+          numberProperty: undefined,
         });
       });
 
