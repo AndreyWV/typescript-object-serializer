@@ -11,7 +11,9 @@ import { deleteUndefinedRecursive } from '../utils/delete-undefined';
 export function serialize<T extends Object>(object: T): any {
   const data = {};
 
-  const keys: Map<keyof T, Extractor> = (object as any).constructor[SERIALIZABLE_PROPERTIES_KEY];
+  const propertiesKey = `${SERIALIZABLE_PROPERTIES_KEY}_${(object as any).constructor.name}`;
+
+  const keys: Map<keyof T, Extractor> = (object as any).constructor[propertiesKey];
   if (keys) {
     Array.from(keys.keys()).forEach(
       key => {
@@ -22,7 +24,8 @@ export function serialize<T extends Object>(object: T): any {
         if (Array.isArray(value)) {
           serializedValue = value.map(itm => serialize(itm));
         } else {
-          const isSerializableObject = value instanceof SerializableObject || (value as any)?.constructor?.[SERIALIZABLE_PROPERTIES_KEY];
+          const valuePropertiesKey = `${SERIALIZABLE_PROPERTIES_KEY}_${(value as any)?.constructor?.name}`;
+          const isSerializableObject = value instanceof SerializableObject || (value as any)?.constructor?.[valuePropertiesKey];
           serializedValue = isSerializableObject ?
             serialize(value) :
             value;

@@ -7,12 +7,14 @@ import { create } from './create';
  * @returns New instance of passed object
  */
 export function clone<T>(data: T): T {
-  const instance = create((data as any).constructor) as T;
+  const ctor = (data as any).constructor;
+  const instance = create(ctor) as T;
 
   const cloneValue = (value: any): any => {
+    const valuePropertiesKey = `${SERIALIZABLE_PROPERTIES_KEY}_${value?.constructor?.name}`;
     if (Array.isArray(value)) {
       return value.map(v => cloneValue(v));
-    } else if (value?.constructor[SERIALIZABLE_PROPERTIES_KEY]) {
+    } else if (value?.constructor[valuePropertiesKey]) {
       return clone(value);
     }
     return value;
