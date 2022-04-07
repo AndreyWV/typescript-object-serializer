@@ -7,27 +7,30 @@ import {
 
 /**
  * @method deserialize Deserialize object to class
- * @param constructor { Constructor<T> } Constructor of serializable class
+ * @param ctor { Constructor<T> } Constructor of serializable class
  * @param data { any } Object of serialized data
  * @returns Instance of serializable class constructor
  */
-export function deserialize<T>(constructor: Constructor<T>, data: any): T {
+export function deserialize<T>(ctor: Constructor<T>, data: any): T {
   let instance: T;
   try {
-    instance = new constructor();
+    instance = new ctor();
   } catch {
     return data;
   }
 
-  const props: Map<keyof T, Extractor> = (constructor as any)[SERIALIZABLE_PROPERTIES_KEY];
+  const propertyKey = `${SERIALIZABLE_PROPERTIES_KEY}_${ctor.name}`;
+  const props: Map<keyof T, Extractor> = (ctor as any)[propertyKey];
 
   if (!props) {
     return instance;
   }
 
+  const keyTypesKey = `${SERIALIZABLE_TYPES_KEY}_${ctor.name}`;
+  const keyTypes: Map<keyof T, any> = (ctor as any)[keyTypesKey];
+
   Array.from(props.keys()).forEach(
     key => {
-      const keyTypes: Map<keyof T, any> = (constructor as any)[SERIALIZABLE_TYPES_KEY];
       const keyTypeFunctionOrConstructor = keyTypes?.get(key) ||
         (
           (Reflect as any).getMetadata &&
@@ -93,7 +96,9 @@ export function deserialize<T>(constructor: Constructor<T>, data: any): T {
         return;
       }
 
-      if (keyType[SERIALIZABLE_PROPERTIES_KEY]) {
+      const keyPropertiesKey = `${SERIALIZABLE_PROPERTIES_KEY}_${keyType?.name}`;
+
+      if (keyType[keyPropertiesKey]) {
         instance[key] = deserialize(keyType, objectData);
       } else {
         instance[key] = objectData;

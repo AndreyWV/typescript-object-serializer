@@ -35,13 +35,16 @@ export function property(
       ctor = target.constructor;
     }
 
-    if (!ctor[SERIALIZABLE_PROPERTIES_KEY]) {
-      ctor[SERIALIZABLE_PROPERTIES_KEY] =
-        new Map<string | symbol, Extractor>();
+    const propertiesKey = `${SERIALIZABLE_PROPERTIES_KEY}_${ctor.name}`;
+
+    if (!ctor[propertiesKey]) {
+      const parentPropertiesKey = `${SERIALIZABLE_PROPERTIES_KEY}_${ctor.prototype?.__proto__?.constructor?.name}`;
+      const parentProperties = ctor[parentPropertiesKey];
+      ctor[propertiesKey] = new Map<string | symbol, Extractor>(parentProperties);
     }
 
     const keysStore: Map<string | symbol, Extractor> =
-      ctor[SERIALIZABLE_PROPERTIES_KEY];
+      ctor[propertiesKey];
 
     keysStore.set(propertyKey, new extractor(propertyKey));
 

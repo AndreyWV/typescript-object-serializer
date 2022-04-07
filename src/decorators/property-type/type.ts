@@ -45,11 +45,15 @@ export function propertyType<T extends typeof SerializableObject, U = Constructo
       ctor = target.constructor;
     }
 
-    if (!ctor[SERIALIZABLE_TYPES_KEY]) {
-      ctor[SERIALIZABLE_TYPES_KEY] = new Map<string | symbol, any>();
+    const typesKey = `${SERIALIZABLE_TYPES_KEY}_${ctor.name}`;
+
+    if (!ctor[typesKey]) {
+      const parentTypesKey = `${SERIALIZABLE_TYPES_KEY}_${ctor.prototype?.__proto__?.constructor?.name}`;
+      const parentTypes = ctor[parentTypesKey];
+      ctor[typesKey] = new Map<string | symbol, any>(parentTypes);
     }
 
-    const typesStore: Map<string | symbol, any> = ctor[SERIALIZABLE_TYPES_KEY];
+    const typesStore: Map<string | symbol, any> = ctor[typesKey];
 
     typesStore.set(propertyKey, defineType);
 
