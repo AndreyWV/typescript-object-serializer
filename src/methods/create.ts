@@ -1,10 +1,10 @@
 import { Constructor } from '../base-types/constructor';
 import { RecursivePartial } from '../base-types/recursive-partial';
-import {
-  SERIALIZABLE_PROPERTIES_KEY,
-  SERIALIZABLE_TYPES_KEY,
-} from '../metadata-keys';
 import { SerializableObjectWithoutBase } from '../serializable-object';
+import {
+  getSerializableProperties,
+  getSerializablePropertiesTypes,
+} from '../utils/get-serializable-properties';
 import { clone } from './clone';
 
 /**
@@ -23,8 +23,7 @@ export function create<T>(
 
   const instance = new ctor() as T;
 
-  const keyTypesKey = `${SERIALIZABLE_TYPES_KEY}_${ctor?.name}`;
-  const keyTypes: Map<keyof T, any> = (ctor as any)[keyTypesKey];
+  const keyTypes = getSerializablePropertiesTypes(ctor) as Map<keyof T, any>;
 
   (Object.keys(data) as Array<keyof T>)
     .forEach(
@@ -35,8 +34,10 @@ export function create<T>(
             (Reflect as any).getMetadata('design:type', instance, key as string | symbol)
           );
 
-        const keyTypePropertiesKey = `${SERIALIZABLE_PROPERTIES_KEY}_${keyType?.name}`;
-        if (keyType?.[keyTypePropertiesKey]) {
+        const isKeyHasSerializableProperties = Boolean(
+          getSerializableProperties(keyType),
+        );
+        if (isKeyHasSerializableProperties) {
           if (Array.isArray(data[key])) {
             instance[key] = (data[key] as Array<any>).map(item => create(keyType, item)) as any;
           } else {

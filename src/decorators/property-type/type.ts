@@ -2,6 +2,7 @@ import { Constructor } from '../../base-types/constructor';
 import { SERIALIZABLE_TYPES_KEY } from '../../metadata-keys';
 import { SerializableObject } from '../../serializable-object';
 import { getConstructorPropertyName } from '../../utils/get-constructor-property-name';
+import { getSerializablePropertiesTypes } from '../../utils/get-serializable-properties';
 
 /**
  * @function property Declares type for current property
@@ -48,8 +49,7 @@ export function propertyType<T extends typeof SerializableObject, U = Constructo
     const typesKey = `${SERIALIZABLE_TYPES_KEY}_${ctor.name}`;
 
     if (!ctor[typesKey]) {
-      const parentTypesKey = `${SERIALIZABLE_TYPES_KEY}_${ctor.prototype?.__proto__?.constructor?.name}`;
-      const parentTypes = ctor[parentTypesKey];
+      const parentTypes = getSerializablePropertiesTypes(ctor.__proto__);
       ctor[typesKey] = new Map<string | symbol, any>(parentTypes);
     }
 

@@ -1,7 +1,7 @@
 import { Extractor } from '../decorators/property/base-extractor';
-import { SERIALIZABLE_PROPERTIES_KEY } from '../metadata-keys';
 import { SerializableObject } from '../serializable-object';
 import { deleteUndefinedRecursive } from '../utils/delete-undefined';
+import { getSerializableProperties } from '../utils/get-serializable-properties';
 
 /**
  * @method serialize Serialize instance date
@@ -11,9 +11,7 @@ import { deleteUndefinedRecursive } from '../utils/delete-undefined';
 export function serialize<T extends Object>(object: T): any {
   const data = {};
 
-  const propertiesKey = `${SERIALIZABLE_PROPERTIES_KEY}_${(object as any).constructor.name}`;
-
-  const keys: Map<keyof T, Extractor> = (object as any).constructor[propertiesKey];
+  const keys = getSerializableProperties((object as any).constructor) as Map<keyof T, Extractor>;
   if (keys) {
     Array.from(keys.keys()).forEach(
       key => {
@@ -24,8 +22,8 @@ export function serialize<T extends Object>(object: T): any {
         if (Array.isArray(value)) {
           serializedValue = value.map(itm => serialize(itm));
         } else {
-          const valuePropertiesKey = `${SERIALIZABLE_PROPERTIES_KEY}_${(value as any)?.constructor?.name}`;
-          const isSerializableObject = value instanceof SerializableObject || (value as any)?.constructor?.[valuePropertiesKey];
+          const isSerializableObject = value instanceof SerializableObject ||
+            Boolean(getSerializableProperties((value as any)?.constructor))
           serializedValue = isSerializableObject ?
             serialize(value) :
             value;

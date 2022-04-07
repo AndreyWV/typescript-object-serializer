@@ -1,9 +1,9 @@
 import { Constructor } from '../base-types/constructor';
 import { Extractor } from '../decorators/property/base-extractor';
 import {
-  SERIALIZABLE_PROPERTIES_KEY,
-  SERIALIZABLE_TYPES_KEY,
-} from '../metadata-keys';
+  getSerializableProperties,
+  getSerializablePropertiesTypes,
+} from '../utils/get-serializable-properties';
 
 /**
  * @method deserialize Deserialize object to class
@@ -19,15 +19,13 @@ export function deserialize<T>(ctor: Constructor<T>, data: any): T {
     return data;
   }
 
-  const propertyKey = `${SERIALIZABLE_PROPERTIES_KEY}_${ctor.name}`;
-  const props: Map<keyof T, Extractor> = (ctor as any)[propertyKey];
+  const props = getSerializableProperties(ctor);
 
   if (!props) {
     return instance;
   }
 
-  const keyTypesKey = `${SERIALIZABLE_TYPES_KEY}_${ctor.name}`;
-  const keyTypes: Map<keyof T, any> = (ctor as any)[keyTypesKey];
+  const keyTypes = getSerializablePropertiesTypes(ctor);
 
   Array.from(props.keys()).forEach(
     key => {
@@ -96,9 +94,11 @@ export function deserialize<T>(ctor: Constructor<T>, data: any): T {
         return;
       }
 
-      const keyPropertiesKey = `${SERIALIZABLE_PROPERTIES_KEY}_${keyType?.name}`;
+      const isKeyHasSerializableProperties = Boolean(
+        getSerializableProperties(keyType),
+      );
 
-      if (keyType[keyPropertiesKey]) {
+      if (isKeyHasSerializableProperties) {
         instance[key] = deserialize(keyType, objectData);
       } else {
         instance[key] = objectData;
