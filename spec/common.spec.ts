@@ -46,6 +46,32 @@ describe('Common', () => {
 
     });
 
+    it('should extend parent serializable properties even if class doesn\'t has own properties', () => {
+
+      class Test {
+        @property(SnakeCaseExtractor)
+        public testProperty: string;
+      }
+
+      class SubTest extends Test { }
+
+      class SubSubTest extends SubTest { }
+
+      const deserialized = deserialize(SubSubTest, {
+        test_property: 'value',
+      });
+
+      expect(deserialized.testProperty).toBe('value');
+      expect(deserialized).toBeInstanceOf(SubSubTest);
+
+      const serialized = serialize(deserialized);
+
+      expect(serialized).toEqual({
+        test_property: 'value',
+      });
+
+    });
+
   });
 
   describe('Descendant of SerializableObject', () => {
@@ -83,6 +109,32 @@ describe('Common', () => {
         string_value: 'string',
       });
       expect(serializedParent).not.toHaveProperty('number_value');
+
+    });
+
+    it('should extend parent serializable properties even if class doesn\'t has own properties', () => {
+
+      class Test extends SerializableObject {
+        @property(SnakeCaseExtractor)
+        public testProperty: string;
+      }
+
+      class SubTest extends Test { }
+
+      class SubSubTest extends SubTest { }
+
+      const deserialized = SubSubTest.deserialize({
+        test_property: 'value',
+      });
+
+      expect(deserialized.testProperty).toBe('value');
+      expect(deserialized).toBeInstanceOf(SubSubTest);
+
+      const serialized = deserialized.serialize();
+
+      expect(serialized).toEqual({
+        test_property: 'value',
+      });
 
     });
 
