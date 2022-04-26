@@ -1,6 +1,9 @@
 import { Constructor } from '../../base-types/constructor';
-import { SERIALIZABLE_TYPES_KEY } from '../../metadata-keys';
 import { SerializableObject } from '../../serializable-object';
+import {
+  definePropertiesTypes,
+  getPropertiesTypes,
+} from '../../srtializable-types';
 import { getConstructorPropertyName } from '../../utils/get-constructor-property-name';
 import { getSerializablePropertiesTypes } from '../../utils/get-serializable-properties';
 
@@ -46,14 +49,12 @@ export function propertyType<T extends typeof SerializableObject, U = Constructo
       ctor = target.constructor;
     }
 
-    const typesKey = `${SERIALIZABLE_TYPES_KEY}_${ctor.name}`;
-
-    if (!ctor[typesKey]) {
+    if (!getPropertiesTypes(ctor)) {
       const parentTypes = getSerializablePropertiesTypes(ctor.__proto__);
-      ctor[typesKey] = new Map<string | symbol, any>(parentTypes);
+      definePropertiesTypes(ctor, parentTypes);
     }
 
-    const typesStore: Map<string | symbol, any> = ctor[typesKey];
+    const typesStore = getPropertiesTypes(ctor) as Map<string | Symbol, any>;
 
     typesStore.set(propertyKey, defineType);
 

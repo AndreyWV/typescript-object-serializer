@@ -1,9 +1,7 @@
 import { Constructor } from '../base-types/constructor';
 import { Extractor } from '../decorators/property/base-extractor';
-import {
-  SERIALIZABLE_PROPERTIES_KEY,
-  SERIALIZABLE_TYPES_KEY,
-} from '../metadata-keys';
+import { getPropertiesKeys } from '../serializable-properties';
+import { getPropertiesTypes } from '../srtializable-types';
 
 export function getSerializableProperties<T>(ctor: Constructor<T>): Map<keyof T, Extractor> | undefined {
 
@@ -17,8 +15,7 @@ export function getSerializableProperties<T>(ctor: Constructor<T>): Map<keyof T,
   let i = 5;
 
   while (i !== 0) {
-    const propertyKey = `${SERIALIZABLE_PROPERTIES_KEY}_${currentCtor.name}`;
-    const props: Map<keyof T, Extractor> = (ctor as any)[propertyKey];
+    const props = getPropertiesKeys(currentCtor);
     if (props) {
       return props;
     }
@@ -42,8 +39,7 @@ export function getSerializablePropertiesTypes<T>(ctor: Constructor<T>): Map<key
   let i = 5;
 
   while (i !== 0) {
-    const propertyKey = `${SERIALIZABLE_TYPES_KEY}_${currentCtor.name}`;
-    const types: Map<keyof T, Extractor> = (ctor as any)[propertyKey];
+    const types = getPropertiesTypes(currentCtor);
     if (types) {
       return types;
     }
