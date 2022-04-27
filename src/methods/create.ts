@@ -34,17 +34,23 @@ export function create<T>(
             (Reflect as any).getMetadata('design:type', instance, key as string | symbol)
           );
 
+        const dataValue = (data as any)[key];
+        if (dataValue === undefined || dataValue === null) {
+          instance[key] = dataValue;
+          return;
+        }
+
         const isKeyHasSerializableProperties = Boolean(
           getSerializableProperties(keyType),
         );
         if (isKeyHasSerializableProperties) {
-          if (Array.isArray(data[key])) {
-            instance[key] = (data[key] as Array<any>).map(item => create(keyType, item)) as any;
+          if (Array.isArray(dataValue)) {
+            instance[key] = (dataValue as Array<any>).map(item => create(keyType, item)) as any;
           } else {
-            instance[key] = create(keyType, data[key] as any);
+            instance[key] = create(keyType, dataValue as any);
           }
         } else {
-          instance[key] = data[key] as any;
+          instance[key] = dataValue as any;
         }
       }
     )

@@ -10,7 +10,7 @@ export function getPropertiesKeys<T = any>(ctor: Constructor<T>): Map<keyof T, E
 export function definePropertiesKeys<T>(ctor: Constructor<T>, parentProperties?: Map<keyof T, Extractor>): void {
   const typesMap = getOrCreateTypesMap(ctor);
   if (!typesMap.get(ctor)) {
-    typesMap.set(ctor, new Map(parentProperties));
+    typesMap.set(ctor, new Map(parentProperties as any));
   }
 }
 
