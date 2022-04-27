@@ -5,7 +5,7 @@ import { SerializableObject } from '../src/serializable-object';
 
 describe('Instance create', () => {
 
-  describe('simple class descendant of Serializable object', () => {
+  describe('class descendant of Serializable object', () => {
 
     class Test extends SerializableObject {
       @property()
@@ -94,6 +94,35 @@ describe('Instance create', () => {
           undefinedByDefaultNonSerializableProperty: undefined,
         });
         expect(testInstance.undefinedByDefaultNonSerializableProperty).toBe(undefined);
+      });
+
+    });
+
+    describe('should create class instance with empty value of serializable property', () => {
+
+      class Employee extends SerializableObject {
+        @property()
+        public name: string;
+      }
+
+      class Department extends SerializableObject {
+        @property()
+        @propertyType(Employee)
+        public employees: Employee[];
+      }
+
+      it('null value', () => {
+        const department = Department.create({
+          employees: null as any,
+        });
+        expect(department.employees).toBe(null);
+      });
+
+      it('undefined value', () => {
+        const department = Department.create({
+          employees: undefined,
+        });
+        expect(department.employees).toBe(undefined);
       });
 
     });
@@ -189,6 +218,35 @@ describe('Instance create', () => {
           undefinedByDefaultNonSerializableProperty: undefined,
         });
         expect(testInstance.undefinedByDefaultNonSerializableProperty).toBe(undefined);
+      });
+
+    });
+
+    describe('should create class instance with empty value of serializable property', () => {
+
+      class Employee {
+        @property()
+        public name: string;
+      }
+
+      class Department {
+        @property()
+        @propertyType(Employee)
+        public employees: Employee[];
+      }
+
+      it('null value', () => {
+        const department = create(Department, {
+          employees: null as any,
+        });
+        expect(department.employees).toBe(null);
+      });
+
+      it('undefined value', () => {
+        const department = create(Department, {
+          employees: undefined,
+        });
+        expect(department.employees).toBe(undefined);
       });
 
     });

@@ -1,5 +1,8 @@
 import { Constructor } from '../../base-types/constructor';
-import { SERIALIZABLE_PROPERTIES_KEY } from '../../metadata-keys';
+import {
+  definePropertiesKeys,
+  getPropertiesKeys,
+} from '../../serializable-properties';
 import { getConstructorPropertyName } from '../../utils/get-constructor-property-name';
 import { getSerializableProperties } from '../../utils/get-serializable-properties';
 import { Extractor } from './base-extractor';
@@ -36,15 +39,14 @@ export function property(
       ctor = target.constructor;
     }
 
-    const propertiesKey = `${SERIALIZABLE_PROPERTIES_KEY}_${ctor.name}`;
+    const properties = getPropertiesKeys(ctor);
 
-    if (!ctor[propertiesKey]) {
+    if (!properties) {
       const parentProperties = getSerializableProperties(ctor.__proto__);
-      ctor[propertiesKey] = new Map<string | symbol, Extractor>(parentProperties);
+      definePropertiesKeys(ctor, parentProperties);
     }
 
-    const keysStore: Map<string | symbol, Extractor> =
-      ctor[propertiesKey];
+    const keysStore = getPropertiesKeys(ctor) as Map<string | Symbol, Extractor>;
 
     keysStore.set(propertyKey, new extractor(propertyKey));
 
