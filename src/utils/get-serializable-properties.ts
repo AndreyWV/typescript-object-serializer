@@ -3,6 +3,8 @@ import { Extractor } from '../decorators/property/base-extractor';
 import { getPropertiesKeys } from '../serializable-properties';
 import { getPropertiesTypes } from '../srtializable-types';
 
+const rootObjectPrototype = ({} as any).prototype;
+
 export function getSerializableProperties<T>(ctor: Constructor<T>): Map<keyof T, Extractor> | undefined {
 
   if (!ctor) {
@@ -15,6 +17,9 @@ export function getSerializableProperties<T>(ctor: Constructor<T>): Map<keyof T,
   let i = 5;
 
   while (i !== 0) {
+    if (currentCtor?.prototype === rootObjectPrototype) {
+      return;
+    }
     const props = getPropertiesKeys(currentCtor);
     if (props) {
       return props;
@@ -39,6 +44,9 @@ export function getSerializablePropertiesTypes<T>(ctor: Constructor<T>): Map<key
   let i = 5;
 
   while (i !== 0) {
+    if (currentCtor?.prototype === rootObjectPrototype) {
+      return;
+    }
     const types = getPropertiesTypes(currentCtor);
     if (types) {
       return types;
