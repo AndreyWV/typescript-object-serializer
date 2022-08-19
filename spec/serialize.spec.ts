@@ -344,6 +344,102 @@ describe('Serialize', () => {
 
   });
 
+  describe('class with nested array of non-serializable items property', () => {
+
+    describe('class descendant of SerializableObject', () => {
+
+      class Test extends SerializableObject {
+        @property()
+        public strings: string[];
+        @property()
+        public numbers: number[];
+        @property()
+        public booleans: boolean[];
+      }
+
+      describe('should serialize data', () => {
+        const instance = Test.create({
+          strings: [
+            'string 1',
+            'string 2',
+          ],
+          numbers: [
+            1,
+            2,
+          ],
+          booleans: [
+            true,
+            false,
+          ],
+        });
+
+        const serialized = instance.serialize();
+        expect(serialized).toEqual({
+          strings: [
+            'string 1',
+            'string 2',
+          ],
+          numbers: [
+            1,
+            2,
+          ],
+          booleans: [
+            true,
+            false,
+          ],
+        });
+      });
+
+    });
+
+    describe('simple class', () => {
+
+      class Test {
+        @property()
+        public strings: string[];
+        @property()
+        public numbers: number[];
+        @property()
+        public booleans: boolean[];
+      }
+
+      describe('should serialize data', () => {
+        const instance = create(Test, {
+          strings: [
+            'string 1',
+            'string 2',
+          ],
+          numbers: [
+            1,
+            2,
+          ],
+          booleans: [
+            true,
+            false,
+          ],
+        });
+
+        const serialized = serialize(instance);
+        expect(serialized).toEqual({
+          strings: [
+            'string 1',
+            'string 2',
+          ],
+          numbers: [
+            1,
+            2,
+          ],
+          booleans: [
+            true,
+            false,
+          ],
+        });
+      });
+
+    });
+
+  });
+
   it('should return empty object if object hasn\'t serializable properties', () => {
 
     class Test {
