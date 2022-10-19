@@ -22,12 +22,12 @@ import { StraightExtractor } from './straight-extractor';
 export function property(
   extractor: Constructor<Extractor> = StraightExtractor,
 )/* : PropertyDecorator | ParameterDecorator */ {
-  return (target: any, propertyKey: string | symbol, index?: number) => {
+  return (target: any, propertyKey: string | symbol, indexOrDescriptor?: number | PropertyDescriptor) => {
 
     let ctor;
 
-    if (propertyKey === undefined && target['prototype'] && index !== undefined) {
-      const extractedPropertyKey = getConstructorPropertyName(target['prototype'].constructor, index as number);
+    if (propertyKey === undefined && target['prototype'] && typeof indexOrDescriptor === 'number' ) {
+      const extractedPropertyKey = getConstructorPropertyName(target['prototype'].constructor, indexOrDescriptor as number);
       if (!extractedPropertyKey) {
         return;
       }

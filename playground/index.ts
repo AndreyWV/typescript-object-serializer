@@ -654,6 +654,47 @@ import { serialize } from '../src/methods/serialize';
 
 })();
 
+// Getters and setters
+(() => {
+
+  console.log('Getters and setters');
+
+  class PersonWithGetter {
+    constructor(
+      public firstName: string,
+      public lastName: string,
+    ) {
+    }
+
+    @property()
+    public get fullName(): string {
+      return this.firstName + ' ' + this.lastName
+    }
+  }
+
+  const personWithGetter = new PersonWithGetter('John', 'Doe');
+  console.log(serialize(personWithGetter)); // { fullName: "John Doe" }
+
+  class PersonWithSetter {
+    public firstName: string;
+    public lastName: string;
+
+    @property()
+    public set fullName(value: string) {
+      const [firstName, lastName] = value.split(' ');
+      this.firstName = firstName;
+      this.lastName = lastName;
+    }
+  }
+
+  const deserialized = deserialize(PersonWithSetter, {
+    fullName: 'John Doe',
+  });
+
+  console.log(deserialized); // PersonWithSetter { firstName: "John", lastName: "Doe" }
+
+})();
+
 // Syntactic sugar - SerializableObject class
 (() => {
 
