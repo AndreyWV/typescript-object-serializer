@@ -1,5 +1,6 @@
 import { Constructor } from '../base-types/constructor';
 import { Extractor } from '../decorators/property/base-extractor';
+import { getPropertyDescriptor } from '../utils/get-property-descriptor';
 import {
   getSerializableProperties,
   getSerializablePropertiesTypes,
@@ -43,7 +44,7 @@ export function deserialize<T>(ctor: Constructor<T>, data: any): T {
         /* If objectData === undefined than instance[key] should have default value from class description */
         if (objectData !== undefined) {
           /* null / 0 / '' / false */
-          instance[key] = objectData;
+          applyValue(instance, key, objectData);
         }
 
         return;
@@ -63,17 +64,25 @@ export function deserialize<T>(ctor: Constructor<T>, data: any): T {
 
       if (Array.isArray(objectData)) {
         if (isConstructor(keyTypeFunctionOrConstructor)) {
-          instance[key] = objectData.map(item => deserialize(keyTypeFunctionOrConstructor, item)) as any;
+          applyValue(
+            instance,
+            key,
+            objectData.map(item => deserialize(keyTypeFunctionOrConstructor, item)) as any,
+          );
         } else if (typeof keyTypeFunctionOrConstructor === 'function') {
-          instance[key] = objectData.map(item => {
-            const itemType = keyTypeFunctionOrConstructor(item);
-            if (itemType !== undefined) {
-              return deserialize(itemType, item);
-            }
-            return item;
-          }) as any;
+          applyValue(
+            instance,
+            key,
+            objectData.map(item => {
+              const itemType = keyTypeFunctionOrConstructor(item);
+              if (itemType !== undefined) {
+                return deserialize(itemType, item);
+              }
+              return item;
+            }) as any,
+          );
         } else {
-          instance[key] = objectData as any;
+          applyValue(instance, key, objectData);
         }
         return;
       }
@@ -90,7 +99,7 @@ export function deserialize<T>(ctor: Constructor<T>, data: any): T {
         getKeyTypeFromFunction();
 
       if (!keyType) {
-        instance[key] = objectData;
+        applyValue(instance, key, objectData);
         return;
       }
 
@@ -99,13 +108,20 @@ export function deserialize<T>(ctor: Constructor<T>, data: any): T {
       );
 
       if (isKeyHasSerializableProperties) {
-        instance[key] = deserialize(keyType, objectData);
+        applyValue(instance, key, deserialize(keyType, objectData));
       } else {
-        instance[key] = objectData;
+        applyValue(instance, key, objectData);
       }
 
     }
   );
 
   return instance;
+}
+
+function applyValue(instance: any, key: string | number | symbol, value: any): void {
+  const descriptor = getPropertyDescriptor(instance, key);
+  if (!descriptor || descriptor.writable || descriptor.set) {
+    instance[key] = value;
+  }
 }

@@ -750,6 +750,50 @@ console.log(department); // Department { id: 123, title: "Department title" }
 console.log(serialize(department)); // { title: "Department title" }
 ```
 
+### Getters and setters
+It is possible to serialize getter and deserialize setter property
+```typescript
+import {
+  deserialize,
+  serialize,
+  property,
+} from 'typescript-object-serializer';
+
+class PersonWithGetter {
+  constructor(
+    public firstName: string,
+    public lastName: string,
+  ) {
+  }
+
+  @property()
+  public get fullName(): string {
+    return this.firstName + ' ' + this.lastName
+  }
+}
+
+const personWithGetter = new PersonWithGetter('John', 'Doe');
+console.log(serialize(personWithGetter)); // { fullName: "John Doe" }
+
+class PersonWithSetter {
+  public firstName: string;
+  public lastName: string;
+
+  @property()
+  public set fullName(value: string) {
+    const [firstName, lastName] = value.split(' ');
+    this.firstName = firstName;
+    this.lastName = lastName;
+  }
+}
+
+const deserialized = deserialize(PersonWithSetter, {
+  fullName: 'John Doe',
+});
+
+console.log(deserialized); // PersonWithSetter { firstName: "John", lastName: "Doe" }
+```
+
 # Syntactic sugar: `SerializableObject`
 Class `SerializebleObject` for easy access to serializer methods like `serialize`, `deserialize`, `create`, `clone`, `deserializeArray`. it makes possible to import `'typescript-object-serializer'` only at class declaration file but not to import it where serialization/deserialization used.
 ```typescript
