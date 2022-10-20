@@ -1,6 +1,9 @@
 import { Constructor } from '../base-types/constructor';
 import { RecursivePartial } from '../base-types/recursive-partial';
-import { SerializableObjectWithoutBase } from '../serializable-object';
+import {
+  SerializableObject,
+  SerializableObjectWithoutBase,
+} from '../serializable-object';
 import {
   getSerializableProperties,
   getSerializablePropertiesTypes,
@@ -15,7 +18,7 @@ import { clone } from './clone';
  */
 export function create<T>(
   ctor: Constructor<T>,
-  data: RecursivePartial<SerializableObjectWithoutBase<T>> = {},
+  data: T extends SerializableObject ? RecursivePartial<SerializableObjectWithoutBase<T>> : RecursivePartial<T> = {} as any,
 ): T {
   if (data instanceof ctor) {
     return clone(data) as T;

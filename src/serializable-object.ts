@@ -15,7 +15,7 @@ type RecursiveWithoutBase<T> = {
 export type SerializableObjectWithoutBase<T extends Partial<SerializableObject>> =
   RecursiveWithoutBase<Pick<T, Exclude<keyof T, keyof SerializableObject>>>;
 
-type SerializableObjectData<T extends typeof SerializableObject, I = InstanceType<T>> =
+type SerializableObjectData<T extends typeof SerializableObject, I extends InstanceType<T> = InstanceType<T>> =
   RecursivePartial<SerializableObjectWithoutBase<I>>;
 
 export class NonArrayDataError extends Error {
@@ -38,7 +38,7 @@ export class SerializableObject {
     this: T,
     data: SerializableObjectData<T> = {},
   ): InstanceType<T> {
-    return create(this as any, data);
+    return create(this as any, data as any);
   }
 
   /**

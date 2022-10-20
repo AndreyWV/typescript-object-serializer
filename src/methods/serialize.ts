@@ -29,9 +29,7 @@ export function serialize<T extends Object>(object: T): any {
       if (Array.isArray(value)) {
         serializedValue = value.map(itm => serialize(itm));
       } else {
-        const isSerializableObject = value instanceof SerializableObject ||
-          Boolean(getSerializableProperties((value as any)?.constructor))
-        serializedValue = isSerializableObject ?
+        serializedValue = isSerializableObject(value) ?
           serialize(value) :
           value;
       }
@@ -41,4 +39,9 @@ export function serialize<T extends Object>(object: T): any {
   );
 
   return deleteUndefinedRecursive(data);
+}
+
+function isSerializableObject(value: any): value is Object {
+  return value instanceof SerializableObject ||
+    Boolean(getSerializableProperties((value as any)?.constructor));
 }
