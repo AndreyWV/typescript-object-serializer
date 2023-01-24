@@ -1,6 +1,6 @@
 {
     "name": "typescript-object-serializer",
-    "version": "0.5.0",
+    "version": "0.6.0",
     "description": "Powerful Scalable Typescript object serializer",
     "scripts": {
         "build": "webpack",
@@ -25,21 +25,22 @@
     "author": "andrey.w.v@gmail.com",
     "license": "MIT",
     "devDependencies": {
-        "@types/jest": "^27.0.1",
-        "html-webpack-plugin": "^5.5.0",
-        "jest": "^27.0.6",
-        "path-browserify": "^1.0.1",
-        "reflect-metadata": "^0.1.13",
-        "ts-jest": "^27.0.7",
-        "ts-loader": "^9.2.6",
-        "ts-node": "^10.2.1",
-        "typescript": "^4.3.5",
-        "webpack": "^5.67.0",
-        "webpack-cli": "^4.9.2",
-        "webpack-dev-server": "^4.7.3"
+        "@types/jest": "~29.2.6",
+        "html-webpack-plugin": "~5.5.0",
+        "jest": "~29.4.0",
+        "jest-environment-jsdom": "~29.4.0",
+        "path-browserify": "~1.0.1",
+        "reflect-metadata": "~0.1.13",
+        "ts-jest": "~29.0.5",
+        "ts-loader": "~9.4.2",
+        "ts-node": "~10.9.1",
+        "typescript": "~4.9.4",
+        "webpack": "~5.75.0",
+        "webpack-cli": "~5.0.1",
+        "webpack-dev-server": "~4.11.1"
     },
     "source": "src/index.ts",
-    "main": "src/index.ts",
+    "main": "dist/index.js",
     "module": "dist/index.js",
     "types": "dist/index.d.ts"
 }

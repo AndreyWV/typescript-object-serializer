@@ -6,7 +6,7 @@ import { create } from './create';
  * @param data Serializable class instance
  * @returns New instance of passed object
  */
-export function clone<T>(data: T): T {
+export function clone<T extends object>(data: T): T {
   const ctor = (data as any).constructor;
   const instance = create(ctor) as T;
 

@@ -8,6 +8,7 @@ module.exports = {
     clean: true,
     library: 'typescript-object-serializer',
     libraryTarget: 'umd',
+    globalObject: 'this',
   },
   resolve: {
     extensions: ['.ts', '.tsx', '.js'],
