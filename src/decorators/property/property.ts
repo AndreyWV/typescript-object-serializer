@@ -22,7 +22,7 @@ import { StraightExtractor } from './straight-extractor';
 export function property(
   extractor: Constructor<Extractor> = StraightExtractor,
 )/* : PropertyDecorator | ParameterDecorator */ {
-  return (target: any, propertyKey: string | symbol, indexOrDescriptor?: number | PropertyDescriptor) => {
+  return (target: any, propertyKey: string | symbol | undefined, indexOrDescriptor?: number | PropertyDescriptor) => {
 
     let ctor;
 
@@ -48,7 +48,7 @@ export function property(
 
     const keysStore = getPropertiesKeys(ctor) as Map<string | Symbol, Extractor>;
 
-    keysStore.set(propertyKey, new extractor(propertyKey));
+    keysStore.set(propertyKey as string | symbol, new extractor(propertyKey));
 
   }
 }

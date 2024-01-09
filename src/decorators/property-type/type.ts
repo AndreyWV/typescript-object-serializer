@@ -32,7 +32,7 @@ import { getSerializablePropertiesTypes } from '../../utils/get-serializable-pro
 export function propertyType<T extends typeof SerializableObject, U = Constructor<any>>(
   defineType: T | ((data: any) => T | undefined) | U | ((data: any) => U | undefined),
 )/* : PropertyDecorator | ParameterDecorator */ {
-  return (target: any, propertyKey: string | symbol, index?: number) => {
+  return (target: any, propertyKey: string | symbol | undefined, index?: number) => {
 
     let ctor;
 
@@ -56,7 +56,7 @@ export function propertyType<T extends typeof SerializableObject, U = Constructo
 
     const typesStore = getPropertiesTypes(ctor) as Map<string | Symbol, any>;
 
-    typesStore.set(propertyKey, defineType);
+    typesStore.set(propertyKey as string | symbol, defineType);
 
   }
 }
