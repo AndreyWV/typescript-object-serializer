@@ -28,9 +28,9 @@ jobs:
           node-version: '18'
       - name: Change dependency
         run: |
-          sed -i 's/"typescript": "\~[0-9]\+\.[0-9]\+\.[0-9]\+"/"typescript": "~4.0.0"/' package.json
+          sed -i 's/"typescript": "\~[0-9]\+\.[0-9]\+\.[0-9]\+"/"typescript": "~4.x"/' package.json
       - name: Install dependencies
-        run: npm i
+        run: npm i --force
       - name: Build
         run: npm run build
       - name: Test
@@ -46,9 +46,9 @@ jobs:
           node-version: '18'
       - name: Change dependency
         run: |
-          sed -i 's/"typescript": "\~[0-9]\+\.[0-9]\+\.[0-9]\+"/"typescript": "~3.0.0"/' package.json
+          sed -i 's/"typescript": "\~4.x"/"typescript": "~3.x"/' package.json
       - name: Install dependencies
-        run: npm i
+        run: npm i --force
       - name: Build
         run: npm run build
       - name: Test
