@@ -3,7 +3,7 @@ name: CI
 on: [push]
 
 jobs:
-  build:
+  testV5:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -13,9 +13,12 @@ jobs:
           node-version: '18'
       - name: Install dependencies
         run: npm ci
-      - name: Run build
+      - name: Build
         run: npm run build
-  test:
+      - name: Test
+        run: npm run test
+  testV4:
+    needs: testV5
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -23,7 +26,30 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: '18'
+      - name: Change dependency
+        run: |
+          sed -i 's/"typescript": "\~[0-9]\+\.[0-9]\+\.[0-9]\+"/"typescript": "~4.0.0"/' package.json
       - name: Install dependencies
-        run: npm ci
-      - name: Run test
+        run: npm i
+      - name: Build
+        run: npm run build
+      - name: Test
+        run: npm run test
+  testV3:
+    needs: testV4
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '18'
+      - name: Change dependency
+        run: |
+          sed -i 's/"typescript": "\~[0-9]\+\.[0-9]\+\.[0-9]\+"/"typescript": "~3.0.0"/' package.json
+      - name: Install dependencies
+        run: npm i
+      - name: Build
+        run: npm run build
+      - name: Test
         run: npm run test
