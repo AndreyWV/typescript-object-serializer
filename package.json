@@ -1,6 +1,6 @@
 {
     "name": "typescript-object-serializer",
-    "version": "0.6.0",
+    "version": "0.7.0",
     "description": "Powerful Scalable Typescript object serializer",
     "scripts": {
         "build": "webpack",
