@@ -1,10 +1,6 @@
 import { Constructor } from '../../base-types/constructor';
-import {
-  definePropertiesKeys,
-  getPropertiesKeys,
-} from '../../serializable-properties';
+import { ExtractorsClassStore } from '../../class-stores/extractor-store';
 import { getConstructorPropertyName } from '../../utils/get-constructor-property-name';
-import { getSerializableProperties } from '../../utils/get-serializable-properties';
 import { Extractor } from './base-extractor';
 import { StraightExtractor } from './straight-extractor';
 
@@ -26,7 +22,7 @@ export function property(
 
     let ctor;
 
-    if (propertyKey === undefined && target['prototype'] && typeof indexOrDescriptor === 'number' ) {
+    if (propertyKey === undefined && target['prototype'] && typeof indexOrDescriptor === 'number') {
       const extractedPropertyKey = getConstructorPropertyName(target['prototype'].constructor, indexOrDescriptor as number);
       if (!extractedPropertyKey) {
         return;
@@ -39,16 +35,17 @@ export function property(
       ctor = target.constructor;
     }
 
-    const properties = getPropertiesKeys(ctor);
+    const propertiesStore = new ExtractorsClassStore<any>(ctor);
 
-    if (!properties) {
-      const parentProperties = getSerializableProperties(ctor.__proto__);
-      definePropertiesKeys(ctor, parentProperties);
+    if (!propertiesStore.getStoreMap()) {
+      const parentProperties = new ExtractorsClassStore(ctor.__proto__)
+        .findStoreMap() as Map<string | number, any> | undefined;
+      propertiesStore.defineStoreMap(parentProperties);
     }
 
-    const keysStore = getPropertiesKeys(ctor) as Map<string | Symbol, Extractor>;
+    const keysStore = propertiesStore.getStoreMap();
 
-    keysStore.set(propertyKey as string | symbol, new extractor(propertyKey));
+    keysStore?.set(propertyKey as string | symbol, new extractor(propertyKey));
 
   }
 }

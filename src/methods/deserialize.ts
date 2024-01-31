@@ -1,10 +1,8 @@
 import { Constructor } from '../base-types/constructor';
+import { ExtractorsClassStore } from '../class-stores/extractor-store';
+import { TypesClassStore } from '../class-stores/types-store';
 import { Extractor } from '../decorators/property/base-extractor';
 import { getPropertyDescriptor } from '../utils/get-property-descriptor';
-import {
-  getSerializableProperties,
-  getSerializablePropertiesTypes,
-} from '../utils/get-serializable-properties';
 
 /**
  * @method deserialize Deserialize object to class
@@ -20,13 +18,15 @@ export function deserialize<T>(ctor: Constructor<T>, data: any): T {
     return data;
   }
 
-  const props = getSerializableProperties(ctor);
+  const propsStore = new ExtractorsClassStore(ctor as any);
+  const props = propsStore.findStoreMap();
 
   if (!props) {
     return instance;
   }
 
-  const keyTypes = getSerializablePropertiesTypes(ctor);
+  const typesStore = new TypesClassStore(ctor as any);
+  const keyTypes = typesStore.findStoreMap();
 
   Array.from(props.keys()).forEach(
     key => {
@@ -104,7 +104,7 @@ export function deserialize<T>(ctor: Constructor<T>, data: any): T {
       }
 
       const isKeyHasSerializableProperties = Boolean(
-        getSerializableProperties(keyType),
+        new ExtractorsClassStore(keyType).findStoreMap(),
       );
 
       if (isKeyHasSerializableProperties) {

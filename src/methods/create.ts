@@ -1,13 +1,11 @@
 import { Constructor } from '../base-types/constructor';
 import { RecursivePartial } from '../base-types/recursive-partial';
+import { ExtractorsClassStore } from '../class-stores/extractor-store';
+import { TypesClassStore } from '../class-stores/types-store';
 import {
   SerializableObject,
   SerializableObjectWithoutBase,
 } from '../serializable-object';
-import {
-  getSerializableProperties,
-  getSerializablePropertiesTypes,
-} from '../utils/get-serializable-properties';
 import { clone } from './clone';
 
 /**
@@ -26,7 +24,7 @@ export function create<T>(
 
   const instance = new ctor() as T;
 
-  const keyTypes = getSerializablePropertiesTypes(ctor) as Map<keyof T, any>;
+  const keyTypes = new TypesClassStore<T>(ctor as any).findStoreMap();
 
   (Object.keys(data) as Array<keyof T>)
     .forEach(
@@ -44,7 +42,7 @@ export function create<T>(
         }
 
         const isKeyHasSerializableProperties = Boolean(
-          getSerializableProperties(keyType),
+          new ExtractorsClassStore(keyType as any).findStoreMap(),
         );
         if (isKeyHasSerializableProperties) {
           if (Array.isArray(dataValue)) {
@@ -56,7 +54,7 @@ export function create<T>(
           instance[key] = dataValue as any;
         }
       }
-    )
+    );
 
   return instance;
 }

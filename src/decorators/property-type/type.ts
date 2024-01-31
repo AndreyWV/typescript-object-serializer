@@ -1,11 +1,7 @@
 import { Constructor } from '../../base-types/constructor';
+import { TypesClassStore } from '../../class-stores/types-store';
 import { SerializableObject } from '../../serializable-object';
-import {
-  definePropertiesTypes,
-  getPropertiesTypes,
-} from '../../srtializable-types';
 import { getConstructorPropertyName } from '../../utils/get-constructor-property-name';
-import { getSerializablePropertiesTypes } from '../../utils/get-serializable-properties';
 
 /**
  * @function property Declares type for current property
@@ -49,14 +45,17 @@ export function propertyType<T extends typeof SerializableObject, U = Constructo
       ctor = target.constructor;
     }
 
-    if (!getPropertiesTypes(ctor)) {
-      const parentTypes = getSerializablePropertiesTypes(ctor.__proto__);
-      definePropertiesTypes(ctor, parentTypes);
+    const typesStore = new TypesClassStore<any>(ctor);
+
+    if (!typesStore.getStoreMap()) {
+      const parentTypes = new TypesClassStore(ctor.__proto__)
+        .findStoreMap() as Map<string | number, any> | undefined;
+      typesStore.defineStoreMap(parentTypes);
     }
 
-    const typesStore = getPropertiesTypes(ctor) as Map<string | Symbol, any>;
+    const storeMap = typesStore.getStoreMap();
 
-    typesStore.set(propertyKey as string | symbol, defineType);
+    storeMap?.set(propertyKey as string | symbol, defineType);
 
   }
 }
