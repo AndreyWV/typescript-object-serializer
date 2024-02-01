@@ -9,9 +9,7 @@ Required configure `tsconfig.json`:
 ```json
 {
     "compilerOptions": {
-        // ...
-        "experimentalDecorators": true,
-        // ...
+        "experimentalDecorators": true
     }
 }
 ```
@@ -25,10 +23,8 @@ npm install reflect-metadata
 ```json
 {
     "compilerOptions": {
-        // ...
         "experimentalDecorators": true,
-        "emitDecoratorMetadata": true,
-        // ...
+        "emitDecoratorMetadata": true
     }
 }
 ```
