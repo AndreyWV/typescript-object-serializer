@@ -1,4 +1,4 @@
-import { Extractor } from './base-extractor';
+import { Extractor } from '../decorators/base-extractor';
 
 /**
  * @class StraightExtractor

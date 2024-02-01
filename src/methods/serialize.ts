@@ -43,6 +43,6 @@ export function serialize<T extends Object>(object: T): any {
 function isSerializableObject(value: any): value is Object {
   return value instanceof SerializableObject ||
     Boolean(
-      new ExtractorsClassStore((value as any)?.constructor).findStoreMap(),
+      new ExtractorsClassStore((value)?.constructor).findStoreMap(),
     );
 }

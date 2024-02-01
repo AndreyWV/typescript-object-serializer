@@ -1,7 +1,7 @@
-import { Constructor } from '../../base-types/constructor';
-import { TypesClassStore } from '../../class-stores/types-store';
-import { SerializableObject } from '../../serializable-object';
-import { getConstructorPropertyName } from '../../utils/get-constructor-property-name';
+import { Constructor } from '../base-types/constructor';
+import { TypesClassStore } from '../class-stores/types-store';
+import { SerializableObject } from '../serializable-object';
+import { getConstructorPropertyName } from '../utils/get-constructor-property-name';
 
 /**
  * @function property Declares type for current property

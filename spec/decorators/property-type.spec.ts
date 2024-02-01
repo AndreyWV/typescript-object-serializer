@@ -1,5 +1,5 @@
-import { propertyType } from '../../src/decorators/property-type/type';
-import { property } from '../../src/decorators/property/property';
+import { property } from '../../src/decorators/property';
+import { propertyType } from '../../src/decorators/property-type';
 import { deserialize } from '../../src/methods/deserialize';
 import { SerializableObject } from '../../src/serializable-object';
 

@@ -1,22 +1,21 @@
 import { Constructor } from '../../base-types/constructor';
-import { ExtractorsClassStore } from '../../class-stores/extractor-store';
 import { getConstructorPropertyName } from '../../utils/get-constructor-property-name';
-import { Extractor } from './base-extractor';
-import { StraightExtractor } from './straight-extractor';
+import { Validator } from '../types/validator';
+import { ValidatorsClassStore } from '../validators-store';
 
 /**
- * @function property Declares serialize/deserialize rules for current property
- * @param extractor { Extractor } Extractor that extracts data from serialized data and applies data to serialized data
+ * @function propertyValidators Declares serialize/deserialize rules for current property
+ * @param validators { Constructor<Validator>[] } List of validators on current property
  * @example
  * class SomeClass extends SerializableObject {
  *
- *   @property()
+ *   @propertyValidators([RequiredValidator, NotEmptyStringValidator])
  *   public id: string;
  *
  * }
  */
-export function property(
-  extractor: Constructor<Extractor> = StraightExtractor,
+export function propertyValidators(
+  validators: Constructor<Validator>[],
 )/* : PropertyDecorator | ParameterDecorator */ {
   return (target: any, propertyKey: string | symbol | undefined, indexOrDescriptor?: number | PropertyDescriptor) => {
 
@@ -35,17 +34,17 @@ export function property(
       ctor = target.constructor;
     }
 
-    const propertiesStore = new ExtractorsClassStore<any>(ctor);
+    const validatorsStore = new ValidatorsClassStore<any>(ctor);
 
-    if (!propertiesStore.getStoreMap()) {
-      const parentProperties = new ExtractorsClassStore(ctor.__proto__)
+    if (!validatorsStore.getStoreMap()) {
+      const parentProperties = new ValidatorsClassStore(ctor.__proto__)
         .findStoreMap() as Map<string | number, any> | undefined;
-      propertiesStore.defineStoreMap(parentProperties);
+      validatorsStore.defineStoreMap(parentProperties);
     }
 
-    const keysStore = propertiesStore.getStoreMap();
+    const keysStore = validatorsStore.getStoreMap();
 
-    keysStore?.set(propertyKey as string | symbol, new extractor(propertyKey));
+    keysStore?.set(propertyKey as string | symbol, validators);
 
   }
 }

@@ -1,4 +1,4 @@
-import { property } from '../src/decorators/property/property';
+import { property } from '../src/decorators/property';
 import { deserialize } from '../src/methods/deserialize';
 import { serialize } from '../src/methods/serialize';
 import { SerializableObject } from '../src/serializable-object';

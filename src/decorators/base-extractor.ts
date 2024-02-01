@@ -1,4 +1,4 @@
-import { Constructor } from '../../base-types/constructor';
+import { Constructor } from '../base-types/constructor';
 
 /**
  * @class Extractor

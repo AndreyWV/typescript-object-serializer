@@ -1,6 +1,6 @@
-import { SnakeCaseExtractor } from '../src/decorators/property/snake-case-extractor';
-import { Extractor } from '../src/decorators/property/base-extractor';
-import { property } from '../src/decorators/property/property';
+import { Extractor } from '../src/decorators/base-extractor';
+import { property } from '../src/decorators/property';
+import { SnakeCaseExtractor } from '../src/extractors/snake-case-extractor';
 import { SerializableObject } from '../src/serializable-object';
 
 describe('Custom extractor', () => {

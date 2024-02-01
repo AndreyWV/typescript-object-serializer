@@ -24,7 +24,7 @@ export function create<T>(
 
   const instance = new ctor() as T;
 
-  const keyTypes = new TypesClassStore<T>(ctor as any).findStoreMap();
+  const keyTypes = new TypesClassStore<T>(ctor).findStoreMap();
 
   (Object.keys(data) as Array<keyof T>)
     .forEach(
@@ -42,16 +42,16 @@ export function create<T>(
         }
 
         const isKeyHasSerializableProperties = Boolean(
-          new ExtractorsClassStore(keyType as any).findStoreMap(),
+          new ExtractorsClassStore(keyType).findStoreMap(),
         );
         if (isKeyHasSerializableProperties) {
           if (Array.isArray(dataValue)) {
             instance[key] = (dataValue as Array<any>).map(item => create(keyType, item)) as any;
           } else {
-            instance[key] = create(keyType, dataValue as any);
+            instance[key] = create(keyType, dataValue);
           }
         } else {
-          instance[key] = dataValue as any;
+          instance[key] = dataValue;
         }
       }
     );

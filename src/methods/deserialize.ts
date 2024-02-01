@@ -1,8 +1,9 @@
 import { Constructor } from '../base-types/constructor';
 import { ExtractorsClassStore } from '../class-stores/extractor-store';
 import { TypesClassStore } from '../class-stores/types-store';
-import { Extractor } from '../decorators/property/base-extractor';
+import { Extractor } from '../decorators/base-extractor';
 import { getPropertyDescriptor } from '../utils/get-property-descriptor';
+import { isConstructor } from '../utils/is-constructor';
 
 /**
  * @method deserialize Deserialize object to class
@@ -18,15 +19,13 @@ export function deserialize<T>(ctor: Constructor<T>, data: any): T {
     return data;
   }
 
-  const propsStore = new ExtractorsClassStore(ctor as any);
-  const props = propsStore.findStoreMap();
+  const props = new ExtractorsClassStore(ctor).findStoreMap();
 
   if (!props) {
     return instance;
   }
 
-  const typesStore = new TypesClassStore(ctor as any);
-  const keyTypes = typesStore.findStoreMap();
+  const keyTypes = new TypesClassStore(ctor).findStoreMap();
 
   Array.from(props.keys()).forEach(
     key => {
@@ -50,18 +49,6 @@ export function deserialize<T>(ctor: Constructor<T>, data: any): T {
         return;
       }
 
-      const isConstructor = (isConstructorSomething: any): boolean => {
-        if (typeof isConstructorSomething !== 'function') {
-          return false;
-        }
-        try {
-          isConstructorSomething();
-          return false;
-        } catch {
-          return true;
-        }
-      }
-
       if (Array.isArray(objectData)) {
         if (isConstructor(keyTypeFunctionOrConstructor)) {
           applyValue(
@@ -79,7 +66,7 @@ export function deserialize<T>(ctor: Constructor<T>, data: any): T {
                 return deserialize(itemType, item);
               }
               return item;
-            }) as any,
+            }),
           );
         } else {
           applyValue(instance, key, objectData);
