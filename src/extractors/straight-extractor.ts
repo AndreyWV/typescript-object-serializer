@@ -1,4 +1,7 @@
-import { Extractor } from '../decorators/base-extractor';
+import {
+  ExtractionResult,
+  Extractor,
+} from '../decorators/base-extractor';
 
 /**
  * @class StraightExtractor
@@ -12,14 +15,22 @@ import { Extractor } from '../decorators/base-extractor';
  * }
  */
 export class StraightExtractor<T> extends Extractor<T> {
-  public extract(data: any): T | undefined {
+  public extract(data: any): ExtractionResult<T> {
     if (typeof data !== 'object' || data === null) {
-      return data;
+      return {
+        data,
+        path: this.key,
+      };
     }
     if (Array.isArray(data)) {
-      return;
-    }
-    return this.transformBeforeExtract(data[this.key]);
+      return {
+        data: undefined,
+        path: this.key,
+      };
+    } return {
+      data: this.transformBeforeExtract(data[this.key]),
+      path: this.key,
+    };
   }
 
   public apply(applyObject: any, value: T): void {

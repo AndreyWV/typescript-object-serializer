@@ -14,12 +14,9 @@ import { ValidatorsClassStore } from '../validators-store';
  */
 export function validate<T>(ctor: Constructor<T>, data: any): ValidationError[] {
 
-  const validatorsStore = new ValidatorsClassStore(ctor);
-  const validators = validatorsStore.findStoreMap();
   const props = new ExtractorsClassStore(ctor).findStoreMap();
 
-  if (!validators || !props) {
-    // TODO: Empty error list
+  if (!props) {
     return [];
   }
 
@@ -29,14 +26,17 @@ export function validate<T>(ctor: Constructor<T>, data: any): ValidationError[] 
   try {
     instance = new ctor();
   } catch {
-    // TODO: Empty error list
     return [];
   }
 
   const validationErrors: ValidationError[] = [];
 
-  Array.from(validators.keys()).forEach(
+  const validatorsStore = new ValidatorsClassStore(ctor).findStoreMap();
+
+  Array.from(props.keys()).forEach(
     key => {
+
+      const keyValidators = validatorsStore?.get(key);
 
       const keyTypeFunctionOrConstructor = keyTypes?.get(key) ||
         (
@@ -46,13 +46,20 @@ export function validate<T>(ctor: Constructor<T>, data: any): ValidationError[] 
 
       const extractor: Extractor | undefined = props.get(key);
 
-      const objectData = extractor?.extract(data);
+      const extractionResult = extractor?.extract(data);
+      const objectData = extractionResult?.data;
 
-      validationErrors.push(
-        ...validators.get(key)!.map(
-          Validator => new Validator().validate(objectData),
-        ),
-      );
+      if (keyValidators) {
+        validationErrors.push(
+          ...keyValidators
+            .map(
+              Validator => new Validator().validate(objectData, extractionResult?.path ?? ''),
+            )
+            .filter(
+              e => e instanceof ValidationError,
+            ) as ValidationError[],
+        );
+      }
 
       // Validate list of serializable items
       if (Array.isArray(objectData)) {
@@ -60,6 +67,14 @@ export function validate<T>(ctor: Constructor<T>, data: any): ValidationError[] 
           validationErrors.push(
             ...objectData
               .map(item => validate(keyTypeFunctionOrConstructor, item))
+              .map((itemErrors, itemIndex) => {
+                return itemErrors.map(
+                  error => {
+                    error.path = `${extractionResult?.path}.[${itemIndex}].${error.path}`;
+                    return error;
+                  },
+                );
+              })
               .flat(),
           );
         } else if (typeof keyTypeFunctionOrConstructor === 'function') {
@@ -67,7 +82,13 @@ export function validate<T>(ctor: Constructor<T>, data: any): ValidationError[] 
             const itemType = keyTypeFunctionOrConstructor(item);
             if (itemType !== undefined) {
               validationErrors.push(
-                ...validate(itemType, item),
+                ...validate(itemType, item)
+                  .map(
+                    error => {
+                      error.path = `${extractionResult?.path}.${error.path}`;
+                      return error;
+                    },
+                  ),
               );
             }
           });
@@ -94,7 +115,13 @@ export function validate<T>(ctor: Constructor<T>, data: any): ValidationError[] 
 
         if (isKeyHasSerializableProperties) {
           validationErrors.push(
-            ...validate(keyType, objectData),
+            ...validate(keyType, objectData)
+              .map(
+                error => {
+                  error.path = `${extractionResult?.path}.${error.path}`;
+                  return error;
+                },
+              ),
           );
         }
       }
@@ -102,5 +129,5 @@ export function validate<T>(ctor: Constructor<T>, data: any): ValidationError[] 
     }
   );
 
-  return [];
+  return validationErrors;
 }

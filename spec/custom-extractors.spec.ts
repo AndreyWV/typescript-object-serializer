@@ -1,4 +1,7 @@
-import { Extractor } from '../src/decorators/base-extractor';
+import {
+  ExtractionResult,
+  Extractor,
+} from '../src/decorators/base-extractor';
 import { property } from '../src/decorators/property';
 import { SnakeCaseExtractor } from '../src/extractors/snake-case-extractor';
 import { SerializableObject } from '../src/serializable-object';
@@ -45,13 +48,19 @@ describe('Custom extractor', () => {
         super(key);
       }
 
-      public extract(data: any): T | undefined {
+      public extract(data: any): ExtractionResult<T> {
         if (typeof data !== 'object' || data === null) {
-          return undefined;
+          return {
+            data: undefined,
+            path: this.key,
+          };
         }
-        return this.transformBeforeExtract(
-          DeepExtractor.getObjectByPath(data, this.key.split('.')),
-        );
+        return {
+          data: this.transformBeforeExtract(
+            DeepExtractor.getObjectByPath(data, this.key.split('.')),
+          ),
+          path: this.key,
+        };
       }
 
       public apply(applyObject: any, value: T): void {

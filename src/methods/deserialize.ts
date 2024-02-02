@@ -37,7 +37,7 @@ export function deserialize<T>(ctor: Constructor<T>, data: any): T {
 
       const extractor: Extractor | undefined = props.get(key);
 
-      const objectData = extractor?.extract(data);
+      const objectData = extractor?.extract(data)?.data;
 
       if (!objectData) {
         /* If objectData === undefined than instance[key] should have default value from class description */
