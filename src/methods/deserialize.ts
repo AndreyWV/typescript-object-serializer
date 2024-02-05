@@ -3,7 +3,7 @@ import { ExtractorsClassStore } from '../class-stores/extractor-store';
 import { TypesClassStore } from '../class-stores/types-store';
 import { Extractor } from '../decorators/base-extractor';
 import { getPropertyDescriptor } from '../utils/get-property-descriptor';
-import { isConstructor } from '../utils/is-constructor';
+import { KeyType } from '../utils/key-type';
 
 /**
  * @method deserialize Deserialize object to class
@@ -25,18 +25,14 @@ export function deserialize<T>(ctor: Constructor<T>, data: any): T {
     return instance;
   }
 
-  const keyTypes = new TypesClassStore(ctor).findStoreMap();
+  const keyTypesStore = new TypesClassStore(ctor);
+  const keyTypes = keyTypesStore.findStoreMap();
 
   Array.from(props.keys()).forEach(
     key => {
-      const keyTypeFunctionOrConstructor = keyTypes?.get(key) ||
-        (
-          (Reflect as any).getMetadata &&
-          (Reflect as any).getMetadata('design:type', instance, key as string | symbol)
-        );
 
+      const keyType = new KeyType(keyTypesStore, instance, key);
       const extractor: Extractor | undefined = props.get(key);
-
       const objectData = extractor?.extract(data)?.data;
 
       if (!objectData) {
@@ -50,18 +46,18 @@ export function deserialize<T>(ctor: Constructor<T>, data: any): T {
       }
 
       if (Array.isArray(objectData)) {
-        if (isConstructor(keyTypeFunctionOrConstructor)) {
+        if (keyType.isConstructor) {
           applyValue(
             instance,
             key,
-            objectData.map(item => deserialize(keyTypeFunctionOrConstructor, item)) as any,
+            objectData.map(item => deserialize(keyType.keyConstructor!, item)) as any,
           );
-        } else if (typeof keyTypeFunctionOrConstructor === 'function') {
+        } else if (keyType.isFunction) {
           applyValue(
             instance,
             key,
             objectData.map(item => {
-              const itemType = keyTypeFunctionOrConstructor(item);
+              const itemType = keyType.getTypeFromFunction(item);
               if (itemType !== undefined) {
                 return deserialize(itemType, item);
               }
@@ -74,28 +70,21 @@ export function deserialize<T>(ctor: Constructor<T>, data: any): T {
         return;
       }
 
-      const getKeyTypeFromFunction = () => {
-        try {
-          return keyTypeFunctionOrConstructor(objectData);
-        } catch {
-        }
-      }
+      const keyTypeConstructor = keyType.isConstructor ?
+        keyType.keyConstructor! :
+        keyType.getTypeFromFunction(objectData);
 
-      const keyType = isConstructor(keyTypeFunctionOrConstructor) ?
-        keyTypeFunctionOrConstructor :
-        getKeyTypeFromFunction();
-
-      if (!keyType) {
+      if (!keyTypeConstructor) {
         applyValue(instance, key, objectData);
         return;
       }
 
       const isKeyHasSerializableProperties = Boolean(
-        new ExtractorsClassStore(keyType).findStoreMap(),
+        new ExtractorsClassStore(keyTypeConstructor).findStoreMap(),
       );
 
       if (isKeyHasSerializableProperties) {
-        applyValue(instance, key, deserialize(keyType, objectData));
+        applyValue(instance, key, deserialize(keyTypeConstructor, objectData));
       } else {
         applyValue(instance, key, objectData);
       }

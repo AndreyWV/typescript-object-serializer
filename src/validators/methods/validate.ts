@@ -2,7 +2,7 @@ import { Constructor } from '../../base-types/constructor';
 import { ExtractorsClassStore } from '../../class-stores/extractor-store';
 import { TypesClassStore } from '../../class-stores/types-store';
 import { Extractor } from '../../decorators/base-extractor';
-import { isConstructor } from '../../utils/is-constructor';
+import { KeyType } from '../../utils/key-type';
 import { ValidationError } from '../types/validation-error';
 import { ValidatorsClassStore } from '../validators-store';
 
@@ -20,7 +20,7 @@ export function validate<T>(ctor: Constructor<T>, data: any): ValidationError[] 
     return [];
   }
 
-  const keyTypes = new TypesClassStore(ctor).findStoreMap();
+  const keyTypesStore = new TypesClassStore(ctor);
 
   let instance: T;
   try {
@@ -38,11 +38,7 @@ export function validate<T>(ctor: Constructor<T>, data: any): ValidationError[] 
 
       const keyValidators = validatorsStore?.get(key);
 
-      const keyTypeFunctionOrConstructor = keyTypes?.get(key) ||
-        (
-          (Reflect as any).getMetadata &&
-          (Reflect as any).getMetadata('design:type', instance, key as string | symbol)
-        );
+      const keyType = new KeyType(keyTypesStore, instance, key);
 
       const extractor: Extractor | undefined = props.get(key);
 
@@ -63,10 +59,10 @@ export function validate<T>(ctor: Constructor<T>, data: any): ValidationError[] 
 
       // Validate list of serializable items
       if (Array.isArray(objectData)) {
-        if (isConstructor(keyTypeFunctionOrConstructor)) {
+        if (keyType.isConstructor) {
           validationErrors.push(
             ...objectData
-              .map(item => validate(keyTypeFunctionOrConstructor, item))
+              .map(item => validate(keyType.keyConstructor!, item))
               .map((itemErrors, itemIndex) => {
                 return itemErrors.map(
                   error => {
@@ -77,9 +73,9 @@ export function validate<T>(ctor: Constructor<T>, data: any): ValidationError[] 
               })
               .flat(),
           );
-        } else if (typeof keyTypeFunctionOrConstructor === 'function') {
+        } else if (keyType.isFunction) {
           objectData.map(item => {
-            const itemType = keyTypeFunctionOrConstructor(item);
+            const itemType = keyType.getTypeFromFunction(item);
             if (itemType !== undefined) {
               validationErrors.push(
                 ...validate(itemType, item)
@@ -96,26 +92,19 @@ export function validate<T>(ctor: Constructor<T>, data: any): ValidationError[] 
         return;
       }
 
-      const getKeyTypeFromFunction = () => {
-        try {
-          return keyTypeFunctionOrConstructor(objectData);
-        } catch {
-        }
-      }
-
-      const keyType = isConstructor(keyTypeFunctionOrConstructor) ?
-        keyTypeFunctionOrConstructor :
-        getKeyTypeFromFunction();
+      const keyTypeConstructor = keyType.isConstructor ?
+        keyType.keyConstructor :
+        keyType.getTypeFromFunction(objectData);
 
       // Validate serializable item
       if (keyType) {
         const isKeyHasSerializableProperties = Boolean(
-          new ExtractorsClassStore(keyType).findStoreMap(),
+          new ExtractorsClassStore(keyTypeConstructor).findStoreMap(),
         );
 
         if (isKeyHasSerializableProperties) {
           validationErrors.push(
-            ...validate(keyType, objectData)
+            ...validate(keyTypeConstructor, objectData)
               .map(
                 error => {
                   error.path = `${extractionResult?.path}.${error.path}`;
