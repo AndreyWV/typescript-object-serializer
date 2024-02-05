@@ -26,7 +26,6 @@ export function deserialize<T>(ctor: Constructor<T>, data: any): T {
   }
 
   const keyTypesStore = new TypesClassStore(ctor);
-  const keyTypes = keyTypesStore.findStoreMap();
 
   Array.from(props.keys()).forEach(
     key => {
@@ -46,33 +45,20 @@ export function deserialize<T>(ctor: Constructor<T>, data: any): T {
       }
 
       if (Array.isArray(objectData)) {
-        if (keyType.isConstructor) {
-          applyValue(
-            instance,
-            key,
-            objectData.map(item => deserialize(keyType.keyConstructor!, item)) as any,
-          );
-        } else if (keyType.isFunction) {
-          applyValue(
-            instance,
-            key,
-            objectData.map(item => {
-              const itemType = keyType.getTypeFromFunction(item);
-              if (itemType !== undefined) {
-                return deserialize(itemType, item);
-              }
-              return item;
-            }),
-          );
-        } else {
-          applyValue(instance, key, objectData);
-        }
+        applyValue(
+          instance,
+          key,
+          objectData.map(item => {
+            const itemTypeConstructor = keyType.getConstructorForObject(item);
+            return itemTypeConstructor ?
+              deserialize(itemTypeConstructor, item) :
+              item;
+          }),
+        );
         return;
       }
 
-      const keyTypeConstructor = keyType.isConstructor ?
-        keyType.keyConstructor! :
-        keyType.getTypeFromFunction(objectData);
+      const keyTypeConstructor = keyType.getConstructorForObject(objectData);
 
       if (!keyTypeConstructor) {
         applyValue(instance, key, objectData);

@@ -3,9 +3,9 @@ import { TypesClassStore } from '../class-stores/types-store';
 
 export class KeyType<T> {
 
-  public isFunction: boolean;
-  public isConstructor: boolean;
-  public keyConstructor?: Constructor<T>;
+  private isFunction: boolean;
+  private isConstructor: boolean;
+  private keyConstructor?: Constructor<T>;
   private keyTypeFunction: (objectData: any) => any;
 
   constructor(
@@ -28,13 +28,6 @@ export class KeyType<T> {
     }
   }
 
-  public getTypeFromFunction(objectData: any): any {
-    try {
-      return this.keyTypeFunction(objectData);
-    } catch {
-    }
-  }
-
   private init() {
     const keyTypeFunctionOrConstructor = this.store.findStoreMap()?.get(this.key) ||
       (
@@ -50,5 +43,21 @@ export class KeyType<T> {
       this.keyTypeFunction = keyTypeFunctionOrConstructor;
     }
   }
+
+  public getConstructorForObject(objectData: any): Constructor<T> | undefined {
+    return this.isConstructor ?
+      this.keyConstructor! :
+      this.isFunction ?
+        this.getTypeFromFunction(objectData) :
+        undefined
+  }
+
+  private getTypeFromFunction(objectData: any): any {
+    try {
+      return this.keyTypeFunction(objectData);
+    } catch {
+    }
+  }
+
 
 }

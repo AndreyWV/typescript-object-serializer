@@ -6,6 +6,8 @@ import { KeyType } from '../../utils/key-type';
 import { ValidationError } from '../types/validation-error';
 import { ValidatorsClassStore } from '../validators-store';
 
+const PATH_SEPARATOR = '.';
+
 /**
  * @method validate Validate javascript object
  * @param ctor { Constructor<T> } Constructor of serializable class
@@ -59,45 +61,31 @@ export function validate<T>(ctor: Constructor<T>, data: any): ValidationError[] 
 
       // Validate list of serializable items
       if (Array.isArray(objectData)) {
-        if (keyType.isConstructor) {
-          validationErrors.push(
-            ...objectData
-              .map(item => validate(keyType.keyConstructor!, item))
-              .map((itemErrors, itemIndex) => {
-                return itemErrors.map(
-                  error => {
-                    error.path = `${extractionResult?.path}.[${itemIndex}].${error.path}`;
-                    return error;
-                  },
-                );
-              })
-              .flat(),
-          );
-        } else if (keyType.isFunction) {
-          objectData.map(item => {
-            const itemType = keyType.getTypeFromFunction(item);
-            if (itemType !== undefined) {
-              validationErrors.push(
-                ...validate(itemType, item)
-                  .map(
-                    error => {
-                      error.path = `${extractionResult?.path}.${error.path}`;
-                      return error;
-                    },
-                  ),
+        validationErrors.push(
+          ...objectData
+            .map<{ itemData: any, itemType?: Constructor<T> }>(itemData => ({
+              itemData,
+              itemType: keyType.getConstructorForObject(itemData),
+            }))
+            .filter(item => item.itemType)
+            .map(item => validate(item.itemType!, item.itemData))
+            .map((itemErrors, itemIndex) => {
+              return itemErrors.map(
+                error => {
+                  error.path = `${extractionResult?.path}${PATH_SEPARATOR}[${itemIndex}]${PATH_SEPARATOR}${error.path}`;
+                  return error;
+                },
               );
-            }
-          });
-        }
+            })
+            .flat(),
+        );
         return;
       }
 
-      const keyTypeConstructor = keyType.isConstructor ?
-        keyType.keyConstructor :
-        keyType.getTypeFromFunction(objectData);
+      const keyTypeConstructor = keyType.getConstructorForObject(objectData);
 
       // Validate serializable item
-      if (keyType) {
+      if (keyTypeConstructor) {
         const isKeyHasSerializableProperties = Boolean(
           new ExtractorsClassStore(keyTypeConstructor).findStoreMap(),
         );
@@ -107,7 +95,7 @@ export function validate<T>(ctor: Constructor<T>, data: any): ValidationError[] 
             ...validate(keyTypeConstructor, objectData)
               .map(
                 error => {
-                  error.path = `${extractionResult?.path}.${error.path}`;
+                  error.path = `${extractionResult?.path}${PATH_SEPARATOR}${error.path}`;
                   return error;
                 },
               ),
