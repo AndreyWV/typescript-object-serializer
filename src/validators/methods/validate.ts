@@ -14,7 +14,23 @@ const PATH_SEPARATOR = '.';
  * @param data { any } Object of serialized data
  * @returns { ValidationError[] } List of validation errors
  */
-export function validate<T>(ctor: Constructor<T>, data: any): ValidationError[] {
+export function validate<T>(ctor: Constructor<T>, data: any | any[]): ValidationError[] {
+
+  if (Array.isArray(data)) {
+    return data
+      .map(item => validate(ctor, item))
+      .map(
+        (validationErrors, index) => {
+          return validationErrors.map(
+            validationError => ({
+              ...validationError,
+              path: `[${index}]${PATH_SEPARATOR}${validationError.path}`,
+            }),
+          );
+        },
+      )
+      .flat();
+  }
 
   const props = new ExtractorsClassStore(ctor).findStoreMap();
 
