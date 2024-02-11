@@ -1,11 +1,14 @@
 import {
+  OverrideNameExtractor,
   property,
   propertyType,
+  SnakeCaseExtractor,
 } from '../../src';
 import { Constructor } from '../../src/base-types/constructor';
 import {
   propertyValidators,
   RequiredValidator,
+  StringRegexpValidator,
   validate,
   ValidationError,
   Validator,
@@ -205,6 +208,7 @@ describe('validate', () => {
       }
       class Test2 {
         @property()
+        @propertyType(Test)
         deepNested: Test;
       }
       class Test3 {
@@ -248,6 +252,124 @@ describe('validate', () => {
 
     });
 
+    it('should return full path of invalid property depends on extractor', () => {
+
+      class Test {
+        @property(OverrideNameExtractor.use('deep_string_property'))
+        @propertyValidators([RequiredValidator])
+        public stringProperty: string;
+      }
+      class Test2 {
+        @property(SnakeCaseExtractor)
+        @propertyType(Test)
+        deepNested: Test;
+      }
+      class Test3 {
+        @property(SnakeCaseExtractor)
+        @propertyType(Test2)
+        nestedArray: Test2[];
+      }
+
+      const result = validate(
+        Test3,
+        {
+          nested_array: [
+            {
+              deep_nested: {
+                deep_string_property: null,
+              },
+            },
+            {
+              deep_nested: {
+                deep_string_property: '12',
+              },
+            },
+            {
+              deep_nested: {
+              },
+            },
+          ],
+        },
+      );
+
+      expect(result).toEqual([
+        {
+          message: 'Property is required',
+          path: 'nested_array.[0].deep_nested.deep_string_property',
+        },
+        {
+          message: 'Property is required',
+          path: 'nested_array.[2].deep_nested.deep_string_property',
+        },
+      ]);
+
+    });
+
+  });
+
+  it('should validate by all validators of current class and all it\'s parent', () => {
+
+    class StringStartsWithAValidator extends Validator {
+      public validate(value: any, path: string): ValidationError | undefined {
+        if (typeof value !== 'string') {
+          return;
+        }
+        if (!value.startsWith('A')) {
+          return new ValidationError('Property must starts with "A"', path);
+        }
+      }
+    }
+
+    class Test1 {
+      @property()
+      @propertyValidators([NotEmptyStringValidator])
+      public property: string;
+    }
+
+    class Test2 extends Test1 {
+      @propertyValidators([StringStartsWithAValidator])
+      public property: string;
+    }
+
+    class Test3 extends Test2 {
+      @propertyValidators([StringRegexpValidator.with(/\w{3}/)])
+      public property: string;
+    }
+
+    const result = validate(
+      Test3,
+      {
+        property: '',
+      },
+    );
+
+    expect(result).toEqual([
+      {
+        message: 'Property must be a non-empty string',
+        path: 'property',
+      },
+      {
+        message: 'Property must starts with "A"',
+        path: 'property',
+      },
+      {
+        message: 'Property does not match the regexp /\\w{3}/',
+        path: 'property',
+      },
+    ]);
+
+  });
+
+  it('should not validate property without extractor', () => {
+
+    class Test {
+      @propertyValidators([RequiredValidator])
+      public property: string;
+    }
+
+    const result = validate(Test, {});
+
+    expect(result).toEqual([]);
 
   });
 

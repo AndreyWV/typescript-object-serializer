@@ -100,8 +100,6 @@ export function validate<T>(ctor: Constructor<T>, data: any | any[]): Validation
 
       const keyTypeConstructor = keyType.getConstructorForObject(objectData);
 
-      console.log(keyTypeConstructor);
-
       // Validate serializable item
       if (keyTypeConstructor) {
         const isKeyHasSerializableProperties = Boolean(

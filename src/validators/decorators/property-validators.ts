@@ -4,12 +4,12 @@ import { Validator } from '../types/validator';
 import { ValidatorsClassStore } from '../validators-store';
 
 /**
- * @function propertyValidators Declares serialize/deserialize rules for current property
+ * @function propertyValidators Declares validators for current property on deserialization
  * @param validators { Constructor<Validator>[] } List of validators on current property
  * @example
  * class SomeClass extends SerializableObject {
  *
- *   @propertyValidators([RequiredValidator, NotEmptyStringValidator])
+ *   @propertyValidators([RequiredValidator, RegExpStringValidator])
  *   public id: string;
  *
  * }
@@ -44,7 +44,14 @@ export function propertyValidators(
 
     const keysStore = validatorsStore.getStoreMap();
 
-    keysStore?.set(propertyKey as string | symbol, validators);
+    if (!keysStore) {
+      return;
+    }
+
+    const propertyKeyParentValidators = keysStore.get(propertyKey as string | symbol);
+    const allValidators = ([] as Constructor<Validator>[]).concat(propertyKeyParentValidators ?? [], validators);
+
+    keysStore.set(propertyKey as string | symbol, allValidators);
 
   }
 }
