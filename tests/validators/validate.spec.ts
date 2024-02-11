@@ -1,19 +1,15 @@
-import { property } from '../../src';
+import {
+  property,
+  propertyType,
+} from '../../src';
 import { Constructor } from '../../src/base-types/constructor';
 import {
   propertyValidators,
+  RequiredValidator,
   validate,
   ValidationError,
   Validator,
 } from '../../src/validators';
-
-export class RequiredValidator extends Validator {
-  public validate(value: any, path: string): ValidationError | undefined {
-    if (value === undefined || value === null) {
-      return new ValidationError('Property is required', path);
-    }
-  }
-}
 
 export class NotEmptyStringValidator extends Validator {
   public validate(value: any, path: string): ValidationError | undefined {
@@ -24,7 +20,7 @@ export class NotEmptyStringValidator extends Validator {
   }
 }
 
-export class StringLengthValidator extends Validator {
+export class CustomStringLengthValidator extends Validator {
 
   constructor(
     public minLength: number,
@@ -33,8 +29,8 @@ export class StringLengthValidator extends Validator {
     super();
   }
 
-  public static with(minLength: number, maxLength: number): Constructor<StringLengthValidator> {
-    return class extends StringLengthValidator {
+  public static with(minLength: number, maxLength: number): Constructor<CustomStringLengthValidator> {
+    return class extends CustomStringLengthValidator {
       constructor() {
         super(minLength, maxLength);
       }
@@ -112,7 +108,7 @@ describe('validate', () => {
   describe('multiple validators', () => {
     class Test {
       @property()
-      @propertyValidators([NotEmptyStringValidator, StringLengthValidator.with(3, 5)])
+      @propertyValidators([NotEmptyStringValidator, CustomStringLengthValidator.with(3, 5)])
       public property: string;
     }
 
@@ -145,7 +141,7 @@ describe('validate', () => {
 
       class Test {
         @property()
-        @propertyValidators([NotEmptyStringValidator, StringLengthValidator.with(3, 5)])
+        @propertyValidators([NotEmptyStringValidator, CustomStringLengthValidator.with(3, 5)])
         public property: string;
       }
 
@@ -198,6 +194,61 @@ describe('validate', () => {
 
   });
 
+  describe('nested serializable objects', () => {
 
+    it('should validate all nested serializable objects', () => {
+
+      class Test {
+        @property()
+        @propertyValidators([RequiredValidator])
+        public property: string;
+      }
+      class Test2 {
+        @property()
+        deepNested: Test;
+      }
+      class Test3 {
+        @property()
+        @propertyType(Test2)
+        nested: Test2[];
+      }
+
+      const result = validate(
+        Test3,
+        {
+          nested: [
+            {
+              deepNested: {
+                property: null,
+              },
+            },
+            {
+              deepNested: {
+                property: '12',
+              },
+            },
+            {
+              deepNested: {
+              },
+            },
+          ],
+        },
+      );
+
+      expect(result).toEqual([
+        {
+          message: 'Property is required',
+          path: 'nested.[0].deepNested.property',
+        },
+        {
+          message: 'Property is required',
+          path: 'nested.[2].deepNested.property',
+        },
+      ]);
+
+    });
+
+
+  });
 
 });
