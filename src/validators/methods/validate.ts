@@ -12,7 +12,7 @@ const PATH_SEPARATOR = '.';
  * @method validate Validate javascript object
  * @param ctor { Constructor<T> } Constructor of serializable class
  * @param data { any } Object of serialized data
- * @returns { ValidationError[] } List of validation errors
+ * @returns { ValidationError[] } List of validation errors. Returns empty array if object is valid.
  */
 export function validate<T>(ctor: Constructor<T>, data: any | any[]): ValidationError[] {
 

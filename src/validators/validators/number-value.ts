@@ -2,6 +2,17 @@ import { Constructor } from '../../base-types/constructor';
 import { ValidationError } from '../types/validation-error';
 import { Validator } from '../types/validator';
 
+/**
+ * @class NumberValueValidator Validates number between min-max values
+ * @example
+ * class SomeClass extends SerializableObject {
+ *
+ *   @property()
+ *   @propertyValidators([NumberValueValidator.with(0, Number.MAX_VALUE)])
+ *   public positiveNumber: number;
+ *
+ * }
+ */
 export class NumberValueValidator extends Validator {
 
   constructor(

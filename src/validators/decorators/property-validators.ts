@@ -9,7 +9,8 @@ import { ValidatorsClassStore } from '../validators-store';
  * @example
  * class SomeClass extends SerializableObject {
  *
- *   @propertyValidators([RequiredValidator, RegExpStringValidator])
+ *   @property()
+ *   @propertyValidators([RequiredValidator, StringLengthValidator.with(1, 10)])
  *   public id: string;
  *
  * }

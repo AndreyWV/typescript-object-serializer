@@ -2,6 +2,17 @@ import { Constructor } from '../../base-types/constructor';
 import { ValidationError } from '../types/validation-error';
 import { Validator } from '../types/validator';
 
+/**
+ * @class StringLengthValidator Validates string by length
+ * @example
+ * class Person extends SerializableObject {
+ *
+ *   @property()
+ *   @propertyValidators([StringLengthValidator.with(1, 50)])
+ *   public name: string;
+ *
+ * }
+ */
 export class StringLengthValidator extends Validator {
 
   constructor(
