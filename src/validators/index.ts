@@ -1,5 +1,6 @@
 export * from './decorators/property-validators';
 export * from './methods/validate';
+export * from './serializable-object-with-validator';
 export * from './types/validation-error';
 export * from './types/validator';
 export * from './validators/number-value';

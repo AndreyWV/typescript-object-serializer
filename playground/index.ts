@@ -1,17 +1,27 @@
 import 'reflect-metadata';
 import {
+  clone,
+  create,
+  deserialize,
+  ExtractionResult,
   Extractor,
   OverrideNameExtractor,
   propertyType,
   SerializableObject,
+  serialize,
   SnakeCaseExtractor,
+  StraightExtractor,
 } from '../src';
 import { property } from '../src/decorators/property';
-import { StraightExtractor } from '../src/extractors/straight-extractor';
-import { clone } from '../src/methods/clone';
-import { create } from '../src/methods/create';
-import { deserialize } from '../src/methods/deserialize';
-import { serialize } from '../src/methods/serialize';
+import {
+  propertyValidators,
+  RequiredValidator,
+  SerializableObjectWithValidation,
+  StringLengthValidator,
+  validate,
+  ValidationError,
+  Validator,
+} from '../src/validators';
 
 // Basic usage
 (() => {
@@ -548,13 +558,19 @@ import { serialize } from '../src/methods/serialize';
       super(key);
     }
 
-    public extract(data: any): T | undefined {
+    public extract(data: any): ExtractionResult<T> {
       if (typeof data !== 'object' || data === null) {
-        return undefined;
+        return {
+          data: undefined,
+          path: this.key,
+        };
       }
-      return this.transformBeforeExtract(
-        DeepExtractor.getObjectByPath(data, this.key.split('.')),
-      );
+      return {
+        data: this.transformBeforeExtract(
+          DeepExtractor.getObjectByPath(data, this.key.split('.')),
+        ),
+        path: this.key,
+      };
     }
 
     public apply(applyObject: any, value: T): void {
@@ -730,5 +746,190 @@ import { serialize } from '../src/methods/serialize';
     title: 'New item',
   });
   console.log(newItem); // Item { id: 3, title: "New item" }
+
+})();
+
+// Basic validation
+(() => {
+
+  console.log('Basic validation');
+
+  class Person {
+    @property()
+    @propertyValidators([RequiredValidator, StringLengthValidator.with({ min: 1 })])
+    public name: string;
+  }
+
+  const resultRequired = validate(Person, {});
+  console.log(resultRequired); // [ ValidationError { message: "Property is required", path: "name" } ]
+
+  const resultEmpty = validate(Person, {
+    name: '',
+  });
+  console.log(resultEmpty); // [ ValidationError { message: "Property length should be greater than or equal 1", path: "name" } ]
+
+})();
+
+// Deep validation
+(() => {
+
+  console.log('Deep validation');
+
+  class Address {
+    @property()
+    @propertyValidators([RequiredValidator])
+    public city: string;
+  }
+
+  class Employee {
+    @property()
+    @propertyValidators([RequiredValidator])
+    public name: string;
+
+    @property()
+    @propertyValidators([RequiredValidator])
+    public address: Address;
+  }
+
+  class Department {
+    @property(SnakeCaseExtractor)
+    @propertyType(Employee)
+    public departmentEmployees: Employee[];
+  }
+
+  const data = {
+    department_employees: [
+      {
+        name: 'John Doe',
+        address: {
+          city: 'New York',
+        },
+      },
+      {
+        address: {
+          city: 'London',
+        },
+      },
+      {
+        name: 'Jane Doe',
+        address: {
+        },
+      },
+      {
+        name: 'Jane Smith',
+        address: {
+          city: 'Berlin'
+        },
+      },
+    ],
+  };
+
+  const validationResult = validate(Department, data);
+
+  console.log(validationResult); // [ ValidationError { message: 'Property is required', path: "department_employees.[1].name" }, ValidationError { message: "Property is required", path: "department_employees.[2].address.city" } ]
+
+})();
+
+// Custom validator
+(() => {
+
+  console.log('Custom validator');
+
+  class VINValidator extends Validator {
+    public validate(value: any, path: string): ValidationError | undefined {
+      if (typeof value !== 'string') {
+        return;
+      }
+      if (!/^[A-HJ-NPR-Z0-9]{17}$/i.test(value)) {
+        return new ValidationError('Invalid VIN', path);
+      }
+    }
+  }
+
+  class Vehicle {
+    @property()
+    @propertyValidators([VINValidator])
+    public vin: string;
+  }
+
+  const validationResult = validate(Vehicle, { vin: '345435' });
+
+  console.log(validationResult); // [ ValidationError { message: "Invalid VIN", path: "vin" } ]
+
+
+})();
+
+// Custom validation error
+(() => {
+
+  console.log('Custom validation error');
+
+  class PasswordCriticalValidationError extends ValidationError {
+    constructor(
+      path: string,
+    ) {
+      super('Password too short', path);
+    }
+  }
+  class PasswordWarnValidationError extends ValidationError {
+    constructor(
+      path: string,
+    ) {
+      super('Password is weak', path);
+    }
+  }
+
+  class PasswordValidator extends Validator {
+
+    public validate(value: any, path: string): ValidationError | undefined {
+      if (typeof value !== 'string') {
+        return;
+      }
+
+      if (value.length < 4) {
+        return new PasswordCriticalValidationError(path);
+      }
+
+      if (value.length < 6) {
+        return new PasswordWarnValidationError(path);
+      }
+    }
+  }
+
+  class LoginCredentials {
+    @property()
+    @propertyValidators([PasswordValidator])
+    public password: string;
+  }
+
+  const shortPasswordResult = validate(LoginCredentials, { password: '123' });
+  console.log(shortPasswordResult); // [ PasswordCriticalValidationError { message: "Password too short", path: "password" } ]
+
+  const weakPasswordResult = validate(LoginCredentials, { password: '12345' });
+  console.log(weakPasswordResult); // [ PasswordWarnValidationError { message: "Password is weak", path: "password" } ]
+
+  const criticalErrors = weakPasswordResult.filter(error => !(error instanceof PasswordWarnValidationError));
+  console.log(criticalErrors); // []
+
+})();
+
+// SerializableObjectWithValidation
+(() => {
+
+  console.log('Serializable object with validation');
+
+  class Person extends SerializableObjectWithValidation {
+    @property()
+    @propertyValidators([RequiredValidator, StringLengthValidator.with({ min: 1 })])
+    public name: string;
+  }
+
+  const resultRequired = Person.validate({});
+  console.log(resultRequired); // [ ValidationError { message: "Property is required", path: "name" } ]
+
+  const resultEmpty = validate(Person, {
+    name: '',
+  });
+  console.log(resultEmpty); // [ ValidationError { message: "Property length should be greater than or equal 1", path: "name" } ]
 
 })();

@@ -594,6 +594,7 @@ import {
   serialize,
   property,
   Extractor,
+  ExtractionResult,
 } from 'typescript-object-serializer';
 
 /* Extract value from deep object (transform to plane object) */
@@ -635,13 +636,19 @@ class DeepExtractor<T = any> extends Extractor<T> {
     super(key);
   }
 
-  public extract(data: any): T | undefined {
+  public extract(data: any): ExtractionResult<T> {
     if (typeof data !== 'object' || data === null) {
-      return undefined;
+      return {
+        data: undefined,
+        path: this.key,
+      };
     }
-    return this.transformBeforeExtract(
-      DeepExtractor.getObjectByPath(data, this.key.split('.')),
-    );
+    return {
+      data: this.transformBeforeExtract(
+        DeepExtractor.getObjectByPath(data, this.key.split('.')),
+      ),
+      path: this.key,
+    };
   }
 
   public apply(applyObject: any, value: T): void {
@@ -828,4 +835,192 @@ const newItem = Item.create({
   title: 'New item',
 });
 console.log(newItem); // Item { id: 3, title: "New item" }
+```
+
+# Data validation
+It is possible to validate data before deserialization. Method `validate` from module `typescript-object-serializer/validators` returns Array of validation errors. It returns *empty array* if data is valid.
+
+## Basic validation
+```typescript
+import { property } from 'typescript-object-serializer';
+import {
+  propertyValidators,
+  RequiredValidator,
+  StringLengthValidator,
+  validate,
+} from 'typescript-object-serializer/validators';
+
+class Person {
+  @property()
+  @propertyValidators([RequiredValidator, StringLengthValidator.with({ min: 1 })])
+  public name: string;
+}
+
+const resultRequired = validate(Person, {});
+console.log(resultRequired); // [ ValidationError { message: "Property is required", path: "name" } ]
+
+const resultEmpty = validate(Person, {
+  name: '',
+});
+console.log(resultEmpty); // [ ValidationError { message: "Property length should be greater than or equal 1", path: "name" } ]
+```
+
+## Deep validation
+```typescript
+import {
+  property,
+  propertyType,
+  SnakeCaseExtractor,
+} from 'typescript-object-serializer';
+import {
+  propertyValidators,
+  RequiredValidator,
+  validate,
+} from 'typescript-object-serializer/validators';
+
+class Address {
+  @property()
+  @propertyValidators([RequiredValidator])
+  public city: string;
+}
+
+class Employee {
+  @property()
+  @propertyValidators([RequiredValidator])
+  public name: string;
+
+  @property()
+  @propertyValidators([RequiredValidator])
+  public address: Address;
+}
+
+class Department {
+  @property(SnakeCaseExtractor)
+  @propertyType(Employee)
+  public departmentEmployees: Employee[];
+}
+
+const data = {
+  department_employees: [
+    {
+      name: 'John Doe',
+      address: {
+        city: 'New York',
+      },
+    },
+    {
+      address: {
+        city: 'London',
+      },
+    },
+    {
+      name: 'Jane Doe',
+      address: {
+      },
+    },
+    {
+      name: 'Jane Smith',
+      address: {
+        city: 'Berlin'
+      },
+    },
+  ],
+};
+
+const validationResult = validate(Department, data);
+
+console.log(validationResult); // [ ValidationError { message: 'Property is required', path: "department_employees.[1].name" }, ValidationError { message: "Property is required", path: "department_employees.[2].address.city" } ]
+```
+
+## Custom validator
+```typescript
+import { property } from 'typescript-object-serializer';
+import {
+  propertyValidators,
+  validate,
+  ValidationError,
+  Validator,
+} from 'typescript-object-serializer/validators';
+
+class VINValidator extends Validator {
+  public validate(value: any, path: string): ValidationError | undefined {
+    if (typeof value !== 'string') {
+      return;
+    }
+    if (!/^[A-HJ-NPR-Z0-9]{17}$/i.test(value)) {
+      return new ValidationError('Invalid VIN', path);
+    }
+  }
+}
+
+class Vehicle {
+  @property()
+  @propertyValidators([VINValidator])
+  public vin: string;
+}
+
+const validationResult = validate(Vehicle, { vin: '345435' });
+
+console.log(validationResult); // [ ValidationError { message: "Invalid VIN", path: "vin" } ]
+```
+
+## Custom validation error
+It is possible to implement own validation errors at custom validators. It allows to
+1. Add some logic on validation result: filter critical and non-critical errors
+2. Add error class with predefined message (no need to write error message at `validate()` method)
+```typescript
+import { property } from 'typescript-object-serializer';
+import {
+  propertyValidators,
+  validate,
+  ValidationError,
+  Validator,
+} from 'typescript-object-serializer/validators';
+
+class PasswordCriticalValidationError extends ValidationError {
+  constructor(
+    path: string,
+  ) {
+    super('Password too short', path);
+  }
+}
+class PasswordWarnValidationError extends ValidationError {
+  constructor(
+    path: string,
+  ) {
+    super('Password is weak', path);
+  }
+}
+
+class PasswordValidator extends Validator {
+
+  public validate(value: any, path: string): ValidationError | undefined {
+    if (typeof value !== 'string') {
+      return;
+    }
+
+    if (value.length < 4) {
+      return new PasswordCriticalValidationError(path);
+    }
+
+    if (value.length < 6) {
+      return new PasswordWarnValidationError(path);
+    }
+  }
+}
+
+class LoginCredentials {
+  @property()
+  @propertyValidators([PasswordValidator])
+  public password: string;
+}
+
+const shortPasswordResult = validate(LoginCredentials, { password: '123' });
+console.log(shortPasswordResult); // [ PasswordCriticalValidationError { message: "Password too short", path: "password" } ]
+
+const weakPasswordResult = validate(LoginCredentials, { password: '12345' });
+console.log(weakPasswordResult); // [ PasswordWarnValidationError { message: "Password is weak", path: "password" } ]
+
+const criticalErrors = weakPasswordResult.filter(error => !(error instanceof PasswordWarnValidationError));
+console.log(criticalErrors); // []
 ```

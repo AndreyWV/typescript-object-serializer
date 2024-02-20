@@ -8,7 +8,7 @@ import { Validator } from '../types/validator';
  * class SomeClass extends SerializableObject {
  *
  *   @property()
- *   @propertyValidators([NumberValueValidator.with(0, Number.MAX_VALUE)])
+ *   @propertyValidators([NumberValueValidator.with({min: 0, max: Number.MAX_VALUE)])
  *   public positiveNumber: number;
  *
  * }
@@ -22,10 +22,10 @@ export class NumberValueValidator extends Validator {
     super();
   }
 
-  public static with(min?: number, max?: number): Constructor<Validator> {
+  public static with(options: { min?: number; max?: number; }): Constructor<Validator> {
     return class extends NumberValueValidator {
       constructor() {
-        super(min, max);
+        super(options.min, options.max);
       }
     }
   }

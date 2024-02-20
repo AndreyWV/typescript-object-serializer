@@ -50,9 +50,7 @@ export class SerializableObject {
     this: T,
     data: any,
   ): InstanceType<T> {
-
     return deserialize(this, data) as InstanceType<T>;
-
   }
 
   /**

@@ -22,10 +22,10 @@ export class StringLengthValidator extends Validator {
     super();
   }
 
-  public static with(minLength?: number, maxLength?: number): Constructor<Validator> {
+  public static with(options: { min?: number; max?: number; }): Constructor<Validator> {
     return class extends StringLengthValidator {
       constructor() {
-        super(minLength, maxLength);
+        super(options.min, options.max);
       }
     }
   }
