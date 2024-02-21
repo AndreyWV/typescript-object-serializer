@@ -1,7 +1,9 @@
-const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
+import HtmlWebpackPlugin from 'html-webpack-plugin';
+import path from 'path';
+import { Configuration } from 'webpack';
+import { Configuration as DevServerConfiguration } from 'webpack-dev-server';
 
-module.exports = {
+const config: Configuration & DevServerConfiguration = {
   entry: './playground/index.ts',
   output: {
     path: path.resolve(__dirname, '.dist-playground'),
@@ -36,3 +38,5 @@ module.exports = {
     port: 3000,
   },
 };
+
+export default config;
