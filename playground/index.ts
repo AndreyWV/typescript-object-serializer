@@ -16,7 +16,6 @@ import { property } from '../src/decorators/property';
 import {
   propertyValidators,
   RequiredValidator,
-  SerializableObjectWithValidation,
   StringLengthValidator,
   validate,
   ValidationError,
@@ -910,26 +909,5 @@ import {
 
   const criticalErrors = weakPasswordResult.filter(error => !(error instanceof PasswordWarnValidationError));
   console.log(criticalErrors); // []
-
-})();
-
-// SerializableObjectWithValidation
-(() => {
-
-  console.log('Serializable object with validation');
-
-  class Person extends SerializableObjectWithValidation {
-    @property()
-    @propertyValidators([RequiredValidator, StringLengthValidator.with({ min: 1 })])
-    public name: string;
-  }
-
-  const resultRequired = Person.validate({});
-  console.log(resultRequired); // [ ValidationError { message: "Property is required", path: "name" } ]
-
-  const resultEmpty = validate(Person, {
-    name: '',
-  });
-  console.log(resultEmpty); // [ ValidationError { message: "Property length should be greater than or equal 1", path: "name" } ]
 
 })();
