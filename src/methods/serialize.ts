@@ -1,7 +1,6 @@
-import { Extractor } from '../decorators/property/base-extractor';
+import { ExtractorsClassStore } from '../class-stores/extractor-store';
 import { SerializableObject } from '../serializable-object';
 import { deleteUndefinedRecursive } from '../utils/delete-undefined';
-import { getSerializableProperties } from '../utils/get-serializable-properties';
 
 /**
  * @method serialize Serialize instance date
@@ -11,19 +10,19 @@ import { getSerializableProperties } from '../utils/get-serializable-properties'
 export function serialize<T extends Object>(object: T): any {
   const data = {};
 
-  const keys = getSerializableProperties((object as any).constructor) as Map<keyof T, Extractor>;
+  const keysStore = new ExtractorsClassStore((object as any).constructor).findStoreMap();
 
-  if (!keys) {
+  if (!keysStore) {
     if (typeof object === 'object') {
       return data;
     }
     return object;
   }
 
-  Array.from(keys.keys()).forEach(
+  Array.from(keysStore.keys()).forEach(
     key => {
-      const extractor = keys.get(key);
-      const value = object[key];
+      const extractor = keysStore.get(key);
+      const value = (object as any)[key];
 
       let serializedValue;
       if (Array.isArray(value)) {
@@ -43,5 +42,7 @@ export function serialize<T extends Object>(object: T): any {
 
 function isSerializableObject(value: any): value is Object {
   return value instanceof SerializableObject ||
-    Boolean(getSerializableProperties((value as any)?.constructor));
+    Boolean(
+      new ExtractorsClassStore((value)?.constructor).findStoreMap(),
+    );
 }

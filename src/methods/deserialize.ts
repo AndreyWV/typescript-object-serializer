@@ -1,10 +1,9 @@
 import { Constructor } from '../base-types/constructor';
-import { Extractor } from '../decorators/property/base-extractor';
+import { ExtractorsClassStore } from '../class-stores/extractor-store';
+import { TypesClassStore } from '../class-stores/types-store';
+import { Extractor } from '../decorators/base-extractor';
 import { getPropertyDescriptor } from '../utils/get-property-descriptor';
-import {
-  getSerializableProperties,
-  getSerializablePropertiesTypes,
-} from '../utils/get-serializable-properties';
+import { KeyType } from '../utils/key-type';
 
 /**
  * @method deserialize Deserialize object to class
@@ -20,25 +19,20 @@ export function deserialize<T>(ctor: Constructor<T>, data: any): T {
     return data;
   }
 
-  const props = getSerializableProperties(ctor);
+  const props = new ExtractorsClassStore(ctor).findStoreMap();
 
   if (!props) {
     return instance;
   }
 
-  const keyTypes = getSerializablePropertiesTypes(ctor);
+  const keyTypesStore = new TypesClassStore(ctor);
 
   Array.from(props.keys()).forEach(
     key => {
-      const keyTypeFunctionOrConstructor = keyTypes?.get(key) ||
-        (
-          (Reflect as any).getMetadata &&
-          (Reflect as any).getMetadata('design:type', instance, key as string | symbol)
-        );
 
+      const keyType = new KeyType(keyTypesStore, instance, key);
       const extractor: Extractor | undefined = props.get(key);
-
-      const objectData = extractor?.extract(data);
+      const objectData = extractor?.extract(data)?.data;
 
       if (!objectData) {
         /* If objectData === undefined than instance[key] should have default value from class description */
@@ -50,65 +44,33 @@ export function deserialize<T>(ctor: Constructor<T>, data: any): T {
         return;
       }
 
-      const isConstructor = (isConstructorSomething: any): boolean => {
-        if (typeof isConstructorSomething !== 'function') {
-          return false;
-        }
-        try {
-          isConstructorSomething();
-          return false;
-        } catch {
-          return true;
-        }
-      }
-
       if (Array.isArray(objectData)) {
-        if (isConstructor(keyTypeFunctionOrConstructor)) {
-          applyValue(
-            instance,
-            key,
-            objectData.map(item => deserialize(keyTypeFunctionOrConstructor, item)) as any,
-          );
-        } else if (typeof keyTypeFunctionOrConstructor === 'function') {
-          applyValue(
-            instance,
-            key,
-            objectData.map(item => {
-              const itemType = keyTypeFunctionOrConstructor(item);
-              if (itemType !== undefined) {
-                return deserialize(itemType, item);
-              }
-              return item;
-            }) as any,
-          );
-        } else {
-          applyValue(instance, key, objectData);
-        }
+        applyValue(
+          instance,
+          key,
+          objectData.map(item => {
+            const itemTypeConstructor = keyType.getConstructorForObject(item);
+            return itemTypeConstructor ?
+              deserialize(itemTypeConstructor, item) :
+              item;
+          }),
+        );
         return;
       }
 
-      const getKeyTypeFromFunction = () => {
-        try {
-          return keyTypeFunctionOrConstructor(objectData);
-        } catch {
-        }
-      }
+      const keyTypeConstructor = keyType.getConstructorForObject(objectData);
 
-      const keyType = isConstructor(keyTypeFunctionOrConstructor) ?
-        keyTypeFunctionOrConstructor :
-        getKeyTypeFromFunction();
-
-      if (!keyType) {
+      if (!keyTypeConstructor) {
         applyValue(instance, key, objectData);
         return;
       }
 
       const isKeyHasSerializableProperties = Boolean(
-        getSerializableProperties(keyType),
+        new ExtractorsClassStore(keyTypeConstructor).findStoreMap(),
       );
 
       if (isKeyHasSerializableProperties) {
-        applyValue(instance, key, deserialize(keyType, objectData));
+        applyValue(instance, key, deserialize(keyTypeConstructor, objectData));
       } else {
         applyValue(instance, key, objectData);
       }

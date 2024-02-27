@@ -24,7 +24,7 @@
     "include": [
         "src",
         "playground",
-        "spec"
+        "tests"
     ],
     "exclude": [
         "node_modules"

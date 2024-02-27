@@ -1,4 +1,4 @@
-import { getSerializableProperties } from '../utils/get-serializable-properties';
+import { ExtractorsClassStore } from '../class-stores/extractor-store';
 import { create } from './create';
 
 /**
@@ -12,7 +12,7 @@ export function clone<T extends object>(data: T): T {
 
   const cloneValue = (value: any): any => {
     const isValueHasSerializableProperties = Boolean(
-      getSerializableProperties(value?.constructor),
+      new ExtractorsClassStore(value?.constructor).findStoreMap(),
     );
     if (Array.isArray(value)) {
       return value.map(v => cloneValue(v));
