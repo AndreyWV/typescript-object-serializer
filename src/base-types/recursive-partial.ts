@@ -1,3 +1,8 @@
 export type RecursivePartial<T> = {
-  [K in keyof T]?: RecursivePartial<T[K]>;
-}
+  [P in keyof T]?:
+    T[P] extends (infer U)[] ?
+    RecursivePartial<U>[] :
+      T[P] extends object | undefined ?
+      RecursivePartial<T[P]> :
+        T[P];
+};

@@ -26,7 +26,13 @@ export function serialize<T extends Object>(object: T): any {
 
       let serializedValue;
       if (Array.isArray(value)) {
-        serializedValue = value.map(itm => serialize(itm));
+        serializedValue = value.map(item => {
+          const itemKeysStore = new ExtractorsClassStore((item as any)?.constructor).findStoreMap();
+          if (!itemKeysStore) {
+            return item;
+          }
+          return serialize(item)
+        });
       } else {
         serializedValue = isSerializableObject(value) ?
           serialize(value) :
