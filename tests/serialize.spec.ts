@@ -85,6 +85,44 @@ describe('Serialize', () => {
             property: null,
           });
         });
+
+      it('should serialize array of objects without serializable type', () => {
+
+        class Test extends SerializableObject {
+          @property()
+          public list: any[];
+        }
+
+        const instance = create(Test, {
+          list: [
+            {
+              property: 123,
+            },
+            {
+              otherProperty: 'aaa',
+            },
+            'string value' as any,
+            123,
+            null,
+          ],
+        });
+
+        const serialized = instance.serialize();
+        expect(serialized).toEqual({
+          list: [
+            {
+              property: 123,
+            },
+            {
+              otherProperty: 'aaa',
+            },
+            'string value',
+            123,
+            null,
+          ],
+        });
+
+      });
     });
 
     describe('simple class', () => {
@@ -160,6 +198,44 @@ describe('Serialize', () => {
             property: null,
           });
         });
+
+      it('should serialize array of objects without serializable type', () => {
+
+        class Test {
+          @property()
+          public list: any[];
+        }
+
+        const instance = create(Test, {
+          list: [
+            {
+              property: 123,
+            },
+            {
+              otherProperty: 'aaa',
+            },
+            'string value' as any,
+            123,
+            null
+          ],
+        });
+
+        const serialized = serialize(instance);
+        expect(serialized).toEqual({
+          list: [
+            {
+              property: 123,
+            },
+            {
+              otherProperty: 'aaa',
+            },
+            'string value',
+            123,
+            null,
+          ],
+        });
+
+      });
     });
 
   });

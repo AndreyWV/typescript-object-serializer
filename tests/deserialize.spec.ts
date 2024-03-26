@@ -61,6 +61,38 @@ describe('Deserialize', () => {
       expect(deserialized.nonSerializableProperty).toBeUndefined();
     });
 
+    it('should deserialize array of objects without serializable type', () => {
+
+      class Test extends SerializableObject {
+        @property()
+        public list: any[];
+      }
+
+      const instance = Test.deserialize({
+        list: [
+          {
+            property: 123,
+          },
+          {
+            otherProperty: 'aaa',
+          },
+          'string value',
+          123,
+          null,
+        ],
+      });
+
+      expect(instance.list[0]).toEqual({
+        property: 123,
+      });
+      expect(instance.list[1]).toEqual({
+        otherProperty: 'aaa',
+      });
+      expect(instance.list[2]).toBe('string value');
+      expect(instance.list[3]).toBe(123);
+      expect(instance.list[4]).toBe(null);
+    });
+
   });
 
   describe('simple class', () => {
@@ -113,6 +145,38 @@ describe('Deserialize', () => {
         nonSerializableProperty: 'aaa',
       });
       expect(deserialized.nonSerializableProperty).toBeUndefined();
+    });
+
+    it('should deserialize array of objects without serializable type', () => {
+
+      class Test {
+        @property()
+        public list: any[];
+      }
+
+      const instance = deserialize(Test, {
+        list: [
+          {
+            property: 123,
+          },
+          {
+            otherProperty: 'aaa',
+          },
+          'string value',
+          123,
+          null,
+        ],
+      });
+
+      expect(instance.list[0]).toEqual({
+        property: 123,
+      });
+      expect(instance.list[1]).toEqual({
+        otherProperty: 'aaa',
+      });
+      expect(instance.list[2]).toBe('string value');
+      expect(instance.list[3]).toBe(123);
+      expect(instance.list[4]).toBe(null);
     });
 
   });
