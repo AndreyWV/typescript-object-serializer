@@ -2,6 +2,7 @@ import {
   OverrideNameExtractor,
   property,
   propertyType,
+  serialize,
   SnakeCaseExtractor,
 } from '../../src';
 import { Constructor } from '../../src/base-types/constructor';
@@ -103,6 +104,61 @@ describe('validate', () => {
       const validationResult = validate(A, {});
 
       expect(validationResult[0]).toBeInstanceOf(CustomValidationError);
+
+    });
+
+    it('should return serializable errors', () => {
+
+      const validationResult = validate(Test, {});
+      const serializedError = serialize(validationResult[0]);
+      expect(serializedError).toEqual({
+        message: 'Property is required',
+        path: 'property'
+      });
+
+    });
+
+    it('should return serializable errors if property is array of serializable items', () => {
+
+      class TestProperty {
+        @property()
+        @propertyValidators([RequiredValidator])
+        public deepProperty: string;
+      }
+
+      class Test {
+        @property()
+        @propertyType(TestProperty)
+        public property: TestProperty[];
+      }
+
+      const validationResult = validate(Test, {
+        property: [
+          {
+            deepProperty: 'test1',
+          },
+          {},
+          {},
+          {
+            deepProperty: 'test2',
+          },
+        ],
+      });
+
+      expect(validationResult[0]).toBeInstanceOf(ValidationError);
+      expect(validationResult[1]).toBeInstanceOf(ValidationError);
+
+      const serializedError1 = serialize(validationResult[0]);
+      expect(serializedError1).toEqual({
+        message: 'Property is required',
+        path: 'property.[1].deepProperty'
+      });
+
+      const serializedError2 = serialize(validationResult[1]);
+      expect(serializedError2).toEqual({
+        message: 'Property is required',
+        path: 'property.[2].deepProperty'
+      });
 
     });
 
@@ -302,6 +358,28 @@ describe('validate', () => {
           path: 'nested_array.[2].deep_nested.deep_string_property',
         },
       ]);
+
+    });
+
+    it('should clear error path if it has some extraction conditions', () => {
+
+      class TestValidator extends Validator {
+        public validate(value: any, path: string): ValidationError | undefined {
+          return new ValidationError(
+            'Property is always invalid',
+            '..property1..[0].property2..',
+          );
+        }
+      }
+
+      class Test {
+        @property()
+        @propertyValidators([TestValidator])
+        public property: any;
+      }
+
+      const result = validate(Test, {});
+      expect(result[0].path).toBe('property1.[0].property2')
 
     });
 

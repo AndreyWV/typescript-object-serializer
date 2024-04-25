@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.0 (2024-04-25)
+
+- Feature: Issue 38 - Serializable validation errors
+
 ## 1.0.1 (2024-03-26)
 
 - Bugfix: Issue 36 - Empty object while serializing array items without serializable type
