@@ -1,6 +1,6 @@
 {
     "name": "typescript-object-serializer",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "description": "Powerful Scalable Typescript object serializer",
     "scripts": {
         "build": "TS_NODE_PROJECT=\"webpack.tsconfig.json\" webpack",
@@ -43,6 +43,14 @@
         "webpack": "~5.89.0",
         "webpack-cli": "~5.1.4",
         "webpack-dev-server": "~4.15.1"
+    },
+    "peerDependencies": {
+        "reflect-metadata": ">0.1.12 && <1.0.0"
+    },
+    "peerDependenciesMeta": {
+        "reflect-metadata": {
+            "optional": true
+        }
     },
     "source": "src/index.ts"
 }

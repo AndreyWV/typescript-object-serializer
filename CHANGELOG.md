@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.0 (2024-05-03)
+
+- Feature: Issue 40 - Added property type validator
+
 ## 1.1.0 (2024-04-25)
 
 - Feature: Issue 38 - Serializable validation errors
