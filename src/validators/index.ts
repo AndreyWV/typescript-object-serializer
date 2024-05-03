@@ -6,3 +6,4 @@ export * from './validators/number-value';
 export * from './validators/regexp';
 export * from './validators/required';
 export * from './validators/string-length';
+export * from './validators/type';
