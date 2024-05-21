@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.1 (2024-05-21)
+
+- Bugfix: Issue 42 - Fixed validation error on undefined array of serializable objects and undefined object with property validators
+
 ## 1.2.0 (2024-05-03)
 
 - Feature: Issue 40 - Added property type validator

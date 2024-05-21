@@ -99,6 +99,10 @@ export function validate<T>(ctor: Constructor<T>, data: any | any[]): Validation
         return;
       }
 
+      if (objectData === undefined || objectData === null) {
+        return;
+      }
+
       const keyTypeConstructor = keyType.getConstructorForObject(objectData);
 
       // Validate serializable item

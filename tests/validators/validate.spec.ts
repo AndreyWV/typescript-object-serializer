@@ -251,6 +251,74 @@ describe('validate', () => {
 
     });
 
+    describe('array of serializable objects validation', () => {
+
+      it('should not return validation error if array is undefined and not required', () => {
+        class ArrayItem {
+          @property()
+          @propertyValidators([RequiredValidator])
+          public property: string;
+        }
+
+        class Test {
+          @property()
+          @propertyType(ArrayItem)
+          public array: ArrayItem[];
+        }
+
+        const validationResult = validate(Test, {});
+
+        expect(validationResult).toEqual([]);
+      });
+
+      it('should not return validation error if array is undefined and pass custom validation', () => {
+        class AlwaysValidValidator extends Validator {
+          public validate(value: any): ValidationError | undefined {
+            return;
+          }
+        }
+
+        class ArrayItem {
+          @property()
+          @propertyValidators([RequiredValidator])
+          public property: string;
+        }
+
+        class Test {
+          @property()
+          @propertyType(ArrayItem)
+          @propertyValidators([AlwaysValidValidator])
+          public array: ArrayItem[];
+        }
+
+        const validationResult = validate(Test, {});
+
+        expect(validationResult).toEqual([]);
+      });
+
+      it('should return only required validation error if array is undefined and required', () => {
+        class ArrayItem {
+          @property()
+          @propertyValidators([RequiredValidator])
+          public property: string;
+        }
+
+        class Test {
+          @property()
+          @propertyType(ArrayItem)
+          @propertyValidators([RequiredValidator])
+          public array: ArrayItem[];
+        }
+
+        const validationResult = validate(Test, {});
+
+        expect(validationResult).toEqual([
+          new ValidationError('Property is required', 'array'),
+        ]);
+      });
+
+    });
+
   });
 
   describe('nested serializable objects', () => {
@@ -380,6 +448,56 @@ describe('validate', () => {
 
       const result = validate(Test, {});
       expect(result[0].path).toBe('property1.[0].property2')
+
+    });
+
+    it('should not return deep error path if property is undefined and pass custom validation', () => {
+
+      class AlwaysValidValidator extends Validator {
+        public validate(value: any): ValidationError | undefined {
+          return;
+        }
+      }
+
+      class Item {
+        @property()
+        @propertyValidators([RequiredValidator])
+        public property: string;
+      }
+
+      class Test {
+        @property()
+        @propertyType(Item)
+        @propertyValidators([AlwaysValidValidator])
+        public item: Item;
+      }
+
+      const result = validate(Test, {});
+
+      expect(result).toEqual([]);
+
+    });
+
+    it('should return only required validation error if property is undefined and required', () => {
+
+      class Item {
+        @property()
+        @propertyValidators([RequiredValidator])
+        public property: string;
+      }
+
+      class Test {
+        @property()
+        @propertyType(Item)
+        @propertyValidators([RequiredValidator])
+        public item: Item;
+      }
+
+      const result = validate(Test, {});
+
+      expect(result).toEqual([
+        new ValidationError('Property is required', 'item'),
+      ]);
 
     });
 
