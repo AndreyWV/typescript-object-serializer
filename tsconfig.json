@@ -10,7 +10,10 @@
         "experimentalDecorators": true,
         "declaration": true,
         "strict": true,
-        "strictPropertyInitialization": false,
+        "strictPropertyInitialization": true,
+        "strictBindCallApply": true,
+        "strictFunctionTypes": true,
+        "strictNullChecks": true,
         "noImplicitAny": true,
         "target": "es2015",
         "lib": [

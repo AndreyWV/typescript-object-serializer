@@ -15,12 +15,12 @@ describe('Common', () => {
 
       class Test {
         @property(SnakeCaseExtractor)
-        public stringValue: string;
+        public stringValue?: string;
       }
 
       class TestChild extends Test {
         @property(SnakeCaseExtractor)
-        public numberValue: number;
+        public numberValue?: number;
       }
 
       const testDeserialized = deserialize(TestChild, {
@@ -51,7 +51,7 @@ describe('Common', () => {
 
       class Test {
         @property(SnakeCaseExtractor)
-        public testProperty: string;
+        public testProperty?: string;
       }
 
       class SubTest extends Test { }
@@ -192,12 +192,12 @@ describe('Common', () => {
 
       class Test extends SerializableObject {
         @property(SnakeCaseExtractor)
-        public stringValue: string;
+        public stringValue?: string;
       }
 
       class TestChild extends Test {
         @property(SnakeCaseExtractor)
-        public numberValue: number;
+        public numberValue?: number;
       }
 
       const testDeserialized = TestChild.deserialize({
@@ -228,7 +228,7 @@ describe('Common', () => {
 
       class Test extends SerializableObject {
         @property(SnakeCaseExtractor)
-        public testProperty: string;
+        public testProperty?: string;
       }
 
       class SubTest extends Test { }
@@ -257,15 +257,15 @@ describe('Common', () => {
         class Person extends SerializableObject {
 
           @property(StraightExtractor.transform({
-            onSerialize: () => {},
-            onDeserialize: () => {},
+            onSerialize: () => { },
+            onDeserialize: () => { },
           }))
-          public firstName: string;
+          public firstName?: string;
           @property(StraightExtractor.transform({
-            onSerialize: () => {},
-            onDeserialize: () => {},
+            onSerialize: () => { },
+            onDeserialize: () => { },
           }))
-          public lastName: string;
+          public lastName?: string;
 
           @property()
           public get fullName(): string {
@@ -301,13 +301,13 @@ describe('Common', () => {
         class Person extends SerializableObject {
 
           @property(StraightExtractor.transform({
-            onSerialize: () => {},
+            onSerialize: () => { },
           }))
-          public firstName: string;
+          public firstName?: string;
           @property(StraightExtractor.transform({
-            onSerialize: () => {},
+            onSerialize: () => { },
           }))
-          public lastName: string;
+          public lastName?: string;
 
           @property()
           public get fullName(): string {
@@ -339,15 +339,15 @@ describe('Common', () => {
         class Person extends SerializableObject {
 
           @property(StraightExtractor.transform({
-            onDeserialize: () => {},
-            onSerialize: () => {},
+            onDeserialize: () => { },
+            onSerialize: () => { },
           }))
-          public firstName: string;
+          public firstName?: string;
           @property(StraightExtractor.transform({
-            onDeserialize: () => {},
-            onSerialize: () => {},
+            onDeserialize: () => { },
+            onSerialize: () => { },
           }))
-          public lastName: string;
+          public lastName?: string;
 
           @property()
           public set fullName(value: string) {
