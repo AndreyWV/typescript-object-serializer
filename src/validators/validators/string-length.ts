@@ -35,10 +35,10 @@ export class StringLengthValidator extends Validator {
       return;
     }
     const valueLength = value.length;
-    if (Number.isInteger(this.minLength) && this.minLength! >= 0 && valueLength <= this.minLength!) {
+    if (Number.isInteger(this.minLength) && this.minLength! >= 0 && valueLength < this.minLength!) {
       return new ValidationError(`Property length should be greater than or equal ${this.minLength}`, path);
     }
-    if (Number.isInteger(this.maxLength) && this.maxLength! >= 0 && valueLength >= this.maxLength!) {
+    if (Number.isInteger(this.maxLength) && this.maxLength! >= 0 && valueLength > this.maxLength!) {
       return new ValidationError(`Property length should be less than or equal ${this.maxLength}`, path);
     }
   }

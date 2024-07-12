@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.2 (2024-07-12)
+
+- Bugfix: Issue 44 - Fixed StringLengthValidator - validation on borders
+
 ## 1.2.1 (2024-05-21)
 
 - Bugfix: Issue 42 - Fixed validation error on undefined array of serializable objects and undefined object with property validators

@@ -57,6 +57,21 @@ describe('StringLengthValidator', () => {
     });
   });
 
+  it('should return undefined if value equals maxLength', () => {
+    const result = new StringLengthValidator(undefined, 2).validate('12', 'property');
+    expect(result).toBeUndefined();
+  });
+
+  it('should return undefined if value equals minLength', () => {
+    const result = new StringLengthValidator(2, undefined).validate('12', 'property');
+    expect(result).toBeUndefined();
+  });
+
+  it('should return undefined if value equals minLength and maxLength', () => {
+    const result = new StringLengthValidator(2, 2).validate('12', 'property');
+    expect(result).toBeUndefined();
+  });
+
   it('should return undefined if value is not string', () => {
     const result = new StringLengthValidator(2, 4).validate({}, 'property');
     expect(result).toBeUndefined();
@@ -106,6 +121,21 @@ describe('NumberValueValidator', () => {
 
   it('should return undefined if value is between borders', () => {
     const result = new NumberValueValidator(0, 10).validate(5, 'property');
+    expect(result).toBeUndefined();
+  });
+
+  it('should return undefined if value equals min', () => {
+    const result = new NumberValueValidator(5, undefined).validate(5, 'property');
+    expect(result).toBeUndefined();
+  });
+
+  it('should return undefined if value equals max', () => {
+    const result = new NumberValueValidator(undefined, 5).validate(5, 'property');
+    expect(result).toBeUndefined();
+  });
+
+  it('should return undefined if value equals min and max', () => {
+    const result = new NumberValueValidator(5, 5).validate(5, 'property');
     expect(result).toBeUndefined();
   });
 
