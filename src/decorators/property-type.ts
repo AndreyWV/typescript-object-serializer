@@ -25,8 +25,8 @@ import { getConstructorPropertyName } from '../utils/get-constructor-property-na
  *
  * }
  */
-export function propertyType<T extends typeof SerializableObject, U = Constructor<any>>(
-  defineType: T | ((data: any) => T | undefined) | U | ((data: any) => U | undefined),
+export function propertyType<T extends typeof SerializableObject, U = Constructor<unknown>>(
+  defineType: T | ((data: unknown) => T | undefined) | U | ((data: unknown) => U | undefined),
 )/* : PropertyDecorator | ParameterDecorator */ {
   return (target: any, propertyKey: string | symbol | undefined, index?: number) => {
 

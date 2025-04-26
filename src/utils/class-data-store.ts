@@ -1,17 +1,23 @@
 import { Constructor } from '../base-types/constructor';
 
+type SerializerClassDataStoreContainer<T, S> = Constructor<T> & {
+  [key: string]: Map<unknown, Map<keyof T, S>>;
+};
+
 /**
  * @class SerializerClassDataStore Stores metadata for serializer methods
+ * T - Type of class for which store is created
+ * S - Type of stored value
  */
-export abstract class SerializerClassDataStore<T = any, S = any> {
+export abstract class SerializerClassDataStore<T, S> {
 
-  private static rootObjectPrototype = ({} as any).prototype;
-  private static SEARCH_STORE_DEPTH = 5;
+  private static readonly rootObjectPrototype = ({} as any).prototype;
+  private static readonly SEARCH_STORE_DEPTH = 5;
 
-  protected abstract key: string;
+  protected abstract storeKey: string;
 
   constructor(
-    private ctor: Constructor<T>,
+    private readonly SerializerClassConstructor: Constructor<T>,
   ) {
   }
 
@@ -20,7 +26,8 @@ export abstract class SerializerClassDataStore<T = any, S = any> {
    * @returns Map with keys - object properties, values - stored value for current Store
    */
   public getStoreMap(): Map<keyof T, S> | undefined {
-    return this.getOrCreateStoreMap().get(this.ctor);
+    return this.getOrCreateStoreMap()
+      .get(this.SerializerClassConstructor);
   }
 
   /**
@@ -29,28 +36,27 @@ export abstract class SerializerClassDataStore<T = any, S = any> {
    */
   public findStoreMap(): Map<keyof T, S> | undefined {
 
-    if (!this.ctor) {
-      return;
-    }
+    let currentIterationConstructor = this.SerializerClassConstructor as
+      SerializerClassDataStoreContainer<T, S> | undefined;
+    let depthLevel = SerializerClassDataStore.SEARCH_STORE_DEPTH;
 
-    let currentCtor = this.ctor;
-
-    let i = SerializerClassDataStore.SEARCH_STORE_DEPTH;
-
-    while (i !== 0) {
-      if (currentCtor?.prototype === SerializerClassDataStore.rootObjectPrototype) {
+    while (depthLevel !== 0) {
+      if (currentIterationConstructor?.prototype === SerializerClassDataStore.rootObjectPrototype) {
         return;
       }
-      const parentStore = new (this['constructor'] as Constructor<SerializerClassDataStore<T>>)(currentCtor);
+      const parentStore = new (this['constructor'] as Constructor<SerializerClassDataStore<T, S>>)(
+        currentIterationConstructor,
+      );
       const parentStoreMap = parentStore.getStoreMap();
       if (parentStoreMap) {
         return parentStoreMap;
       }
-      currentCtor = (currentCtor as any).__proto__;
-      if (!currentCtor) {
+      currentIterationConstructor = (currentIterationConstructor as SerializerClassDataStoreContainer<T, S>)
+        .__proto__ as unknown as (SerializerClassDataStoreContainer<T, S> | undefined);
+      if (!currentIterationConstructor) {
         break;
       }
-      i--;
+      depthLevel--;
     }
   }
 
@@ -59,17 +65,21 @@ export abstract class SerializerClassDataStore<T = any, S = any> {
    * Creates store map for store metadata
    * If parentProperties are passed - they used as default values of store
    */
-  public defineStoreMap<T>(parentProperties?: Map<keyof T, S>): void {
+  public defineStoreMap(parentProperties?: Map<keyof T, S>): void {
     const storeMap = this.getOrCreateStoreMap();
-    if (!storeMap.get(this.ctor)) {
-      storeMap.set(this.ctor, new Map(parentProperties as any));
+    if (!storeMap.get(this.SerializerClassConstructor)) {
+      storeMap.set(
+        this.SerializerClassConstructor,
+        new Map(parentProperties),
+      );
     }
   }
 
-  private getOrCreateStoreMap<T>(): Map<any, Map<keyof T, S>> {
-    if (!(this.ctor as any)[this.key]) {
-      (this.ctor as any)[this.key] = new Map();
+  private getOrCreateStoreMap(): Map<unknown, Map<keyof T, S>> {
+    const serializerClassConstructor = this.SerializerClassConstructor as SerializerClassDataStoreContainer<T, S>;
+    if (!serializerClassConstructor[this.storeKey]) {
+      serializerClassConstructor[this.storeKey] = new Map();
     }
-    return (this.ctor as any)[this.key];
+    return serializerClassConstructor[this.storeKey];
   }
 }
