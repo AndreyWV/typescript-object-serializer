@@ -57,5 +57,5 @@ export function propertyType<T extends typeof SerializableObject, U = Constructo
 
     storeMap?.set(propertyKey as string | symbol, defineType);
 
-  }
+  };
 }

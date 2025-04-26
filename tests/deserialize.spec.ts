@@ -16,9 +16,9 @@ describe('Deserialize', () => {
       public stringProperty: string = 'test';
 
       @property()
-      public numberProperty: number;
+      public declare numberProperty: number;
 
-      public nonSerializableProperty: string;
+      public declare nonSerializableProperty: string;
     }
 
     it('should deserialize data', () => {
@@ -63,12 +63,12 @@ describe('Deserialize', () => {
 
     it('should deserialize array of objects without serializable type', () => {
 
-      class Test extends SerializableObject {
+      class Test2 extends SerializableObject {
         @property()
-        public list: any[];
+        public declare list: any[];
       }
 
-      const instance = Test.deserialize({
+      const instance = Test2.deserialize({
         list: [
           {
             property: 123,
@@ -102,9 +102,9 @@ describe('Deserialize', () => {
       public stringProperty: string = 'test';
 
       @property()
-      public numberProperty: number;
+      public declare numberProperty: number;
 
-      public nonSerializableProperty: string;
+      public declare nonSerializableProperty: string;
     }
 
     it('should deserialize data', () => {
@@ -149,12 +149,12 @@ describe('Deserialize', () => {
 
     it('should deserialize array of objects without serializable type', () => {
 
-      class Test {
+      class Test2 {
         @property()
-        public list: any[];
+        public declare list: any[];
       }
 
-      const instance = deserialize(Test, {
+      const instance = deserialize(Test2, {
         list: [
           {
             property: 123,
@@ -187,13 +187,13 @@ describe('Deserialize', () => {
 
       class DeepNestedProperty extends SerializableObject {
         @property()
-        public property: string;
+        public declare property: string;
       }
 
       class NestedProperty extends SerializableObject {
         @property()
         @propertyType(DeepNestedProperty)
-        public deepNestedProperty: DeepNestedProperty;
+        public declare deepNestedProperty: DeepNestedProperty;
 
         @property()
         @propertyType(DeepNestedProperty)
@@ -205,7 +205,7 @@ describe('Deserialize', () => {
       class Test extends SerializableObject {
         @property()
         @propertyType(NestedProperty)
-        public nestedProperty: NestedProperty;
+        public declare nestedProperty: NestedProperty;
       }
 
       it('should deserialize data', () => {
@@ -224,7 +224,7 @@ describe('Deserialize', () => {
 
       it('should apply default value of property if it defined and value of serialized property not passed', () => {
         const deserialized = Test.deserialize({
-          nestedProperty: {}
+          nestedProperty: {},
         });
         expect(deserialized.nestedProperty.deepNestedPropertyWithDefaultValue).toBeInstanceOf(DeepNestedProperty);
         expect(deserialized.nestedProperty.deepNestedPropertyWithDefaultValue.property).toBe('default');
@@ -245,13 +245,13 @@ describe('Deserialize', () => {
 
       class DeepNestedProperty {
         @property()
-        public property: string;
+        public declare property: string;
       }
 
       class NestedProperty {
         @property()
         @propertyType(DeepNestedProperty)
-        public deepNestedProperty: DeepNestedProperty;
+        public declare deepNestedProperty: DeepNestedProperty;
 
         @property()
         @propertyType(DeepNestedProperty)
@@ -263,7 +263,7 @@ describe('Deserialize', () => {
       class Test {
         @property()
         @propertyType(NestedProperty)
-        public nestedProperty: NestedProperty;
+        public declare nestedProperty: NestedProperty;
       }
 
       it('should deserialize data', () => {
@@ -282,7 +282,7 @@ describe('Deserialize', () => {
 
       it('should apply default value of property if it defined and value of serialized property not passed', () => {
         const deserialized = deserialize(Test, {
-          nestedProperty: {}
+          nestedProperty: {},
         });
         expect(deserialized.nestedProperty.deepNestedPropertyWithDefaultValue).toBeInstanceOf(DeepNestedProperty);
         expect(deserialized.nestedProperty.deepNestedPropertyWithDefaultValue.property).toBe('default');
@@ -307,7 +307,7 @@ describe('Deserialize', () => {
 
       class ArrayItem extends SerializableObject {
         @property()
-        public value: number;
+        public declare value: number;
       }
 
       const defaultArray: ArrayItem[] = [];
@@ -353,7 +353,7 @@ describe('Deserialize', () => {
 
       class ArrayItem {
         @property()
-        public value: number;
+        public declare value: number;
       }
 
       const defaultArray: ArrayItem[] = [];
@@ -403,7 +403,7 @@ describe('Deserialize', () => {
 
       class Test extends SerializableObject {
         @property()
-        public property: any[];
+        public declare property: any[];
       }
 
       it('should deserialize array data directly', () => {
@@ -427,7 +427,7 @@ describe('Deserialize', () => {
 
       class Test {
         @property()
-        public property: any[];
+        public declare property: any[];
       }
 
       it('should deserialize array data directly', () => {
@@ -453,7 +453,7 @@ describe('Deserialize', () => {
 
     class Test extends SerializableObject {
       @property()
-      public property: string;
+      public declare property: string;
     }
 
     it('should deserialize array of serializable items', () => {
@@ -474,7 +474,7 @@ describe('Deserialize', () => {
 
       expect(() => {
         return Test.deserializeArray({} as any);
-      }).toThrowError(NonArrayDataError);
+      }).toThrow(new NonArrayDataError());
 
     });
 
@@ -483,7 +483,7 @@ describe('Deserialize', () => {
   it('should return basic class instance if passed not-serializable class constructor', () => {
 
     class Test {
-      public property: string;
+      public declare property: string;
     }
 
     const instance = deserialize(Test, {

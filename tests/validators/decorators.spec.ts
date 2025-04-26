@@ -9,14 +9,14 @@ describe('@propertyValidators', () => {
 
     class Test {
       @propertyValidators([RequiredValidator])
-      public property: string;
+      public declare property: string;
     }
 
     const store = (Test as any)['typescript-object-serializer_validators'];
 
     expect(store.get(Test)).toEqual(
       new Map([
-        ['property', [RequiredValidator]]
+        ['property', [RequiredValidator]],
       ]),
     );
 
@@ -36,7 +36,7 @@ describe('@propertyValidators', () => {
 
     expect(store.get(Test)).toEqual(
       new Map([
-        ['property', [RequiredValidator]]
+        ['property', [RequiredValidator]],
       ]),
     );
 

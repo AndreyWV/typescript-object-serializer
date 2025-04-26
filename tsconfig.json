@@ -15,7 +15,7 @@
         "strictFunctionTypes": true,
         "strictNullChecks": true,
         "noImplicitAny": true,
-        "target": "es2015",
+        "target": "ESNext",
         "lib": [
             "es2015",
             "es2017",

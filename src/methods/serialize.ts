@@ -7,7 +7,7 @@ import { deleteUndefinedRecursive } from '../utils/delete-undefined';
  * @param object Serializable object instance
  * @returns { any } Object of serialized data
  */
-export function serialize<T extends Object>(object: T): any {
+export function serialize<T extends object>(object: T): any {
   const data = {};
 
   const keysStore = new ExtractorsClassStore((object as any).constructor).findStoreMap();
@@ -31,12 +31,12 @@ export function serialize<T extends Object>(object: T): any {
           if (!itemKeysStore) {
             return item;
           }
-          return serialize(item)
+          return serialize(item);
         });
       } else {
-        serializedValue = isSerializableObject(value) ?
-          serialize(value) :
-          value;
+        serializedValue = isSerializableObject(value)
+          ? serialize(value)
+          : value;
       }
 
       extractor?.apply(data, serializedValue);
@@ -46,9 +46,9 @@ export function serialize<T extends Object>(object: T): any {
   return deleteUndefinedRecursive(data);
 }
 
-function isSerializableObject(value: any): value is Object {
-  return value instanceof SerializableObject ||
-    Boolean(
+function isSerializableObject(value: any): value is object {
+  return value instanceof SerializableObject
+    || Boolean(
       new ExtractorsClassStore((value)?.constructor).findStoreMap(),
     );
 }

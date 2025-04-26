@@ -43,7 +43,7 @@ export abstract class TypeValidator extends Validator {
           return new ValidationError('Value must be of type String', path);
         }
       }
-    }
+    };
   }
 
   public static Number(): Constructor<Validator> {
@@ -56,7 +56,7 @@ export abstract class TypeValidator extends Validator {
           return new ValidationError('Value must be of type Number', path);
         }
       }
-    }
+    };
   }
 
   public static Boolean(): Constructor<Validator> {
@@ -69,7 +69,7 @@ export abstract class TypeValidator extends Validator {
           return new ValidationError('Value must be of type Boolean', path);
         }
       }
-    }
+    };
   }
 
   public static Object(): Constructor<Validator> {
@@ -82,7 +82,7 @@ export abstract class TypeValidator extends Validator {
           return new ValidationError('Value must be of type Object', path);
         }
       }
-    }
+    };
   }
 
 }

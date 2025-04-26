@@ -20,7 +20,7 @@ export function clone<T extends object>(data: T): T {
       return clone(value);
     }
     return value;
-  }
+  };
 
   (Object.keys(data) as Array<keyof T>)
     .forEach(

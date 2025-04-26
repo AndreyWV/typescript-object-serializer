@@ -3,7 +3,7 @@ import { Constructor } from '../base-types/constructor';
 export type ExtractionResult<T> = {
   data: T | undefined,
   path: string,
-}
+};
 
 /**
  * @class Extractor
@@ -48,14 +48,14 @@ export abstract class Extractor<T = any> {
   public abstract apply(applyObject: any, value: T): void;
 
   protected transformBeforeExtract(value: any): T | undefined {
-    return this.transformOnDeserialize ?
-      this.transformOnDeserialize(value) :
-      value;
+    return this.transformOnDeserialize
+      ? this.transformOnDeserialize(value)
+      : value;
   }
 
   protected transformBeforeApply(value: any): T | undefined {
-    return this.transformOnSerialize ?
-      this.transformOnSerialize(value) :
-      value;
+    return this.transformOnSerialize
+      ? this.transformOnSerialize(value)
+      : value;
   }
 }

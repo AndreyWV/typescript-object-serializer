@@ -3,10 +3,10 @@ import { TypesClassStore } from '../class-stores/types-store';
 
 export class KeyType<T> {
 
-  private isFunction: boolean;
-  private isConstructor: boolean;
+  private isFunction?: boolean;
+  private isConstructor?: boolean;
   private keyConstructor?: Constructor<T>;
-  private keyTypeFunction: (objectData: any) => any;
+  private keyTypeFunction?: (objectData: any) => any;
 
   constructor(
     private store: TypesClassStore<T>,
@@ -28,11 +28,11 @@ export class KeyType<T> {
     }
   }
 
-  private init() {
-    const keyTypeFunctionOrConstructor = this.store.findStoreMap()?.get(this.key) ||
-      (
-        (Reflect as any).getMetadata &&
-        (Reflect as any).getMetadata('design:type', this.instance, this.key)
+  private init(): void {
+    const keyTypeFunctionOrConstructor = this.store.findStoreMap()?.get(this.key)
+      || (
+        (Reflect as any).getMetadata
+        && (Reflect as any).getMetadata('design:type', this.instance, this.key)
       );
     this.isConstructor = KeyType.isConstructor(keyTypeFunctionOrConstructor);
     this.isFunction = !this.isConstructor && typeof keyTypeFunctionOrConstructor === 'function';
@@ -45,18 +45,17 @@ export class KeyType<T> {
   }
 
   public getConstructorForObject(objectData: any): Constructor<T> | undefined {
-    return this.isConstructor ?
-      this.keyConstructor! :
-      this.isFunction ?
-        this.getTypeFromFunction(objectData) :
-        undefined
+    return this.isConstructor
+      ? this.keyConstructor!
+      : this.isFunction
+        ? this.getTypeFromFunction(objectData)
+        : undefined;
   }
 
   private getTypeFromFunction(objectData: any): any {
     try {
-      return this.keyTypeFunction(objectData);
-    } catch {
-    }
+      return this.keyTypeFunction!(objectData);
+    } catch { /* empty */ }
   }
 
 

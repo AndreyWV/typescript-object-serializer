@@ -9,7 +9,7 @@ describe('Decorator @propertyType', () => {
 
     class TestProperty extends SerializableObject {
       @property()
-      public value: string;
+      public declare value: string;
     }
 
     class SuccessResult extends SerializableObject {
@@ -29,15 +29,19 @@ describe('Decorator @propertyType', () => {
 
       @property()
       @propertyType(TestProperty)
-      public arrayProperty: TestProperty[];
+      public declare arrayProperty: TestProperty[];
 
       @property()
-      @propertyType((value: any) => value?.success ? SuccessResult : FailedResult)
-      public conditionalPropertyType: SuccessResult | FailedResult;
+      @propertyType((value: any) => value?.success
+        ? SuccessResult
+        : FailedResult)
+      public declare conditionalPropertyType: SuccessResult | FailedResult;
 
       @property()
-      @propertyType((value: any) => value?.success ? SuccessResult : FailedResult)
-      public arrayWithConditionalPropertyType: Array<SuccessResult | FailedResult>;
+      @propertyType((value: any) => value?.success
+        ? SuccessResult
+        : FailedResult)
+      public declare arrayWithConditionalPropertyType: Array<SuccessResult | FailedResult>;
 
     }
 
@@ -119,7 +123,7 @@ describe('Decorator @propertyType', () => {
 
     class TestProperty {
       @property()
-      public value: string;
+      public declare value: string;
     }
 
     class SuccessResult {
@@ -139,15 +143,19 @@ describe('Decorator @propertyType', () => {
 
       @property()
       @propertyType(TestProperty)
-      public arrayProperty: TestProperty[];
+      public declare arrayProperty: TestProperty[];
 
       @property()
-      @propertyType((value: any) => value?.success ? SuccessResult : FailedResult)
-      public conditionalPropertyType: SuccessResult | FailedResult;
+      @propertyType((value: any) => value?.success
+        ? SuccessResult
+        : FailedResult)
+      public declare conditionalPropertyType: SuccessResult | FailedResult;
 
       @property()
-      @propertyType((value: any) => value?.success ? SuccessResult : FailedResult)
-      public arrayWithConditionalPropertyType: Array<SuccessResult | FailedResult>;
+      @propertyType((value: any) => value?.success
+        ? SuccessResult
+        : FailedResult)
+      public declare arrayWithConditionalPropertyType: Array<SuccessResult | FailedResult>;
 
     }
 

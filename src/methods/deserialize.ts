@@ -11,12 +11,12 @@ import { KeyType } from '../utils/key-type';
  * @param data { any } Object of serialized data
  * @returns Instance of serializable class constructor
  */
-export function deserialize<T>(ctor: Constructor<T>, data: any): T {
+export function deserialize<T>(ctor: Constructor<T>, data: unknown): T {
   let instance: T;
   try {
     instance = new ctor();
   } catch {
-    return data;
+    throw new Error('First argument should be constructor');
   }
 
   const props = new ExtractorsClassStore(ctor).findStoreMap();
@@ -50,9 +50,9 @@ export function deserialize<T>(ctor: Constructor<T>, data: any): T {
           key,
           objectData.map(item => {
             const itemTypeConstructor = keyType.getConstructorForObject(item);
-            return itemTypeConstructor ?
-              deserialize(itemTypeConstructor, item) :
-              item;
+            return itemTypeConstructor
+              ? deserialize(itemTypeConstructor, item)
+              : item;
           }),
         );
         return;
@@ -75,7 +75,7 @@ export function deserialize<T>(ctor: Constructor<T>, data: any): T {
         applyValue(instance, key, objectData);
       }
 
-    }
+    },
   );
 
   return instance;

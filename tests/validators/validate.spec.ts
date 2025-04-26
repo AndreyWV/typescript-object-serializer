@@ -38,7 +38,7 @@ export class CustomStringLengthValidator extends Validator {
       constructor() {
         super(minLength, maxLength);
       }
-    }
+    };
   }
 
   public validate(value: any, path: string): ValidationError | undefined {
@@ -73,7 +73,7 @@ describe('validate', () => {
       expect(validationResult).toEqual([
         {
           message: 'Property is required',
-          path: 'property'
+          path: 'property',
         },
       ]);
     });
@@ -98,7 +98,7 @@ describe('validate', () => {
       class A {
         @property()
         @propertyValidators([AlwaysInvalidValidator])
-        public property: string;
+        public declare property: string;
       }
 
       const validationResult = validate(A, {});
@@ -113,7 +113,7 @@ describe('validate', () => {
       const serializedError = serialize(validationResult[0]);
       expect(serializedError).toEqual({
         message: 'Property is required',
-        path: 'property'
+        path: 'property',
       });
 
     });
@@ -123,16 +123,16 @@ describe('validate', () => {
       class TestProperty {
         @property()
         @propertyValidators([RequiredValidator])
-        public deepProperty: string;
+        public declare deepProperty: string;
       }
 
-      class Test {
+      class Test2 {
         @property()
         @propertyType(TestProperty)
-        public property: TestProperty[];
+        public declare property: TestProperty[];
       }
 
-      const validationResult = validate(Test, {
+      const validationResult = validate(Test2, {
         property: [
           {
             deepProperty: 'test1',
@@ -151,13 +151,13 @@ describe('validate', () => {
       const serializedError1 = serialize(validationResult[0]);
       expect(serializedError1).toEqual({
         message: 'Property is required',
-        path: 'property.[1].deepProperty'
+        path: 'property.[1].deepProperty',
       });
 
       const serializedError2 = serialize(validationResult[1]);
       expect(serializedError2).toEqual({
         message: 'Property is required',
-        path: 'property.[2].deepProperty'
+        path: 'property.[2].deepProperty',
       });
 
     });
@@ -168,7 +168,7 @@ describe('validate', () => {
     class Test {
       @property()
       @propertyValidators([NotEmptyStringValidator, CustomStringLengthValidator.with(3, 5)])
-      public property: string;
+      public declare property: string;
     }
 
     it('should return validation errors from all validators', () => {
@@ -183,7 +183,7 @@ describe('validate', () => {
       expect(validationResult1).toEqual([
         {
           message: 'Property must be a non-empty string',
-          path: 'property'
+          path: 'property',
         },
         {
           message: 'Property must be between 3 and 5 characters long',
@@ -201,7 +201,7 @@ describe('validate', () => {
       class Test {
         @property()
         @propertyValidators([NotEmptyStringValidator, CustomStringLengthValidator.with(3, 5)])
-        public property: string;
+        public declare property: string;
       }
 
       const validationResult = validate(
@@ -257,13 +257,13 @@ describe('validate', () => {
         class ArrayItem {
           @property()
           @propertyValidators([RequiredValidator])
-          public property: string;
+          public declare property: string;
         }
 
         class Test {
           @property()
           @propertyType(ArrayItem)
-          public array: ArrayItem[];
+          public declare array: ArrayItem[];
         }
 
         const validationResult = validate(Test, {});
@@ -273,7 +273,7 @@ describe('validate', () => {
 
       it('should not return validation error if array is undefined and pass custom validation', () => {
         class AlwaysValidValidator extends Validator {
-          public validate(value: any): ValidationError | undefined {
+          public validate(): ValidationError | undefined {
             return;
           }
         }
@@ -281,14 +281,14 @@ describe('validate', () => {
         class ArrayItem {
           @property()
           @propertyValidators([RequiredValidator])
-          public property: string;
+          public declare property: string;
         }
 
         class Test {
           @property()
           @propertyType(ArrayItem)
           @propertyValidators([AlwaysValidValidator])
-          public array: ArrayItem[];
+          public declare array: ArrayItem[];
         }
 
         const validationResult = validate(Test, {});
@@ -300,14 +300,14 @@ describe('validate', () => {
         class ArrayItem {
           @property()
           @propertyValidators([RequiredValidator])
-          public property: string;
+          public declare property: string;
         }
 
         class Test {
           @property()
           @propertyType(ArrayItem)
           @propertyValidators([RequiredValidator])
-          public array: ArrayItem[];
+          public declare array: ArrayItem[];
         }
 
         const validationResult = validate(Test, {});
@@ -328,17 +328,17 @@ describe('validate', () => {
       class Test {
         @property()
         @propertyValidators([RequiredValidator])
-        public property: string;
+        public declare property: string;
       }
       class Test2 {
         @property()
         @propertyType(Test)
-        deepNested: Test;
+        declare deepNested: Test;
       }
       class Test3 {
         @property()
         @propertyType(Test2)
-        nested: Test2[];
+        declare nested: Test2[];
       }
 
       const result = validate(
@@ -381,17 +381,17 @@ describe('validate', () => {
       class Test {
         @property(OverrideNameExtractor.use('deep_string_property'))
         @propertyValidators([RequiredValidator])
-        public stringProperty: string;
+        public declare stringProperty: string;
       }
       class Test2 {
         @property(SnakeCaseExtractor)
         @propertyType(Test)
-        deepNested: Test;
+        declare deepNested: Test;
       }
       class Test3 {
         @property(SnakeCaseExtractor)
         @propertyType(Test2)
-        nestedArray: Test2[];
+        declare nestedArray: Test2[];
       }
 
       const result = validate(
@@ -432,7 +432,7 @@ describe('validate', () => {
     it('should clear error path if it has some extraction conditions', () => {
 
       class TestValidator extends Validator {
-        public validate(value: any, path: string): ValidationError | undefined {
+        public validate(): ValidationError | undefined {
           return new ValidationError(
             'Property is always invalid',
             '..property1..[0].property2..',
@@ -447,14 +447,14 @@ describe('validate', () => {
       }
 
       const result = validate(Test, {});
-      expect(result[0].path).toBe('property1.[0].property2')
+      expect(result[0].path).toBe('property1.[0].property2');
 
     });
 
     it('should not return deep error path if property is undefined and pass custom validation', () => {
 
       class AlwaysValidValidator extends Validator {
-        public validate(value: any): ValidationError | undefined {
+        public validate(): ValidationError | undefined {
           return;
         }
       }
@@ -462,14 +462,14 @@ describe('validate', () => {
       class Item {
         @property()
         @propertyValidators([RequiredValidator])
-        public property: string;
+        public declare property: string;
       }
 
       class Test {
         @property()
         @propertyType(Item)
         @propertyValidators([AlwaysValidValidator])
-        public item: Item;
+        public declare item: Item;
       }
 
       const result = validate(Test, {});
@@ -483,14 +483,14 @@ describe('validate', () => {
       class Item {
         @property()
         @propertyValidators([RequiredValidator])
-        public property: string;
+        public declare property: string;
       }
 
       class Test {
         @property()
         @propertyType(Item)
         @propertyValidators([RequiredValidator])
-        public item: Item;
+        public declare item: Item;
       }
 
       const result = validate(Test, {});
@@ -519,17 +519,17 @@ describe('validate', () => {
     class Test1 {
       @property()
       @propertyValidators([NotEmptyStringValidator])
-      public property: string;
+      public declare property: string;
     }
 
     class Test2 extends Test1 {
       @propertyValidators([StringStartsWithAValidator])
-      public property: string;
+      public declare property: string;
     }
 
     class Test3 extends Test2 {
       @propertyValidators([StringRegexpValidator.with(/\w{3}/)])
-      public property: string;
+      public declare property: string;
     }
 
     const result = validate(
@@ -560,7 +560,7 @@ describe('validate', () => {
 
     class Test {
       @propertyValidators([RequiredValidator])
-      public property: string;
+      public declare property: string;
     }
 
     const result = validate(Test, {});

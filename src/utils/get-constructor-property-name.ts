@@ -8,7 +8,7 @@ export function getConstructorPropertyName(c: any, index: number): string | unde
   }
   const ctorName = names.split(',')[index];
   if (ctorName) {
-    const ownPropertyRegExp = new RegExp(`this\\.\([a-zA-Z\d]*?\)\\s?=\\s?${ctorName.trim()}`);
+    const ownPropertyRegExp = new RegExp(`this\\.([a-zA-Z\\d]*?)\\s?=\\s?${ctorName.trim()}`);
     const ownPropertyMatch = ownPropertyRegExp.exec(ctorString);
     return ownPropertyMatch?.[1];
   }

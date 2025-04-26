@@ -16,7 +16,9 @@ import { clone } from './clone';
  */
 export function create<T>(
   ctor: Constructor<T>,
-  data: T extends SerializableObject ? RecursivePartial<SerializableObjectWithoutBase<T>> : RecursivePartial<T> = {} as any,
+  data: T extends SerializableObject
+    ? RecursivePartial<SerializableObjectWithoutBase<T>>
+    : RecursivePartial<T> = {} as any,
 ): T {
   if (data instanceof ctor) {
     return clone(data) as T;
@@ -29,10 +31,10 @@ export function create<T>(
   (Object.keys(data) as Array<keyof T>)
     .forEach(
       key => {
-        const keyType = keyTypes?.get(key) ||
-          (
-            (Reflect as any).getMetadata &&
-            (Reflect as any).getMetadata('design:type', instance, key as string | symbol)
+        const keyType = keyTypes?.get(key)
+          || (
+            (Reflect as any).getMetadata
+            && (Reflect as any).getMetadata('design:type', instance, key as string | symbol)
           );
 
         const dataValue = (data as any)[key];
@@ -53,7 +55,7 @@ export function create<T>(
         } else {
           instance[key] = dataValue;
         }
-      }
+      },
     );
 
   return instance;

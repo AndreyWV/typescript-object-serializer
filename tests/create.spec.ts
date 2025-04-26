@@ -12,11 +12,11 @@ describe('Instance create', () => {
       public testProperty: string = 'default value';
 
       @property()
-      public undefinedByDefaultTestProperty: string;
+      public declare undefinedByDefaultTestProperty: string;
 
       public nonSerializableProperty: string = 'default value of non-serializable property';
 
-      public undefinedByDefaultNonSerializableProperty: string;
+      public declare undefinedByDefaultNonSerializableProperty: string;
     }
 
     it('should create class instance', () => {
@@ -102,13 +102,13 @@ describe('Instance create', () => {
 
       class Employee extends SerializableObject {
         @property()
-        public name: string;
+        public declare name: string;
       }
 
       class Department extends SerializableObject {
         @property()
         @propertyType(Employee)
-        public employees: Employee[];
+        public declare employees: Employee[];
       }
 
       it('null value', () => {
@@ -136,11 +136,11 @@ describe('Instance create', () => {
       public testProperty: string = 'default value';
 
       @property()
-      public undefinedByDefaultTestProperty: string;
+      public declare undefinedByDefaultTestProperty: string;
 
       public nonSerializableProperty: string = 'default value of non-serializable property';
 
-      public undefinedByDefaultNonSerializableProperty: string;
+      public declare undefinedByDefaultNonSerializableProperty: string;
     }
 
     it('should create class instance', () => {
@@ -226,13 +226,13 @@ describe('Instance create', () => {
 
       class Employee {
         @property()
-        public name: string;
+        public declare name: string;
       }
 
       class Department {
         @property()
         @propertyType(Employee)
-        public employees: Employee[];
+        public declare employees: Employee[];
       }
 
       it('null value', () => {
@@ -263,13 +263,13 @@ describe('Instance create', () => {
     class NestedProperty extends SerializableObject {
       @property()
       @propertyType(DeepNestedProperty)
-      public deepNestedProperty: DeepNestedProperty;
+      public declare deepNestedProperty: DeepNestedProperty;
     }
 
     class Test extends SerializableObject {
       @property()
       @propertyType(NestedProperty)
-      public nestedProperty: NestedProperty;
+      public declare nestedProperty: NestedProperty;
     }
 
     it('should create instance with deep declaration', () => {
@@ -325,13 +325,13 @@ describe('Instance create', () => {
     class NestedProperty {
       @property()
       @propertyType(DeepNestedProperty)
-      public deepNestedProperty: DeepNestedProperty;
+      public declare deepNestedProperty: DeepNestedProperty;
     }
 
     class Test {
       @property()
       @propertyType(NestedProperty)
-      public nestedProperty: NestedProperty;
+      public declare nestedProperty: NestedProperty;
     }
 
     it('should create instance with deep declaration', () => {
@@ -380,12 +380,12 @@ describe('Instance create', () => {
   describe('class with nested serializable array property descendant of SerializableObject', () => {
     class ArrayItem extends SerializableObject {
       @property()
-      public test: string;
+      public declare test: string;
     }
     class Test extends SerializableObject {
       @property()
       @propertyType(ArrayItem)
-      public array: ArrayItem[];
+      public declare array: ArrayItem[];
     }
 
     it('should create instance with serializable array property', () => {
@@ -409,12 +409,12 @@ describe('Instance create', () => {
   describe('class with nested serializable array property', () => {
     class ArrayItem {
       @property()
-      public test: string;
+      public declare test: string;
     }
     class Test {
       @property()
       @propertyType(ArrayItem)
-      public array: ArrayItem[];
+      public declare array: ArrayItem[];
     }
 
     it('should create instance with serializable array property', () => {
@@ -439,13 +439,13 @@ describe('Instance create', () => {
 
     class Property extends SerializableObject {
       @property()
-      public deepProperty: string;
+      public declare deepProperty: string;
     }
 
     class Test extends SerializableObject {
       @property()
       @propertyType(Property)
-      public property: Property;
+      public declare property: Property;
     }
 
     it('should return clone of instance', () => {
@@ -472,13 +472,13 @@ describe('Instance create', () => {
 
     class Property {
       @property()
-      public deepProperty: string;
+      public declare deepProperty: string;
     }
 
     class Test {
       @property()
       @propertyType(Property)
-      public property: Property;
+      public declare property: Property;
     }
 
     it('should return clone of instance', () => {

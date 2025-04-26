@@ -16,7 +16,7 @@ describe('Property type auto-detection', () => {
 
     class Test extends SerializableObject {
       @property()
-      public property: Property;
+      public declare property: Property;
     }
 
 
@@ -41,7 +41,7 @@ describe('Property type auto-detection', () => {
 
     class Test {
       @property()
-      public property: Property;
+      public declare property: Property;
     }
 
 

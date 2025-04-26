@@ -88,8 +88,8 @@ export function validate<T>(ctor: Constructor<T>, data: any | any[]): Validation
             .map((itemErrors, itemIndex) => {
               return itemErrors.map(
                 error => {
-                  error.path =
-                    `${extractionResult?.path}${PATH_SEPARATOR}[${itemIndex}]${PATH_SEPARATOR}${error.path}`;
+                  error.path
+                    = `${extractionResult?.path}${PATH_SEPARATOR}[${itemIndex}]${PATH_SEPARATOR}${error.path}`;
                   return error;
                 },
               );
@@ -124,7 +124,7 @@ export function validate<T>(ctor: Constructor<T>, data: any | any[]): Validation
         }
       }
 
-    }
+    },
   );
 
   return validationErrors;

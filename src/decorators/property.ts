@@ -47,5 +47,5 @@ export function property(
 
     keysStore?.set(propertyKey as string | symbol, new extractor(propertyKey));
 
-  }
+  };
 }

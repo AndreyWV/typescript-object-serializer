@@ -27,7 +27,7 @@ export class StringLengthValidator extends Validator {
       constructor() {
         super(options.min, options.max);
       }
-    }
+    };
   }
 
   public validate(value: any, path: string): ValidationError | undefined {

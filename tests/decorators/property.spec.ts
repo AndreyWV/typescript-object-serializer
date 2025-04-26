@@ -19,7 +19,7 @@ describe('Decorator @property', () => {
 
       class Test extends SerializableObject {
         @property()
-        public test: string;
+        public declare test: string;
       }
 
       it('should serialize property to same property key', () => {
@@ -50,9 +50,9 @@ describe('Decorator @property', () => {
         class Test extends SerializableObject {
           @property(StraightExtractor.transform({
             onDeserialize: (value: any) => value && Number(value),
-            onSerialize: (value: number) => value && String(value)
+            onSerialize: (value: number) => value && String(value),
           }))
-          public test: number;
+          public declare test: number;
         }
 
         it('should transform property on serialize', () => {
@@ -82,7 +82,7 @@ describe('Decorator @property', () => {
       class Test extends SerializableObject {
 
         @property(SnakeCaseExtractor)
-        public testProperty: string;
+        public declare testProperty: string;
 
       }
 
@@ -113,9 +113,10 @@ describe('Decorator @property', () => {
         const symbolKey = Symbol('property');
 
         expect(() => {
-          class Test extends SerializableObject {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          class Test2 extends SerializableObject {
             @property(SnakeCaseExtractor)
-            public [symbolKey]: string;
+            public [symbolKey]?: string;
           }
         }).toThrowError(new NotStringPropertyKeyError(symbolKey));
 
@@ -123,17 +124,17 @@ describe('Decorator @property', () => {
 
       describe('with value transformation', () => {
 
-        class Test extends SerializableObject {
+        class Test2 extends SerializableObject {
           @property(SnakeCaseExtractor.transform({
             onDeserialize: (value: any) => value && Number(value),
-            onSerialize: (value: number) => value && String(value)
+            onSerialize: (value: number) => value && String(value),
           }))
-          public testProperty: number;
+          public declare testProperty: number;
         }
 
         it('should transform property on serialize', () => {
 
-          const instance = Test.create({
+          const instance = Test2.create({
             testProperty: 123,
           });
 
@@ -144,7 +145,7 @@ describe('Decorator @property', () => {
 
         it('should transform property on deserialize', () => {
 
-          const deserialized = Test.deserialize({
+          const deserialized = Test2.deserialize({
             test_property: '123',
           });
           expect(deserialized.testProperty).toBe(123);
@@ -167,7 +168,7 @@ describe('Decorator @property', () => {
             onDeserialize: value => new DepartmentId(value),
             onSerialize: (value: DepartmentId) => value.value,
           }))
-          public id: DepartmentId;
+          public declare id: DepartmentId;
 
         }
 
@@ -200,7 +201,7 @@ describe('Decorator @property', () => {
       class Department extends SerializableObject {
 
         @property(OverrideNameExtractor.use('department_id'))
-        public id: string;
+        public declare id: string;
 
       }
 
@@ -226,17 +227,17 @@ describe('Decorator @property', () => {
 
       describe('with value transformation', () => {
 
-        class Department extends SerializableObject {
+        class Department2 extends SerializableObject {
           @property(OverrideNameExtractor.use('department_id').transform({
             onDeserialize: (value: any) => value && Number(value),
-            onSerialize: (value: number) => value && String(value)
+            onSerialize: (value: number) => value && String(value),
           }))
-          public id: number;
+          public declare id: number;
         }
 
         it('should transform property on serialize', () => {
 
-          const instance = Department.create({
+          const instance = Department2.create({
             id: 123,
           });
 
@@ -247,7 +248,7 @@ describe('Decorator @property', () => {
 
         it('should transform property on deserialize', () => {
 
-          const deserialized = Department.deserialize({
+          const deserialized = Department2.deserialize({
             department_id: '123',
           });
           expect(deserialized.id).toBe(123);
@@ -265,7 +266,7 @@ describe('Decorator @property', () => {
 
       class Test {
         @property()
-        public test: string;
+        public declare test: string;
       }
 
       it('should serialize property to same property key', () => {
@@ -296,9 +297,9 @@ describe('Decorator @property', () => {
         class Test {
           @property(StraightExtractor.transform({
             onDeserialize: (value: any) => value && Number(value),
-            onSerialize: (value: number) => value && String(value)
+            onSerialize: (value: number) => value && String(value),
           }))
-          public test: number;
+          public declare test: number;
         }
 
         it('should transform property on serialize', () => {
@@ -328,7 +329,7 @@ describe('Decorator @property', () => {
       class Test {
 
         @property(SnakeCaseExtractor)
-        public testProperty: string;
+        public declare testProperty: string;
 
       }
 
@@ -359,27 +360,28 @@ describe('Decorator @property', () => {
         const symbolKey = Symbol('property');
 
         expect(() => {
-          class Test {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          class Test2 {
             @property(SnakeCaseExtractor)
-            public [symbolKey]: string;
+            public [symbolKey]?: string;
           }
-        }).toThrowError(new NotStringPropertyKeyError(symbolKey));
+        }).toThrow(new NotStringPropertyKeyError(symbolKey));
 
       });
 
       describe('with value transformation', () => {
 
-        class Test {
+        class Test2 {
           @property(SnakeCaseExtractor.transform({
             onDeserialize: (value: any) => value && Number(value),
-            onSerialize: (value: number) => value && String(value)
+            onSerialize: (value: number) => value && String(value),
           }))
-          public testProperty: number;
+          public declare testProperty: number;
         }
 
         it('should transform property on serialize', () => {
 
-          const instance = create(Test, {
+          const instance = create(Test2, {
             testProperty: 123,
           });
 
@@ -390,7 +392,7 @@ describe('Decorator @property', () => {
 
         it('should transform property on deserialize', () => {
 
-          const deserialized = deserialize(Test, {
+          const deserialized = deserialize(Test2, {
             test_property: '123',
           });
           expect(deserialized.testProperty).toBe(123);
@@ -413,7 +415,7 @@ describe('Decorator @property', () => {
             onDeserialize: value => new DepartmentId(value),
             onSerialize: (value: DepartmentId) => value.value,
           }))
-          public id: DepartmentId;
+          public declare id: DepartmentId;
 
         }
 
@@ -446,7 +448,7 @@ describe('Decorator @property', () => {
       class Department {
 
         @property(OverrideNameExtractor.use('department_id'))
-        public id: string;
+        public declare id: string;
 
       }
 
@@ -472,12 +474,13 @@ describe('Decorator @property', () => {
 
       describe('with value transformation', () => {
 
+        // eslint-disable-next-line @typescript-eslint/no-shadow
         class Department {
           @property(OverrideNameExtractor.use('department_id').transform({
             onDeserialize: (value: any) => value && Number(value),
-            onSerialize: (value: number) => value && String(value)
+            onSerialize: (value: number) => value && String(value),
           }))
-          public id: number;
+          public declare id: number;
         }
 
         it('should transform property on serialize', () => {

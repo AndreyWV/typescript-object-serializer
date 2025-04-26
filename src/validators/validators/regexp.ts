@@ -41,7 +41,7 @@ export class StringRegexpValidator extends Validator {
       constructor() {
         super(regexp);
       }
-    }
+    };
   }
 
   public validate(value: any, path: string): ValidationError | undefined {

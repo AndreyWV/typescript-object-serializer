@@ -54,5 +54,5 @@ export function propertyValidators(
 
     keysStore.set(propertyKey as string | symbol, allValidators);
 
-  }
+  };
 }

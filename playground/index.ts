@@ -30,10 +30,10 @@ import {
   class Person {
 
     @property()
-    public name: string;
+    public name!: string;
 
     @property(SnakeCaseExtractor)
-    public lastName: string;
+    public lastName!: string;
 
   }
 
@@ -45,7 +45,7 @@ import {
   console.log(person instanceof Person); // true
   console.log(person.name); // "John"
   console.log(person.lastName); // "Doe"
-  console.log(serialize(person)) // { name: "John", last_name: "Doe" }
+  console.log(serialize(person)); // { name: "John", last_name: "Doe" }
 })();
 
 // Deep serializable property
@@ -56,21 +56,21 @@ import {
   class Person {
 
     @property()
-    public name: string;
+    public name!: string;
 
     @property(SnakeCaseExtractor)
-    public lastName: string;
+    public lastName!: string;
 
   }
 
   class Employee {
 
     @property()
-    id: number;
+    id!: number;
 
     @property()
     @propertyType(Person)
-    public person: Person;
+    public person!: Person;
 
   }
 
@@ -92,12 +92,12 @@ import {
 
   class Person {
     @property()
-    public name: string;
+    public name!: string;
   }
 
   class Employee extends Person {
     @property()
-    id: number;
+    id!: number;
   }
 
   const employee = deserialize(Employee, {
@@ -115,15 +115,15 @@ import {
 
   class Person {
     @property()
-    public name: string;
+    public name!: string;
   }
 
   class Employee {
     @property()
-    public id: number;
+    public id!: number;
 
     @property()
-    public person: Person; // <- Type will be extracted from property metadata
+    public person!: Person; // <- Type will be extracted from property metadata
   }
 
   const employee = deserialize(Employee, {
@@ -144,32 +144,32 @@ import {
   class Person {
 
     @property()
-    public name: string;
+    public name!: string;
 
     @property(SnakeCaseExtractor)
-    public lastName: string;
+    public lastName!: string;
 
   }
 
   class Employee {
 
     @property()
-    id: number;
+    id!: number;
 
     @property()
     @propertyType(Person)
-    public person: Person;
+    public person!: Person;
 
   }
 
   class Department {
 
     @property()
-    public title: string;
+    public title!: string;
 
     @property()
     @propertyType(Employee)
-    public employees: Employee[];
+    public employees!: Employee[];
 
   }
 
@@ -225,10 +225,10 @@ import {
   class Person {
 
     @property()
-    public name: string;
+    public name!: string;
 
     @property(StraightExtractor) // Same as @property()
-    public lastName: string;
+    public lastName!: string;
 
   }
 
@@ -237,7 +237,7 @@ import {
     lastName: 'Doe',
   });
 
-  console.log(person); // Person { name: "John", lastName: "Doe" }
+  console.log(person); // Person{ name: "John", lastName: "Doe" }
 })();
 
 // SnakeCaseExtractor
@@ -248,10 +248,10 @@ import {
   class Person {
 
     @property()
-    public name: string;
+    public name!: string;
 
     @property(SnakeCaseExtractor)
-    public lastName: string;
+    public lastName!: string;
 
   }
 
@@ -271,7 +271,7 @@ import {
   class Department {
 
     @property(OverrideNameExtractor.use('department_id'))
-    public id: string;
+    public id!: string;
 
   }
 
@@ -290,21 +290,21 @@ import {
   class Person {
 
     @property()
-    public name: string;
+    public name!: string;
 
     @property(SnakeCaseExtractor)
-    public lastName: string;
+    public lastName!: string;
 
   }
 
   class Employee {
 
     @property()
-    id: number;
+    id!: number;
 
     @property()
     @propertyType(Person) // <- Not required if auto-detection types enabled
-    public person: Person;
+    public person!: Person;
 
   }
 
@@ -312,7 +312,7 @@ import {
 
     @property()
     @propertyType(Employee) // <- Required because not possible to detect type from property declaration (property metadata seems like Array)
-    public employees: Employee[];
+    public employees!: Employee[];
 
   }
 })();
@@ -328,14 +328,14 @@ import {
   }
   class FailedResult {
     @property()
-    public error: string;
+    public error!: string;
   }
 
   class Response {
 
     @property()
     @propertyType(value => value?.is_success ? SuccessResult : FailedResult)
-    public results: Array<SuccessResult | FailedResult>;
+    public results!: Array<SuccessResult | FailedResult>;
 
   }
 
@@ -366,10 +366,10 @@ import {
   class Person {
 
     @property()
-    public lastName: string;
+    public lastName!: string;
 
     @property()
-    public firstName: string;
+    public firstName!: string;
 
   }
 
@@ -392,10 +392,10 @@ import {
   class Person {
 
     @property()
-    public lastName: string;
+    public lastName!: string;
 
     @property()
-    public firstName: string;
+    public firstName!: string;
 
   }
 
@@ -418,10 +418,10 @@ import {
   class Person {
 
     @property(SnakeCaseExtractor)
-    public lastName: string;
+    public lastName!: string;
 
     @property(SnakeCaseExtractor)
-    public firstName: string;
+    public firstName!: string;
 
   }
 
@@ -444,7 +444,7 @@ import {
       onDeserialize: value => Number(value),
       onSerialize: value => String(value),
     }))
-    public age: number;
+    public age!: number;
 
   }
 
@@ -479,7 +479,7 @@ import {
       onDeserialize: value => new DepartmentId(value),
       onSerialize: (value: DepartmentId) => value?.value,
     }))
-    public id: DepartmentId; // <- Non-serializable object type
+    public id!: DepartmentId; // <- Non-serializable object type
 
   }
 
@@ -508,7 +508,7 @@ import {
   class Department {
 
     @property(PrivateSnakeCaseExtractor)
-    private _departmentId: string;
+    private _departmentId!: string;
 
   }
 
@@ -583,19 +583,19 @@ import {
   class Person {
 
     @property()
-    public id: number;
+    public id!: number;
 
     @property(DeepExtractor.byPath('data.person.age').transform({
       onDeserialize: value => value && Number(value),
       onSerialize: value => value && String(value),
     }))
-    public age: number;
+    public age!: number;
 
     @property(DeepExtractor.byPath('data.person.last_name'))
     public lastName: string = 'Default';
 
     @property(DeepExtractor.byPath('data.person.first_name'))
-    public firstName: string;
+    public firstName!: string;
 
   }
 
@@ -628,10 +628,10 @@ import {
 
   class Department {
     @property(OnlyDeserializeStraightExtractor)
-    public id: number;
+    public id!: number;
 
     @property()
-    public title: string;
+    public title!: string;
   }
 
   const department = deserialize(Department, {
@@ -653,10 +653,10 @@ import {
     @property(StraightExtractor.transform({
       onSerialize: () => { },
     }))
-    public id: number;
+    public id!: number;
 
     @property()
-    public title: string;
+    public title!: string;
   }
 
   const department = deserialize(Department, {
@@ -683,7 +683,7 @@ import {
 
     @property()
     public get fullName(): string {
-      return this.firstName + ' ' + this.lastName
+      return this.firstName + ' ' + this.lastName;
     }
   }
 
@@ -691,8 +691,8 @@ import {
   console.log(serialize(personWithGetter)); // { fullName: "John Doe" }
 
   class PersonWithSetter {
-    public firstName: string;
-    public lastName: string;
+    public firstName!: string;
+    public lastName!: string;
 
     @property()
     public set fullName(value: string) {
@@ -717,9 +717,9 @@ import {
 
   class Item extends SerializableObject {
     @property()
-    public id: number;
+    public id!: number;
     @property()
-    public title: string;
+    public title!: string;
   }
 
   const items = Item.deserializeArray([
@@ -756,7 +756,7 @@ import {
   class Person {
     @property()
     @propertyValidators([RequiredValidator, StringLengthValidator.with({ min: 1 })])
-    public name: string;
+    public name!: string;
   }
 
   const resultRequired = validate(Person, {});
@@ -777,23 +777,23 @@ import {
   class Address {
     @property()
     @propertyValidators([RequiredValidator])
-    public city: string;
+    public city!: string;
   }
 
   class Employee {
     @property()
     @propertyValidators([RequiredValidator])
-    public name: string;
+    public name!: string;
 
     @property()
     @propertyValidators([RequiredValidator])
-    public address: Address;
+    public address!: Address;
   }
 
   class Department {
     @property(SnakeCaseExtractor)
     @propertyType(Employee)
-    public departmentEmployees: Employee[];
+    public departmentEmployees!: Employee[];
   }
 
   const data = {
@@ -848,7 +848,7 @@ import {
   class Vehicle {
     @property()
     @propertyValidators([VINValidator])
-    public vin: string;
+    public vin!: string;
   }
 
   const validationResult = validate(Vehicle, { vin: '345435' });
@@ -898,7 +898,7 @@ import {
   class LoginCredentials {
     @property()
     @propertyValidators([PasswordValidator])
-    public password: string;
+    public password!: string;
   }
 
   const shortPasswordResult = validate(LoginCredentials, { password: '123' });

@@ -16,12 +16,12 @@ describe('Serialize', () => {
 
       class Test extends SerializableObject {
         @property()
-        public stringProperty: string;
+        public declare stringProperty: string;
 
         @property()
-        public numberProperty: number | null;
+        public declare numberProperty: number | null;
 
-        public nonSerializableProperty: string;
+        public declare nonSerializableProperty: string;
       }
 
       it('should serialize data', () => {
@@ -69,13 +69,13 @@ describe('Serialize', () => {
         expect(serialized.nonSerializableProperty).toBeUndefined();
       });
 
-      it('should include property to serializable object if property is undefined ' +
-        'but has value from transformer', () => {
+      it('should include property to serializable object if property is undefined '
+        + 'but has value from transformer', () => {
           class A extends SerializableObject {
             @property(StraightExtractor.transform({
               onSerialize: (value) => value ?? null,
             }))
-            public property: string;
+            public declare property: string;
           }
           const instance = A.create({
             property: undefined,
@@ -88,12 +88,12 @@ describe('Serialize', () => {
 
       it('should serialize array of objects without serializable type', () => {
 
-        class Test extends SerializableObject {
+        class Test2 extends SerializableObject {
           @property()
-          public list: any[];
+          public declare list: any[];
         }
 
-        const instance = create(Test, {
+        const instance = create(Test2, {
           list: [
             {
               property: 123,
@@ -129,12 +129,12 @@ describe('Serialize', () => {
 
       class Test {
         @property()
-        public stringProperty: string;
+        public declare stringProperty: string;
 
         @property()
-        public numberProperty: number | null;
+        public declare numberProperty: number | null;
 
-        public nonSerializableProperty: string;
+        public declare nonSerializableProperty: string;
       }
 
       it('should serialize data', () => {
@@ -182,13 +182,13 @@ describe('Serialize', () => {
         expect(serialized.nonSerializableProperty).toBeUndefined();
       });
 
-      it('should include property to serializable object if property is undefined ' +
-        'but has value from transformer', () => {
+      it('should include property to serializable object if property is undefined '
+        + 'but has value from transformer', () => {
           class A {
             @property(StraightExtractor.transform({
               onSerialize: (value) => value ?? null,
             }))
-            public property: string;
+            public declare property: string;
           }
           const instance = create(A, {
             property: undefined,
@@ -201,12 +201,12 @@ describe('Serialize', () => {
 
       it('should serialize array of objects without serializable type', () => {
 
-        class Test {
+        class Test2 {
           @property()
-          public list: any[];
+          public declare list: any[];
         }
 
-        const instance = create(Test, {
+        const instance = create(Test2, {
           list: [
             {
               property: 123,
@@ -216,7 +216,7 @@ describe('Serialize', () => {
             },
             'string value' as any,
             123,
-            null
+            null,
           ],
         });
 
@@ -246,17 +246,17 @@ describe('Serialize', () => {
 
       class DeepNestedProperty extends SerializableObject {
         @property()
-        public property: string;
+        public declare property: string;
       }
 
       class NestedProperty extends SerializableObject {
         @property()
-        public deepNestedProperty: DeepNestedProperty;
+        public declare deepNestedProperty: DeepNestedProperty;
       }
 
       class Test extends SerializableObject {
         @property()
-        public nestedProperty: NestedProperty;
+        public declare nestedProperty: NestedProperty;
       }
 
       it('should serialize data', () => {
@@ -284,17 +284,17 @@ describe('Serialize', () => {
 
       class DeepNestedProperty {
         @property()
-        public property: string;
+        public declare property: string;
       }
 
       class NestedProperty {
         @property()
-        public deepNestedProperty: DeepNestedProperty;
+        public declare deepNestedProperty: DeepNestedProperty;
       }
 
       class Test {
         @property()
-        public nestedProperty: NestedProperty;
+        public declare nestedProperty: NestedProperty;
       }
 
       it('should serialize data', () => {
@@ -326,7 +326,7 @@ describe('Serialize', () => {
 
       class ArrayItem extends SerializableObject {
         @property(SnakeCaseExtractor)
-        public valueNumber: number;
+        public declare valueNumber: number;
       }
 
       const defaultArray: ArrayItem[] = [];
@@ -374,7 +374,7 @@ describe('Serialize', () => {
 
       class ArrayItem {
         @property()
-        public value: number;
+        public declare value: number;
       }
 
       const defaultArray: ArrayItem[] = [];
@@ -426,11 +426,11 @@ describe('Serialize', () => {
 
       class Test extends SerializableObject {
         @property()
-        public strings: string[];
+        public declare strings: string[];
         @property()
-        public numbers: number[];
+        public declare numbers: number[];
         @property()
-        public booleans: boolean[];
+        public declare booleans: boolean[];
       }
 
       describe('should serialize data', () => {
@@ -472,11 +472,11 @@ describe('Serialize', () => {
 
       class Test {
         @property()
-        public strings: string[];
+        public declare strings: string[];
         @property()
-        public numbers: number[];
+        public declare numbers: number[];
         @property()
-        public booleans: boolean[];
+        public declare booleans: boolean[];
       }
 
       describe('should serialize data', () => {
@@ -519,7 +519,7 @@ describe('Serialize', () => {
   it('should return empty object if object hasn\'t serializable properties', () => {
 
     class Test {
-      public property: string;
+      public declare property: string;
     }
 
     const instance = create(Test, {

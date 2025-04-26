@@ -10,12 +10,12 @@ describe('Serializable class constructor', () => {
     it('descendant of SerializableObject', () => {
       class Person extends SerializableObject {
         @property()
-        public name: string;
+        public declare name: string;
       }
 
       class User extends Person {
         @property()
-        public id: number;
+        public declare id: number;
       }
 
       const user = User.deserialize({
@@ -33,12 +33,12 @@ describe('Serializable class constructor', () => {
     it('simple class', () => {
       class Person {
         @property()
-        public name: string;
+        public declare name: string;
       }
 
       class User extends Person {
         @property()
-        public id: number;
+        public declare id: number;
       }
 
       const user = deserialize(User, {

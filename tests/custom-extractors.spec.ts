@@ -34,7 +34,7 @@ describe('Custom extractor', () => {
       private static getOrCreateObjectByPath(dataObject: any, keys: string[]): any {
         let currentObject = dataObject;
         keys.forEach(key => {
-          if (!currentObject.hasOwnProperty(key)) {
+          if (!Object.prototype.hasOwnProperty.call(currentObject, key)) {
             currentObject[key] = {};
           }
           currentObject = currentObject[key];
@@ -74,19 +74,19 @@ describe('Custom extractor', () => {
     class TestPerson extends SerializableObject {
 
       @property()
-      public id: number;
+      public declare id: number;
 
       @property(DeepExtractor.byPath('data.person.age').transform({
         onDeserialize: value => value && Number(value),
         onSerialize: value => value && String(value),
       }))
-      public age: number;
+      public declare age: number;
 
       @property(DeepExtractor.byPath('data.person.last_name'))
       public lastName: string = 'Default';
 
       @property(DeepExtractor.byPath('data.person.first_name'))
-      public firstName: string;
+      public declare firstName: string;
 
     }
 
@@ -174,13 +174,13 @@ describe('Custom extractor', () => {
   describe('Only deserialize property', () => {
 
     class OnlyDeserializeSnakeCaseExtractor<T> extends SnakeCaseExtractor<T> {
-      public apply(applyObject: any, value: T): void {
+      public apply(): void {
       }
     }
 
     class Test extends SerializableObject {
       @property(OnlyDeserializeSnakeCaseExtractor)
-      public id: number;
+      public declare id: number;
     }
 
     it('should deserialize data', () => {
