@@ -2,8 +2,8 @@ import {
   SnakeCaseExtractor,
   StraightExtractor,
 } from '../src';
-import { property } from '../src/decorators/property';
-import { propertyType } from '../src/decorators/property-type';
+import { property } from '../src/core/decorators/property';
+import { propertyType } from '../src/core/decorators/property-type';
 import { create } from '../src/methods/create';
 import { serialize } from '../src/methods/serialize';
 import { SerializableObject } from '../src/serializable-object';

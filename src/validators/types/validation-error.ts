@@ -1,4 +1,4 @@
-import { property } from '../../decorators/property';
+import { property } from '../../core/decorators/property';
 
 /**
  * @class ValidationError Instance contains validation message and full path to invalid property.

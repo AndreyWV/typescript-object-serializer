@@ -1,4 +1,4 @@
-import { RecursivePartial } from './base-types/recursive-partial';
+import { RecursivePartial } from './utils/recursive-partial';
 import { clone } from './methods/clone';
 import { create } from './methods/create';
 import { deserialize } from './methods/deserialize';
@@ -20,7 +20,7 @@ type SerializableObjectData<T extends typeof SerializableObject, I extends Insta
 
 export class NonArrayDataError extends Error {
   constructor() {
-    super('Array data should be passed to deserializeArray method');
+    super('[Serializer] Array data should be passed to deserializeArray method');
   }
 }
 

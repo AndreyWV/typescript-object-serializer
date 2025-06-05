@@ -10,7 +10,7 @@ export function clone<T extends object>(data: T): T {
   const ctor = (data as any).constructor;
   const instance = create(ctor) as T;
 
-  const cloneValue = (value: any): any => {
+  const cloneValue = <U>(value: U): U => {
     const isValueHasSerializableProperties = Boolean(
       new ExtractorsClassStore(value?.constructor).findStoreMap(),
     );

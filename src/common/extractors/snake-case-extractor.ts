@@ -1,10 +1,11 @@
+import { Modifier } from '../../core/types/modifier';
 import { StraightExtractor } from './straight-extractor';
 
 export class NotStringPropertyKeyError extends Error {
   constructor(
-    propertyKey: any,
+    propertyKey: never,
   ) {
-    super(`SnakeCaseExtractor should be used with object key type "string": ${String(propertyKey)}`);
+    super(`[Serializer] SnakeCaseExtractor should be used with object key type "string": ${String(propertyKey)}`);
   }
 }
 
@@ -19,7 +20,7 @@ export class NotStringPropertyKeyError extends Error {
  *
  * }
  */
-export class SnakeCaseExtractor<T> extends StraightExtractor<T> {
+export class SnakeCaseExtractor extends StraightExtractor {
 
   protected static camelCaseToSnakeCase(key: string): string {
     return key.replace(
@@ -30,11 +31,12 @@ export class SnakeCaseExtractor<T> extends StraightExtractor<T> {
 
   constructor(
     key: string,
+    modifier: Modifier,
   ) {
     if (typeof key !== 'string') {
       throw new NotStringPropertyKeyError(key);
     }
-    super(SnakeCaseExtractor.camelCaseToSnakeCase(key));
+    super(SnakeCaseExtractor.camelCaseToSnakeCase(key), modifier);
   }
 
 }

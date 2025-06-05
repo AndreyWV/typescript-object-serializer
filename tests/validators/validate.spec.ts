@@ -5,7 +5,7 @@ import {
   serialize,
   SnakeCaseExtractor,
 } from '../../src';
-import { Constructor } from '../../src/base-types/constructor';
+import { Constructor } from '../../src/utils/constructor';
 import {
   propertyValidators,
   RequiredValidator,

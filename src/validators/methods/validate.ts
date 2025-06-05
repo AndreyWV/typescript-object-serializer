@@ -1,7 +1,7 @@
-import { Constructor } from '../../base-types/constructor';
+import { Constructor } from '../../utils/constructor';
 import { ExtractorsClassStore } from '../../class-stores/extractor-store';
 import { TypesClassStore } from '../../class-stores/types-store';
-import { Extractor } from '../../decorators/base-extractor';
+import { Extractor } from '../../core/types/extractor';
 import { KeyType } from '../../utils/key-type';
 import { ValidationError } from '../types/validation-error';
 import { ValidatorsClassStore } from '../validators-store';

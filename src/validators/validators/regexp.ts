@@ -1,4 +1,4 @@
-import { Constructor } from '../../base-types/constructor';
+import { Constructor } from '../../utils/constructor';
 import { ValidationError } from '../types/validation-error';
 import { Validator } from '../types/validator';
 

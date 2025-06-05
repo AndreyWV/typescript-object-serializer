@@ -1,4 +1,4 @@
-import { Constructor } from '../base-types/constructor';
+import { Constructor } from '../utils/constructor';
 import { SerializerClassDataStore } from '../utils/class-data-store';
 import { Validator } from './types/validator';
 

@@ -2,34 +2,34 @@
     "compileOnSave": false,
     "compilerOptions": {
         "baseUrl": ".",
-        "outDir": "./dist",
-        "sourceMap": true,
-        "moduleResolution": "node",
-        "module": "CommonJS",
+        "declaration": true,
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
-        "declaration": true,
-        "strict": true,
-        "strictPropertyInitialization": true,
-        "strictBindCallApply": true,
-        "strictFunctionTypes": true,
-        "strictNullChecks": true,
-        "noImplicitAny": true,
-        "target": "ESNext",
         "lib": [
             "es2015",
             "es2017",
             "es2018",
             "esnext",
             "dom"
-        ]
+        ],
+        "module": "CommonJS",
+        "moduleResolution": "node",
+        "noImplicitAny": true,
+        "outDir": "./dist",
+        "sourceMap": true,
+        "strict": true,
+        "strictBindCallApply": true,
+        "strictFunctionTypes": true,
+        "strictNullChecks": true,
+        "strictPropertyInitialization": true,
+        "target": "ESNext"
     },
+    "exclude": [
+        "node_modules"
+    ],
     "include": [
         "src",
         "playground",
         "tests"
-    ],
-    "exclude": [
-        "node_modules"
     ]
 }

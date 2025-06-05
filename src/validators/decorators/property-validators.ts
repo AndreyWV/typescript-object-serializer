@@ -1,5 +1,5 @@
-import { Constructor } from '../../base-types/constructor';
-import { getConstructorPropertyName } from '../../utils/get-constructor-property-name';
+import { Constructor } from '../../utils/constructor';
+import { ConstructorPropertyDeclaration, getConstructorPropertyNameByIndex } from '../../utils/constructor-property-declaration';
 import { Validator } from '../types/validator';
 import { ValidatorsClassStore } from '../validators-store';
 
@@ -23,7 +23,7 @@ export function propertyValidators(
     let ctor;
 
     if (propertyKey === undefined && target['prototype'] && typeof indexOrDescriptor === 'number') {
-      const extractedPropertyKey = getConstructorPropertyName(target['prototype'].constructor, indexOrDescriptor as number);
+      const extractedPropertyKey = ConstructorPropertyDeclaration.getConstructorPropertyNameByIndex(target['prototype'].constructor, indexOrDescriptor as number);
       if (!extractedPropertyKey) {
         return;
       }

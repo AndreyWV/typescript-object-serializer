@@ -1,5 +1,5 @@
-import { property } from '../src/decorators/property';
-import { propertyType } from '../src/decorators/property-type';
+import { property } from '../src/core/decorators/property';
+import { propertyType } from '../src/core/decorators/property-type';
 import { clone } from '../src/methods/clone';
 import { create } from '../src/methods/create';
 import { SerializableObject } from '../src/serializable-object';

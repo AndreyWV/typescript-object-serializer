@@ -1,11 +1,11 @@
 import { propertyType } from '../../src';
-import { property } from '../../src/decorators/property';
-import { OverrideNameExtractor } from '../../src/extractors/override-name-extractor';
+import { property } from '../../src/core/decorators/property';
+import { OverrideNameExtractor } from '../../src/common/extractors/override-name-extractor';
 import {
   NotStringPropertyKeyError,
   SnakeCaseExtractor,
-} from '../../src/extractors/snake-case-extractor';
-import { StraightExtractor } from '../../src/extractors/straight-extractor';
+} from '../../src/common/extractors/snake-case-extractor';
+import { StraightExtractor } from '../../src/common/extractors/straight-extractor';
 import { create } from '../../src/methods/create';
 import { deserialize } from '../../src/methods/deserialize';
 import { serialize } from '../../src/methods/serialize';

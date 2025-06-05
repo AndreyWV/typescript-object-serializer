@@ -12,7 +12,7 @@ import {
   SnakeCaseExtractor,
   StraightExtractor,
 } from '../src';
-import { property } from '../src/decorators/property';
+import { property } from '../src/core/decorators/property';
 import {
   propertyValidators,
   RequiredValidator,

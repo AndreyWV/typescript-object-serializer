@@ -1,9 +1,9 @@
-import { Constructor } from '../base-types/constructor';
+import { Constructor } from '../../utils/constructor';
 import { StraightExtractor } from './straight-extractor';
 
 /**
- * @class Extractor
- * @description Basic abstract class for declaring serialize/deserialize rules
+ * @class OverrideNameExtractor
+ * @description Class for overriding property name for extracting/applying
  * @example
  * class SomeClass extends SerializableObject {
  *
@@ -12,13 +12,14 @@ import { StraightExtractor } from './straight-extractor';
  *
  * }
  */
-export class OverrideNameExtractor<T> extends StraightExtractor<T> {
+export class OverrideNameExtractor extends StraightExtractor {
 
-  public static use<U, E extends Constructor<OverrideNameExtractor<U>>>(
+  public static use<E extends Constructor<OverrideNameExtractor>>(
     this: E,
     property: string,
   ): E {
     return class extends this {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       constructor(...args: any[]) {
         super(property);
       }

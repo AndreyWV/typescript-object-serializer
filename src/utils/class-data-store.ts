@@ -1,4 +1,4 @@
-import { Constructor } from '../base-types/constructor';
+import { Constructor } from './constructor';
 
 type SerializerClassDataStoreContainer<T, S> = Constructor<T> & {
   [key: string]: Map<unknown, Map<keyof T, S>>;
@@ -9,15 +9,29 @@ type SerializerClassDataStoreContainer<T, S> = Constructor<T> & {
  * T - Type of class for which store is created
  * S - Type of stored value
  */
-export abstract class SerializerClassDataStore<T, S> {
+export abstract class SerializerClassDataStore<S, T = never> {
 
-  private static readonly rootObjectPrototype = ({} as any).prototype;
+  /**
+   * Prototype of root object - used to stop search for store map
+   */
+  private static readonly rootObjectPrototype = ({} as typeof Object).prototype;
+
+  /**
+   * Depth of search for store map in parent classes to prevent deep recursive
+   */
   private static readonly SEARCH_STORE_DEPTH = 5;
 
+  /**
+   * @property storeKey - key of store map
+   * Key must be unique for each serializer entity
+   */
   protected abstract storeKey: string;
 
   constructor(
-    private readonly SerializerClassConstructor: Constructor<T>,
+    /**
+     * Constructor of serializable class for declaring and extracting serializer rules
+     */
+    private readonly SerializerClassConstructor: Constructor<never>,
   ) {
   }
 
@@ -30,6 +44,19 @@ export abstract class SerializerClassDataStore<T, S> {
       .get(this.SerializerClassConstructor);
   }
 
+  public getStoreMapOrDeclareFromParent(): Map<keyof T, S> {
+    const storeMap = this.getStoreMap();
+    if (storeMap) {
+      return storeMap;
+    }
+    const parentStore = new (this['constructor'] as Constructor<SerializerClassDataStore<S, T>>)(
+      (this.SerializerClassConstructor as any).__proto__,
+    );
+    const parentProperties = parentStore.findStoreMap();
+    this.defineStoreMap(parentProperties);
+    return this.getStoreMap()!;
+  }
+
   /**
    * @method findStoreMap
    * Deeply looks for store map at current class and its parents
@@ -37,26 +64,44 @@ export abstract class SerializerClassDataStore<T, S> {
   public findStoreMap(): Map<keyof T, S> | undefined {
 
     let currentIterationConstructor = this.SerializerClassConstructor as
-      SerializerClassDataStoreContainer<T, S> | undefined;
-    let depthLevel = SerializerClassDataStore.SEARCH_STORE_DEPTH;
+      unknown as
+      SerializerClassDataStoreContainer<T, S>
+      | undefined;
+    let currentIterationLevel = SerializerClassDataStore.SEARCH_STORE_DEPTH;
 
-    while (depthLevel !== 0) {
+    /**
+     * Stop search if max depth is reached
+     */
+    while (currentIterationLevel !== 0) {
+    /**
+     * Stop search if root object prototype is reached
+     * Root object can't contain any serializer rules
+     */
       if (currentIterationConstructor?.prototype === SerializerClassDataStore.rootObjectPrototype) {
         return;
       }
-      const parentStore = new (this['constructor'] as Constructor<SerializerClassDataStore<T, S>>)(
+      /**
+       * Search rules at parent
+       */
+      const parentStore = new (this['constructor'] as Constructor<SerializerClassDataStore<S, T>>)(
         currentIterationConstructor,
       );
       const parentStoreMap = parentStore.getStoreMap();
       if (parentStoreMap) {
         return parentStoreMap;
       }
+      /**
+       * Move to parent
+       */
       currentIterationConstructor = (currentIterationConstructor as SerializerClassDataStoreContainer<T, S>)
         .__proto__ as unknown as (SerializerClassDataStoreContainer<T, S> | undefined);
+      /**
+       * Just in case
+       */
       if (!currentIterationConstructor) {
         break;
       }
-      depthLevel--;
+      currentIterationLevel--;
     }
   }
 
@@ -76,7 +121,10 @@ export abstract class SerializerClassDataStore<T, S> {
   }
 
   private getOrCreateStoreMap(): Map<unknown, Map<keyof T, S>> {
-    const serializerClassConstructor = this.SerializerClassConstructor as SerializerClassDataStoreContainer<T, S>;
+    const serializerClassConstructor = this.SerializerClassConstructor as
+      unknown as
+      SerializerClassDataStoreContainer<T, S>;
+
     if (!serializerClassConstructor[this.storeKey]) {
       serializerClassConstructor[this.storeKey] = new Map();
     }
