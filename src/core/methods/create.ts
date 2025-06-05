@@ -1,62 +1,98 @@
-import { Constructor } from '../base-types/constructor';
-import { RecursivePartial } from '../base-types/recursive-partial';
+import { Constructor } from '../../utils/constructor';
+import { RecursiveObject, RecursivePartial } from '../../utils/recursive-type';
 import { ExtractorsClassStore } from '../class-stores/extractor-store';
 import { TypesClassStore } from '../class-stores/types-store';
-import {
-  SerializableObject,
-  SerializableObjectWithoutBase,
-} from '../serializable-object';
 import { clone } from './clone';
 
 /**
  * @function create Create Serializable class instance
- * @param ctor Constructor of serializable class
+ * @param ObjectConstructor Constructor of serializable class
  * @param data Plain object structured as current class
  * @returns Instance of serializable class constructor
  */
 export function create<T>(
-  ctor: Constructor<T>,
-  data: T extends SerializableObject
-    ? RecursivePartial<SerializableObjectWithoutBase<T>>
-    : RecursivePartial<T> = {} as any,
+  ObjectConstructor: Constructor<T>,
+  data: RecursiveObject<T>,
 ): T {
-  if (data instanceof ctor) {
-    return clone(data) as T;
+  if (data instanceof ObjectConstructor) {
+    return clone(data);
   }
 
-  const instance = new ctor() as T;
+  return new ObjectCreator(ObjectConstructor).create(data);
+}
 
-  const keyTypes = new TypesClassStore<T>(ctor).findStoreMap();
+/**
+ * @function create Create Serializable class instance
+ * !IMPORTANT This method get <RecursivePartial> values and set it as is
+ *   Prefer to use create() method with strict type checking
+ * @param ObjectConstructor Constructor of serializable class
+ * @param data Plain object structured as current class
+ * @returns Instance of serializable class constructor
+ */
+export function createPartial<T>(
+  ObjectConstructor: Constructor<T>,
+  data?: RecursivePartial<T>,
+): T {
+  return create(ObjectConstructor, (data ?? {}) as never);
+}
 
-  (Object.keys(data) as Array<keyof T>)
-    .forEach(
-      key => {
-        const keyType = keyTypes?.get(key)
-          || (
-            (Reflect as any).getMetadata
-            && (Reflect as any).getMetadata('design:type', instance, key as string | symbol)
+class ObjectCreator<T> {
+
+  private readonly instance: T;
+  private readonly typesStore: TypesClassStore;
+
+  constructor(
+    private readonly ObjectConstructor: Constructor<T>,
+  ) {
+    this.instance = new this.ObjectConstructor();
+    this.typesStore = new TypesClassStore(ObjectConstructor as Constructor<never>);
+  }
+
+  public create(data: RecursiveObject<T>): T {
+    (Object.keys(data) as Array<keyof T>)
+      .forEach(
+        key => {
+          const keyType = this.getKeyType(key);
+
+          const dataValue = (data as T)[key];
+
+          // If force passed null or undefined then set it as is
+          if (dataValue === undefined || dataValue === null) {
+            this.instance[key] = dataValue;
+            return;
+          }
+
+          if (typeof keyType !== 'function') {
+            this.instance[key] = dataValue;
+            return;
+          }
+
+          const isKeyHasSerializableProperties = Boolean(
+            new ExtractorsClassStore(keyType as Constructor<never>)
+              .findStoreMap(),
           );
 
-        const dataValue = (data as any)[key];
-        if (dataValue === undefined || dataValue === null) {
-          instance[key] = dataValue;
-          return;
-        }
-
-        const isKeyHasSerializableProperties = Boolean(
-          new ExtractorsClassStore(keyType).findStoreMap(),
-        );
-        if (isKeyHasSerializableProperties) {
-          if (Array.isArray(dataValue)) {
-            instance[key] = (dataValue as Array<any>).map(item => create(keyType, item)) as any;
-          } else {
-            instance[key] = create(keyType, dataValue);
+          if (isKeyHasSerializableProperties) {
+            if (Array.isArray(dataValue)) {
+              this.instance[key] = dataValue
+                .map(
+                  item => new ObjectCreator(keyType as Constructor<unknown>)
+                    .create(item),
+                ) as never;
+            } else {
+              this.instance[key] = new ObjectCreator(keyType as Constructor<unknown>)
+                .create(dataValue) as never;
+            }
           }
-        } else {
-          instance[key] = dataValue;
-        }
-      },
-    );
+        },
+      );
 
-  return instance;
+    return this.instance;
+  }
+
+  private getKeyType(key: keyof T): unknown {
+    return this.typesStore.findStoreMap()?.get(key)
+      || Reflect?.getMetadata?.('design:type', this.instance as object, key as string | symbol);
+  }
+
 }

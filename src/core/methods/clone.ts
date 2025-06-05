@@ -1,5 +1,5 @@
 import { ExtractorsClassStore } from '../class-stores/extractor-store';
-import { create } from './create';
+import { createPartial } from './create';
 
 /**
  * @method clone Create same object as passed (including deep serializable instances)
@@ -7,25 +7,45 @@ import { create } from './create';
  * @returns New instance of passed object
  */
 export function clone<T extends object>(data: T): T {
-  const ctor = (data as any).constructor;
-  const instance = create(ctor) as T;
+  return new ObjectCloner(data).clone();
+}
 
-  const cloneValue = <U>(value: U): U => {
+class ObjectCloner<T extends object> {
+
+  private readonly instance: T;
+
+  constructor(
+    private readonly data: T,
+  ) {
+    const DataConstructor = (data as any).constructor;
+    this.instance = createPartial(DataConstructor) as T;
+  }
+
+  public clone(): T {
+    (Object.keys(this.data) as Array<keyof T>)
+      .forEach(
+        key => this.instance[key] = ObjectCloner.cloneValue(this.data[key]),
+      );
+
+    return this.instance;
+  }
+
+  private static cloneValue<U>(value: U): U {
     const isValueHasSerializableProperties = Boolean(
-      new ExtractorsClassStore(value?.constructor).findStoreMap(),
+      new ExtractorsClassStore((value as any)?.constructor)
+        .findStoreMap(),
     );
     if (Array.isArray(value)) {
-      return value.map(v => cloneValue(v));
+      return value
+        .map(
+          item => new ObjectCloner(item)
+            .clone(),
+        ) as U;
     } else if (isValueHasSerializableProperties) {
-      return clone(value);
+      return new ObjectCloner(value as any)
+        .clone();
     }
     return value;
   };
 
-  (Object.keys(data) as Array<keyof T>)
-    .forEach(
-      key => instance[key] = cloneValue(data[key]),
-    );
-
-  return instance;
 }

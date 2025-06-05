@@ -1,22 +1,14 @@
-import { RecursivePartial } from './utils/recursive-partial';
-import { clone } from './methods/clone';
-import { create } from './methods/create';
-import { deserialize } from './methods/deserialize';
-import { serialize } from './methods/serialize';
-
-type RecursiveWithoutBase<T> = {
-  [K in keyof T]: T[K] extends SerializableObject ?
-  SerializableObjectWithoutBase<T[K]> :
-  T[K] extends Array<SerializableObject> ?
-  Array<SerializableObjectWithoutBase<T[K][number]>> :
-  T[K];
-};
-
-export type SerializableObjectWithoutBase<T extends Partial<SerializableObject>> =
-  RecursiveWithoutBase<Pick<T, Exclude<keyof T, keyof SerializableObject>>>;
-
-type SerializableObjectData<T extends typeof SerializableObject, I extends InstanceType<T> = InstanceType<T>> =
-  RecursivePartial<SerializableObjectWithoutBase<I>>;
+import { clone } from './core/methods/clone';
+import {
+  create,
+  createPartial,
+} from './core/methods/create';
+import { deserialize } from './core/methods/deserialize';
+import { serialize } from './core/methods/serialize';
+import {
+  RecursiveObject,
+  RecursivePartial,
+} from './utils/recursive-type';
 
 export class NonArrayDataError extends Error {
   constructor() {
@@ -36,9 +28,23 @@ export class SerializableObject {
    */
   public static create<T extends typeof SerializableObject>(
     this: T,
-    data: SerializableObjectData<T> = {},
+    data: RecursiveObject<T>,
   ): InstanceType<T> {
-    return create(this as any, data as any);
+    return create(this as never, data as never);
+  }
+
+  /**
+   * @method create Create SerializableObject instance
+   * !IMPORTANT This method get <RecursivePartial> values and set it as is
+   *   Prefer to use create() method with strict type checking
+   * @param data Plain object structured as current class
+   * @returns Instance of current class
+   */
+  public static createPartial<T extends typeof SerializableObject>(
+    this: T,
+    data: RecursivePartial<T> = {},
+  ): InstanceType<T> {
+    return createPartial(this as never, data as never);
   }
 
   /**
@@ -48,7 +54,7 @@ export class SerializableObject {
    */
   public static deserialize<T extends typeof SerializableObject>(
     this: T,
-    data: any,
+    data: unknown,
   ): InstanceType<T> {
     return deserialize(this, data) as InstanceType<T>;
   }
@@ -60,22 +66,23 @@ export class SerializableObject {
    */
   public static deserializeArray<T extends typeof SerializableObject>(
     this: T,
-    data: any[],
+    data: unknown[],
   ): InstanceType<T>[] {
     if (!Array.isArray(data)) {
       throw new NonArrayDataError();
     }
-    return data.map(data => deserialize(this, data)) as InstanceType<T>[];
+    return data
+      .map(
+        dataItem => deserialize(this, dataItem),
+      ) as InstanceType<T>[];
   }
 
   /**
    * @method serialize Serialize current instance
    * @returns { any } Object of serialized data
    */
-  public serialize(): any {
-
+  public serialize(): unknown {
     return serialize(this);
-
   }
 
   /**
