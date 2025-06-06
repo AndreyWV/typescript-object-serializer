@@ -1,6 +1,6 @@
-import { Constructor } from '../../utils/constructor';
-import { ValidationError } from '../types/validation-error';
-import { Validator } from '../types/validator';
+import { Constructor } from '../../../utils/constructor';
+import { ValidationError } from '../../core/types/validation-error';
+import { Validator } from '../../core/types/validator';
 
 /**
  * @class TypeValidator Validates that the value is of the specified type.

@@ -1,6 +1,6 @@
-import { Constructor } from '../../utils/constructor';
-import { ValidationError } from '../types/validation-error';
-import { Validator } from '../types/validator';
+import { Constructor } from '../../../utils/constructor';
+import { ValidationError } from '../../core/types/validation-error';
+import { Validator } from '../../core/types/validator';
 
 /**
  * @class NumberValueValidator Validates number between min-max values
@@ -16,8 +16,8 @@ import { Validator } from '../types/validator';
 export class NumberValueValidator extends Validator {
 
   constructor(
-    protected min?: number,
-    protected max?: number,
+    protected readonly min?: number,
+    protected readonly max?: number,
   ) {
     super();
   }

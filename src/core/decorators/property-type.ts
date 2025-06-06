@@ -1,6 +1,6 @@
 import { Constructor } from '../../utils/constructor';
-import { TypesClassStore } from '../class-stores/types-store';
-import { DecoratorBase } from './base-decorator';
+import { TypesClassStore } from '../store/types-store';
+import { DecoratorBase } from '../../utils/base-decorator';
 
 /**
  * @function property Declares type for current property

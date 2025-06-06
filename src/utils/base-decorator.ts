@@ -1,5 +1,5 @@
-import { Constructor } from '../../utils/constructor';
-import { ConstructorPropertyDeclaration } from '../../utils/constructor-property-declaration';
+import { Constructor } from './constructor';
+import { ConstructorPropertyDeclaration } from './constructor-property-declaration';
 
 export abstract class DecoratorBase {
 

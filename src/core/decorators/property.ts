@@ -1,8 +1,8 @@
 import { StraightExtractor } from '../../common/extractors/straight-extractor';
 import { Constructor } from '../../utils/constructor';
-import { ExtractorsClassStore } from '../class-stores/extractor-store';
+import { ExtractorsClassStore } from '../store/extractor-store';
 import { Extractor } from '../types/extractor';
-import { DecoratorBase } from './base-decorator';
+import { DecoratorBase } from '../../utils/base-decorator';
 
 /**
  * @function property Declares serialize/deserialize rules for current property

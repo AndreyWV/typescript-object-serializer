@@ -1,7 +1,7 @@
 import { SerializableObject } from '../../serializable-object';
 import { deleteUndefinedRecursive } from '../../utils/delete-undefined';
-import { ExtractorsClassStore } from '../class-stores/extractor-store';
-import { ModifiersClassStore } from '../class-stores/modifier-store';
+import { ExtractorsClassStore } from '../store/extractor-store';
+import { ModifiersClassStore } from '../store/modifier-store';
 
 /**
  * @method serialize Serialize instance data

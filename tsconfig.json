@@ -6,11 +6,10 @@
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
         "lib": [
-            "es2015",
-            "es2017",
-            "es2018",
-            "esnext",
-            "dom"
+            "ES2015",
+            "ES2017",
+            "ES2018",
+            "ESNext"
         ],
         "module": "CommonJS",
         "moduleResolution": "node",
@@ -22,7 +21,10 @@
         "strictFunctionTypes": true,
         "strictNullChecks": true,
         "strictPropertyInitialization": true,
-        "target": "ESNext"
+        "target": "ESNext",
+        "types": [
+            "reflect-metadata"
+        ]
     },
     "exclude": [
         "node_modules"

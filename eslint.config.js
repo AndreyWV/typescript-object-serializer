@@ -6,8 +6,8 @@ const globals = require('globals');
 module.exports = [
   {
     files: [
-      'src/**/*.ts',
-      'tests/**/*.ts',
+      './src/**/*.ts',
+      './tests/**/*.ts',
     ],
     languageOptions: {
       parser: require('@typescript-eslint/parser'),

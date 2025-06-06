@@ -1,9 +1,9 @@
 import { Constructor } from '../../utils/constructor';
 import { getPropertyDescriptor } from '../../utils/get-property-descriptor';
 import { KeyType } from '../../utils/key-type';
-import { ExtractorsClassStore } from '../class-stores/extractor-store';
-import { ModifiersClassStore } from '../class-stores/modifier-store';
-import { TypesClassStore } from '../class-stores/types-store';
+import { ExtractorsClassStore } from '../store/extractor-store';
+import { ModifiersClassStore } from '../store/modifier-store';
+import { TypesClassStore } from '../store/types-store';
 
 /**
  * @method deserialize Deserialize object to class
@@ -25,16 +25,16 @@ class Deserializer<T> {
   private declare modifiersStore?: ModifiersClassStore;
 
   constructor(
-    private readonly dataConstructor: Constructor<T>,
+    private readonly DataConstructor: Constructor<T>,
   ) {
     try {
-      this.instance = new dataConstructor();
+      this.instance = new DataConstructor();
     } catch {
-      throw new Error(`[Serializer] First argument should be constructor "${dataConstructor?.toString()}"`);
+      throw new Error(`[Serializer] First argument should be constructor "${DataConstructor?.toString()}"`);
     }
-    this.keyTypesStore = new TypesClassStore(dataConstructor as Constructor<never>);
-    this.extractorsStore = new ExtractorsClassStore(this.dataConstructor as Constructor<never>);
-    this.modifiersStore = new ModifiersClassStore(this.dataConstructor as Constructor<never>);
+    this.keyTypesStore = new TypesClassStore(DataConstructor as Constructor<never>);
+    this.extractorsStore = new ExtractorsClassStore(this.DataConstructor as Constructor<never>);
+    this.modifiersStore = new ModifiersClassStore(this.DataConstructor as Constructor<never>);
   }
 
   public deserialize(data: unknown): T {

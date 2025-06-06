@@ -1,4 +1,4 @@
-import { ExtractorsClassStore } from '../class-stores/extractor-store';
+import { ExtractorsClassStore } from '../store/extractor-store';
 import { createPartial } from './create';
 
 /**

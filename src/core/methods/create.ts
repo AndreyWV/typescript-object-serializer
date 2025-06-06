@@ -1,7 +1,7 @@
 import { Constructor } from '../../utils/constructor';
 import { RecursiveObject, RecursivePartial } from '../../utils/recursive-type';
-import { ExtractorsClassStore } from '../class-stores/extractor-store';
-import { TypesClassStore } from '../class-stores/types-store';
+import { ExtractorsClassStore } from '../store/extractor-store';
+import { TypesClassStore } from '../store/types-store';
 import { clone } from './clone';
 
 /**

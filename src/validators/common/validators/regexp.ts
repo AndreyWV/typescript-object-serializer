@@ -1,6 +1,6 @@
-import { Constructor } from '../../utils/constructor';
-import { ValidationError } from '../types/validation-error';
-import { Validator } from '../types/validator';
+import { Constructor } from '../../../utils/constructor';
+import { ValidationError } from '../../core/types/validation-error';
+import { Validator } from '../../core/types/validator';
 
 /**
  * @class StringRegexpValidator Validates string by regexp
@@ -31,7 +31,7 @@ import { Validator } from '../types/validator';
 export class StringRegexpValidator extends Validator {
 
   constructor(
-    protected regexp: RegExp,
+    protected readonly regexp: RegExp,
   ) {
     super();
   }

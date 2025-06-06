@@ -1,6 +1,6 @@
-import { Constructor } from '../../utils/constructor';
-import { ValidationError } from '../types/validation-error';
-import { Validator } from '../types/validator';
+import { Constructor } from '../../../utils/constructor';
+import { ValidationError } from '../../core/types/validation-error';
+import { Validator } from '../../core/types/validator';
 
 /**
  * @class StringLengthValidator Validates string by length
@@ -16,8 +16,8 @@ import { Validator } from '../types/validator';
 export class StringLengthValidator extends Validator {
 
   constructor(
-    protected minLength?: number,
-    protected maxLength?: number,
+    protected readonly minLength?: number,
+    protected readonly maxLength?: number,
   ) {
     super();
   }

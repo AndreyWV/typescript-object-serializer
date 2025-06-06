@@ -1,4 +1,4 @@
-import { property } from '../../core/decorators/property';
+import { property } from '../../../core/decorators/property';
 
 /**
  * @class ValidationError Instance contains validation message and full path to invalid property.
@@ -11,7 +11,7 @@ export class ValidationError {
 
   constructor(
     @property()
-    public message: string,
+    public readonly message: string,
     @property()
     path: string,
   ) {

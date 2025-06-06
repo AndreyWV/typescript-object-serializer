@@ -1,5 +1,5 @@
-import { ValidationError } from '../types/validation-error';
-import { Validator } from '../types/validator';
+import { ValidationError } from '../../core/types/validation-error';
+import { Validator } from '../../core/types/validator';
 
 /**
  * @class RequiredValidator Validates value is not null or undefined

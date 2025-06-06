@@ -14,15 +14,14 @@ import { StraightExtractor } from './straight-extractor';
  */
 export class OverrideNameExtractor extends StraightExtractor {
 
-  public static use<E extends Constructor<OverrideNameExtractor>>(
-    this: E,
+  public static use(
     property: string,
-  ): E {
-    return class extends this {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      constructor(...args: any[]) {
+  ): Constructor<OverrideNameExtractor> {
+    return class extends OverrideNameExtractor {
+      constructor() {
         super(property);
       }
     };
   }
+
 }

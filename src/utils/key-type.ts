@@ -1,4 +1,4 @@
-import { TypesClassStore } from '../core/class-stores/types-store';
+import { TypesClassStore } from '../core/store/types-store';
 import { Constructor } from './constructor';
 
 export class KeyType<T> {
@@ -12,12 +12,13 @@ export class KeyType<T> {
 
   public getConstructorForObject(objectData: unknown): Constructor<T> | undefined {
 
-    const typesMap = this.store.findStoreMap()?.get(this.key);
+    const typesMap = this.store.findStoreMap()
+      ?.get(this.key);
 
     if (typesMap) {
-      const MatchConstructor = typesMap.keys()
+      const MatchConstructor = Array.from(typesMap.keys())
         .find(
-          KeyConstructor => typesMap.get(KeyConstructor)!(objectData),
+          (KeyConstructor: Constructor<never>) => typesMap.get(KeyConstructor)!(objectData),
         );
 
       if (MatchConstructor) {

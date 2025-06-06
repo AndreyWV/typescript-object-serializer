@@ -1,7 +1,7 @@
 import { Constructor } from '../../utils/constructor';
-import { ModifiersClassStore } from '../class-stores/modifier-store';
+import { ModifiersClassStore } from '../store/modifier-store';
 import { Modifier } from '../types/modifier';
-import { DecoratorBase } from './base-decorator';
+import { DecoratorBase } from '../../utils/base-decorator';
 
 /**
  * @function property Declares serialize/deserialize rules for current property
