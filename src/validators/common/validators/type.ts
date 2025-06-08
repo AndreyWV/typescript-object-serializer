@@ -33,9 +33,9 @@ export abstract class TypeValidator extends Validator {
     return value === undefined || value === null;
   }
 
-  public static String(): Constructor<Validator> {
+  public static String(): Constructor<TypeValidator> {
     return class extends TypeValidator {
-      public validate(value: any, path: string): ValidationError | undefined {
+      public validate(value: unknown, path: string): ValidationError | undefined {
         if (this.isEmpty(value)) {
           return;
         }
@@ -46,9 +46,9 @@ export abstract class TypeValidator extends Validator {
     };
   }
 
-  public static Number(): Constructor<Validator> {
+  public static Number(): Constructor<TypeValidator> {
     return class extends TypeValidator {
-      public validate(value: any, path: string): ValidationError | undefined {
+      public validate(value: unknown, path: string): ValidationError | undefined {
         if (this.isEmpty(value)) {
           return;
         }
@@ -59,9 +59,9 @@ export abstract class TypeValidator extends Validator {
     };
   }
 
-  public static Boolean(): Constructor<Validator> {
+  public static Boolean(): Constructor<TypeValidator> {
     return class extends TypeValidator {
-      public validate(value: any, path: string): ValidationError | undefined {
+      public validate(value: unknown, path: string): ValidationError | undefined {
         if (this.isEmpty(value)) {
           return;
         }
@@ -72,9 +72,9 @@ export abstract class TypeValidator extends Validator {
     };
   }
 
-  public static Object(): Constructor<Validator> {
+  public static Object(): Constructor<TypeValidator> {
     return class extends TypeValidator {
-      public validate(value: any, path: string): ValidationError | undefined {
+      public validate(value: unknown, path: string): ValidationError | undefined {
         if (this.isEmpty(value)) {
           return;
         }

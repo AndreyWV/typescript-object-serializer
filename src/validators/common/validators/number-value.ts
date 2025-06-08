@@ -30,7 +30,7 @@ export class NumberValueValidator extends Validator {
     };
   }
 
-  public validate(value: any, path: string): ValidationError | undefined {
+  public validate(value: unknown, path: string): ValidationError | undefined {
     if (typeof value !== 'number') {
       return;
     }
