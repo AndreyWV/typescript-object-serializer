@@ -1,3 +1,4 @@
+import { Modifier } from '../../core/types/modifier';
 import { Constructor } from '../../utils/constructor';
 import { StraightExtractor } from './straight-extractor';
 
@@ -18,8 +19,11 @@ export class OverrideNameExtractor extends StraightExtractor {
     property: string,
   ): Constructor<OverrideNameExtractor> {
     return class extends OverrideNameExtractor {
-      constructor() {
-        super(property);
+      constructor(_: string, modifier?: Modifier) {
+        super(
+          property,
+          modifier,
+        );
       }
     };
   }

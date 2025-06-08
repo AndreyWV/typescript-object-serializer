@@ -3,7 +3,7 @@ import {
   property,
   SerializableObject,
 } from '../src';
-import { deserialize } from '../src/methods/deserialize';
+import { deserialize } from '../src/core/methods/deserialize';
 
 describe('Property type auto-detection', () => {
 
@@ -11,7 +11,7 @@ describe('Property type auto-detection', () => {
 
     class Property extends SerializableObject {
       @property()
-      public data: any;
+      public data: unknown;
     }
 
     class Test extends SerializableObject {
@@ -36,7 +36,7 @@ describe('Property type auto-detection', () => {
 
     class Property {
       @property()
-      public data: any;
+      public data: unknown;
     }
 
     class Test {

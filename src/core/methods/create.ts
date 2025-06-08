@@ -1,5 +1,8 @@
 import { Constructor } from '../../utils/constructor';
-import { RecursiveObject, RecursivePartial } from '../../utils/recursive-type';
+import {
+  RecursiveObject,
+  RecursivePartial,
+} from '../../utils/recursive-type';
 import { ExtractorsClassStore } from '../store/extractor-store';
 import { TypesClassStore } from '../store/types-store';
 import { clone } from './clone';
@@ -62,7 +65,7 @@ class ObjectCreator<T> {
             return;
           }
 
-          if (typeof keyType !== 'function') {
+          if (!keyType) {
             this.instance[key] = dataValue;
             return;
           }
@@ -91,8 +94,11 @@ class ObjectCreator<T> {
   }
 
   private getKeyType(key: keyof T): unknown {
-    return this.typesStore.findStoreMap()?.get(key)
-      || Reflect?.getMetadata?.('design:type', this.instance as object, key as string | symbol);
+    const keysMap = this.typesStore.findStoreMap()?.get(key);
+    if (keysMap) {
+      return Array.from(keysMap.keys())[0];
+    }
+    return Reflect?.getMetadata?.('design:type', this.instance as object, key as string | symbol);
   }
 
 }

@@ -1,6 +1,6 @@
+import { deserialize } from '../../src/core/methods/deserialize';
 import { property } from '../../src/core/decorators/property';
 import { propertyType } from '../../src/core/decorators/property-type';
-import { deserialize } from '../../src/methods/deserialize';
 import { SerializableObject } from '../../src/serializable-object';
 
 describe('Decorator @propertyType', () => {
@@ -14,7 +14,7 @@ describe('Decorator @propertyType', () => {
 
     class SuccessResult extends SerializableObject {
       @property()
-      public data?: any;
+      public data?: unknown;
     }
     class FailedResult extends SerializableObject {
       @property()
@@ -25,22 +25,44 @@ describe('Decorator @propertyType', () => {
 
       @property()
       @propertyType(TestProperty)
-      public property: any;
+      public property: unknown;
 
       @property()
       @propertyType(TestProperty)
       public declare arrayProperty: TestProperty[];
 
       @property()
-      @propertyType((value: any) => value?.success
-        ? SuccessResult
-        : FailedResult)
+      @propertyType(
+        SuccessResult,
+        (value: unknown) => Boolean(
+          typeof value === 'object'
+          && (value as Record<string, unknown>)?.success,
+        ),
+      )
+      @propertyType(
+        FailedResult,
+        (value: unknown) => Boolean(
+          typeof value === 'object'
+          && !(value as Record<string, unknown>)?.success,
+        ),
+      )
       public declare conditionalPropertyType: SuccessResult | FailedResult;
 
       @property()
-      @propertyType((value: any) => value?.success
-        ? SuccessResult
-        : FailedResult)
+      @propertyType(
+        SuccessResult,
+        (value: unknown) => Boolean(
+          typeof value === 'object'
+          && (value as Record<string, unknown>)?.success,
+        ),
+      )
+      @propertyType(
+        FailedResult,
+        (value: unknown) => Boolean(
+          typeof value === 'object'
+          && !(value as Record<string, unknown>)?.success,
+        ),
+      )
       public declare arrayWithConditionalPropertyType: Array<SuccessResult | FailedResult>;
 
     }
@@ -128,7 +150,7 @@ describe('Decorator @propertyType', () => {
 
     class SuccessResult {
       @property()
-      public data?: any;
+      public data?: unknown;
     }
     class FailedResult {
       @property()
@@ -139,22 +161,44 @@ describe('Decorator @propertyType', () => {
 
       @property()
       @propertyType(TestProperty)
-      public property: any;
+      public property: unknown;
 
       @property()
       @propertyType(TestProperty)
       public declare arrayProperty: TestProperty[];
 
       @property()
-      @propertyType((value: any) => value?.success
-        ? SuccessResult
-        : FailedResult)
+      @propertyType(
+        SuccessResult,
+        (value: unknown) => Boolean(
+          typeof value === 'object'
+          && (value as Record<string, unknown>)?.success,
+        ),
+      )
+      @propertyType(
+        FailedResult,
+        (value: unknown) => Boolean(
+          typeof value === 'object'
+          && !(value as Record<string, unknown>)?.success,
+        ),
+      )
       public declare conditionalPropertyType: SuccessResult | FailedResult;
 
       @property()
-      @propertyType((value: any) => value?.success
-        ? SuccessResult
-        : FailedResult)
+      @propertyType(
+        SuccessResult,
+        (value: unknown) => Boolean(
+          typeof value === 'object'
+          && (value as Record<string, unknown>)?.success,
+        ),
+      )
+      @propertyType(
+        FailedResult,
+        (value: unknown) => Boolean(
+          typeof value === 'object'
+          && !(value as Record<string, unknown>)?.success,
+        ),
+      )
       public declare arrayWithConditionalPropertyType: Array<SuccessResult | FailedResult>;
 
     }

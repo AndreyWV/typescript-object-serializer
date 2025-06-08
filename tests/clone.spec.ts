@@ -1,7 +1,7 @@
 import { property } from '../src/core/decorators/property';
 import { propertyType } from '../src/core/decorators/property-type';
-import { clone } from '../src/methods/clone';
-import { create } from '../src/methods/create';
+import { clone } from '../src/core/methods/clone';
+import { create } from '../src/core/methods/create';
 import { SerializableObject } from '../src/serializable-object';
 
 describe('Clone', () => {

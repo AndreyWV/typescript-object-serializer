@@ -5,6 +5,7 @@ import {
 } from './core/methods/create';
 import { deserialize } from './core/methods/deserialize';
 import { serialize } from './core/methods/serialize';
+import { Constructor } from './utils/constructor';
 import {
   RecursiveObject,
   RecursivePartial,
@@ -26,10 +27,10 @@ export class SerializableObject {
    * @param data Plain object structured as current class
    * @returns Instance of current class
    */
-  public static create<T extends typeof SerializableObject>(
-    this: T,
+  public static create<T extends SerializableObject>(
+    this: Constructor<T>,
     data: RecursiveObject<T>,
-  ): InstanceType<T> {
+  ): T {
     return create(this as never, data as never);
   }
 
@@ -40,10 +41,10 @@ export class SerializableObject {
    * @param data Plain object structured as current class
    * @returns Instance of current class
    */
-  public static createPartial<T extends typeof SerializableObject>(
-    this: T,
+  public static createPartial<T extends SerializableObject>(
+    this: Constructor<T>,
     data: RecursivePartial<T> = {},
-  ): InstanceType<T> {
+  ): T {
     return createPartial(this as never, data as never);
   }
 
@@ -79,9 +80,9 @@ export class SerializableObject {
 
   /**
    * @method serialize Serialize current instance
-   * @returns { any } Object of serialized data
+   * @returns { Record<string, unknown> } Object of serialized data
    */
-  public serialize(): unknown {
+  public serialize(): Record<string, unknown> {
     return serialize(this);
   }
 

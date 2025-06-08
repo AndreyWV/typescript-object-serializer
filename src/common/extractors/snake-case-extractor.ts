@@ -3,7 +3,7 @@ import { StraightExtractor } from './straight-extractor';
 
 export class NotStringPropertyKeyError extends Error {
   constructor(
-    propertyKey: never,
+    propertyKey: unknown,
   ) {
     super(`[Serializer] SnakeCaseExtractor should be used with object key type "string": ${String(propertyKey)}`);
   }

@@ -1,6 +1,6 @@
 import { property } from '../src/core/decorators/property';
-import { deserialize } from '../src/methods/deserialize';
-import { serialize } from '../src/methods/serialize';
+import { deserialize } from '../src/core/methods/deserialize';
+import { serialize } from '../src/core/methods/serialize';
 import { SerializableObject } from '../src/serializable-object';
 
 describe('Serializable class constructor', () => {

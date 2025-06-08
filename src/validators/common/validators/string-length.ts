@@ -8,7 +8,7 @@ import { Validator } from '../../core/types/validator';
  * class Person extends SerializableObject {
  *
  *   @property()
- *   @propertyValidators([StringLengthValidator.with(1, 50)])
+ *   @propertyValidators([StringLengthValidator.with({min: 1, max: 50)])
  *   public name: string;
  *
  * }
@@ -30,7 +30,7 @@ export class StringLengthValidator extends Validator {
     };
   }
 
-  public validate(value: any, path: string): ValidationError | undefined {
+  public validate(value: unknown, path: string): ValidationError | undefined {
     if (typeof value !== 'string') {
       return;
     }
@@ -38,14 +38,14 @@ export class StringLengthValidator extends Validator {
       ?? this.validateMaxLength(value, path);
   }
 
-  private validateMinLength(value: any, path: string): ValidationError | undefined {
+  private validateMinLength(value: string, path: string): ValidationError | undefined {
     const valueLength = value.length;
     if (Number.isInteger(this.minLength) && this.minLength! >= 0 && valueLength < this.minLength!) {
       return new ValidationError(`Property length should be greater than or equal ${this.minLength}`, path);
     }
   }
 
-  private validateMaxLength(value: any, path: string): ValidationError | undefined {
+  private validateMaxLength(value: string, path: string): ValidationError | undefined {
     const valueLength = value.length;
     if (Number.isInteger(this.maxLength) && this.maxLength! >= 0 && valueLength > this.maxLength!) {
       return new ValidationError(`Property length should be less than or equal ${this.maxLength}`, path);

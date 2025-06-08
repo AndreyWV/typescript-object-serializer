@@ -12,7 +12,6 @@ export class ValidationError {
   constructor(
     @property()
     public readonly message: string,
-    @property()
     path: string,
   ) {
     this.path = ValidationError.clearErrorPath(path);

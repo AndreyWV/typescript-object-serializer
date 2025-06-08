@@ -28,8 +28,8 @@ export abstract class DecoratorBase {
       );
       if (!extractedPropertyKey) {
         throw new Error(
-          `[Serializer] Error define property name at constructor: "${targetPrototypeConstructor.toString()}"`
-          + ` - ${indexOrDescriptor}`,
+          `[Serializer] Error define property name at constructor: "${targetPrototypeConstructor.name.toString()}",`
+          + `index: ${indexOrDescriptor}`,
         );
       }
       propertyKey = extractedPropertyKey;

@@ -1,54 +1,61 @@
+import { SnakeCaseExtractor } from '../src/common/extractors/snake-case-extractor';
+import { modifier } from '../src/core/decorators/modifier';
+import { property } from '../src/core/decorators/property';
 import {
   ExtractionResult,
   Extractor,
 } from '../src/core/types/extractor';
-import { property } from '../src/core/decorators/property';
-import { SnakeCaseExtractor } from '../src/common/extractors/snake-case-extractor';
+import { Modifier } from '../src/core/types/modifier';
 import { SerializableObject } from '../src/serializable-object';
+import { Constructor } from '../src/utils/constructor';
 
 describe('Custom extractor', () => {
 
   describe('Nested data to plain', () => {
 
-    class DeepExtractor<T = any> extends Extractor<T> {
+    class DeepExtractor extends Extractor {
 
-      public static byPath<C extends typeof DeepExtractor>(path: string): C {
+      public static byPath(path: string): Constructor<DeepExtractor> {
         return class extends DeepExtractor {
-          constructor() {
-            super(path);
+          constructor(_: string, mod?: Modifier) {
+            super(path, mod);
           }
-        } as any;
+        };
       }
 
-      private static getObjectByPath(dataObject: any, keys: string[]): any {
-        let extracted: any = dataObject;
+      private static getObjectByPath(dataObject: unknown, keys: string[]): unknown {
+        let extracted = dataObject;
         keys.forEach(key => {
-          if (!extracted) {
+          if (typeof extracted !== 'object' || extracted === null) {
             return undefined;
           }
-          extracted = (extracted as any)[key];
+          extracted = extracted[key as keyof typeof extracted];
         });
         return extracted;
       }
 
-      private static getOrCreateObjectByPath(dataObject: any, keys: string[]): any {
+      private static getOrCreateObjectByPath(
+        dataObject: Record<string, unknown>,
+        keys: string[],
+      ): Record<string, unknown> {
         let currentObject = dataObject;
         keys.forEach(key => {
           if (!Object.prototype.hasOwnProperty.call(currentObject, key)) {
             currentObject[key] = {};
           }
-          currentObject = currentObject[key];
+          currentObject = currentObject[key] as Record<string, unknown>;
         });
         return currentObject;
       }
 
       constructor(
-        protected key: string,
+        protected readonly key: string,
+        mod?: Modifier,
       ) {
-        super(key);
+        super(key, mod);
       }
 
-      public extract(data: any): ExtractionResult<T> {
+      public extract(data: unknown): ExtractionResult {
         if (typeof data !== 'object' || data === null) {
           return {
             data: undefined,
@@ -56,19 +63,33 @@ describe('Custom extractor', () => {
           };
         }
         return {
-          data: this.transformBeforeExtract(
+          data: this.modifier.beforeDeserialize(
             DeepExtractor.getObjectByPath(data, this.key.split('.')),
           ),
           path: this.key,
         };
       }
 
-      public apply(applyObject: any, value: T): void {
+      public apply(applyObject: unknown, value: unknown): void {
         const keys = this.key.split('.');
-        const dataObject = DeepExtractor.getOrCreateObjectByPath(applyObject, keys.slice(0, -1));
-        dataObject[keys[keys.length - 1]] = this.transformBeforeApply(value);
+        const dataObject = DeepExtractor.getOrCreateObjectByPath(
+          applyObject as Record<string, unknown>,
+          keys.slice(0, -1),
+        );
+        dataObject[keys[keys.length - 1]] = this.modifier.afterSerialize(value);
       }
 
+    }
+
+    class StringAgeModifier extends Modifier {
+
+      public beforeDeserialize(value: unknown): number {
+        return Number(value);
+      }
+
+      public afterSerialize(value: unknown): string {
+        return String(value);
+      }
     }
 
     class TestPerson extends SerializableObject {
@@ -76,10 +97,8 @@ describe('Custom extractor', () => {
       @property()
       public declare id: number;
 
-      @property(DeepExtractor.byPath('data.person.age').transform({
-        onDeserialize: value => value && Number(value),
-        onSerialize: value => value && String(value),
-      }))
+      @property(DeepExtractor.byPath('data.person.age'))
+      @modifier(StringAgeModifier)
       public declare age: number;
 
       @property(DeepExtractor.byPath('data.person.last_name'))
@@ -151,7 +170,7 @@ describe('Custom extractor', () => {
 
     it('should serialize partial data', () => {
 
-      const person = TestPerson.create({
+      const person = TestPerson.createPartial({
         age: 25,
         lastName: 'Last',
         id: 555,
@@ -173,7 +192,7 @@ describe('Custom extractor', () => {
 
   describe('Only deserialize property', () => {
 
-    class OnlyDeserializeSnakeCaseExtractor<T> extends SnakeCaseExtractor<T> {
+    class OnlyDeserializeSnakeCaseExtractor extends SnakeCaseExtractor {
       public apply(): void {
       }
     }

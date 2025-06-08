@@ -1,7 +1,7 @@
 import { property } from '../src/core/decorators/property';
 import { propertyType } from '../src/core/decorators/property-type';
-import { create } from '../src/methods/create';
-import { deserialize } from '../src/methods/deserialize';
+import { create } from '../src/core/methods/create';
+import { deserialize } from '../src/core/methods/deserialize';
 import {
   NonArrayDataError,
   SerializableObject,

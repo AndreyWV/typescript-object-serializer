@@ -2,10 +2,12 @@ import {
   SnakeCaseExtractor,
   StraightExtractor,
 } from '../src';
+import { modifier } from '../src/core/decorators/modifier';
 import { property } from '../src/core/decorators/property';
 import { propertyType } from '../src/core/decorators/property-type';
-import { create } from '../src/methods/create';
-import { serialize } from '../src/methods/serialize';
+import { create } from '../src/core/methods/create';
+import { serialize } from '../src/core/methods/serialize';
+import { Modifier } from '../src/core/types/modifier';
 import { SerializableObject } from '../src/serializable-object';
 
 describe('Serialize', () => {
@@ -19,7 +21,7 @@ describe('Serialize', () => {
         public declare stringProperty: string;
 
         @property()
-        public declare numberProperty: number | null;
+        public numberProperty?: number | null;
 
         public declare nonSerializableProperty: string;
       }
@@ -29,6 +31,7 @@ describe('Serialize', () => {
         const instance = Test.create({
           numberProperty: 5,
           stringProperty: 'value',
+          nonSerializableProperty: '324',
         });
         const serialized = instance.serialize();
         expect(serialized).toEqual({
@@ -41,6 +44,8 @@ describe('Serialize', () => {
       it('should serialize null value of serializable property', () => {
         const instance = Test.create({
           numberProperty: null,
+          stringProperty: 'value',
+          nonSerializableProperty: '324',
         });
         const serialized = instance.serialize();
         expect(serialized.numberProperty).toBeNull();
@@ -50,6 +55,7 @@ describe('Serialize', () => {
         const instance = Test.create({
           numberProperty: undefined,
           stringProperty: 'test',
+          nonSerializableProperty: '321',
         });
         const serialized = instance.serialize();
         expect(serialized).toEqual({
@@ -70,15 +76,23 @@ describe('Serialize', () => {
       });
 
       it('should include property to serializable object if property is undefined '
-        + 'but has value from transformer', () => {
+        + 'but has value from modifier', () => {
+
+          class PropertyModifier extends Modifier {
+            public afterSerialize(data: unknown): unknown {
+              return data === undefined
+                ? null
+                : data;
+            }
+          }
+
           class A extends SerializableObject {
-            @property(StraightExtractor.transform({
-              onSerialize: (value) => value ?? null,
-            }))
+            @property(StraightExtractor)
+            @modifier(PropertyModifier)
             public declare property: string;
           }
           const instance = A.create({
-            property: undefined,
+            property: undefined as any,
           });
           const serialized = instance.serialize();
           expect(serialized).toEqual({
@@ -90,7 +104,7 @@ describe('Serialize', () => {
 
         class Test2 extends SerializableObject {
           @property()
-          public declare list: any[];
+          public declare list: unknown[];
         }
 
         const instance = create(Test2, {
@@ -101,9 +115,9 @@ describe('Serialize', () => {
             {
               otherProperty: 'aaa',
             },
-            'string value' as any,
+            'string value' as never,
             123,
-            null,
+            null as never,
           ],
         });
 
@@ -132,7 +146,7 @@ describe('Serialize', () => {
         public declare stringProperty: string;
 
         @property()
-        public declare numberProperty: number | null;
+        public numberProperty?: number | null;
 
         public declare nonSerializableProperty: string;
       }
@@ -142,6 +156,7 @@ describe('Serialize', () => {
         const instance = create(Test, {
           numberProperty: 5,
           stringProperty: 'value',
+          nonSerializableProperty: '321',
         });
         const serialized = serialize(instance);
         expect(serialized).toEqual({
@@ -154,6 +169,8 @@ describe('Serialize', () => {
       it('should serialize null value of serializable property', () => {
         const instance = create(Test, {
           numberProperty: null,
+          stringProperty: 'value',
+          nonSerializableProperty: '321',
         });
         const serialized = serialize(instance);
         expect(serialized.numberProperty).toBeNull();
@@ -163,6 +180,7 @@ describe('Serialize', () => {
         const instance = create(Test, {
           numberProperty: undefined,
           stringProperty: 'test',
+          nonSerializableProperty: '321',
         });
         const serialized = serialize(instance);
         expect(serialized).toEqual({
@@ -184,14 +202,22 @@ describe('Serialize', () => {
 
       it('should include property to serializable object if property is undefined '
         + 'but has value from transformer', () => {
+
+        class PropertyModifier extends Modifier {
+          public afterSerialize(data: unknown): unknown {
+            return data === undefined
+              ? null
+              : data;
+          }
+        }
+
           class A {
-            @property(StraightExtractor.transform({
-              onSerialize: (value) => value ?? null,
-            }))
+            @property(StraightExtractor)
+            @modifier(PropertyModifier)
             public declare property: string;
           }
           const instance = create(A, {
-            property: undefined,
+            property: undefined as any,
           });
           const serialized = serialize(instance);
           expect(serialized).toEqual({
@@ -203,7 +229,7 @@ describe('Serialize', () => {
 
         class Test2 {
           @property()
-          public declare list: any[];
+          public declare list: unknown[];
         }
 
         const instance = create(Test2, {
@@ -214,9 +240,9 @@ describe('Serialize', () => {
             {
               otherProperty: 'aaa',
             },
-            'string value' as any,
+            'string value' as never,
             123,
-            null,
+            null as never,
           ],
         });
 

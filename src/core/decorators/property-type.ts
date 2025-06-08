@@ -26,7 +26,7 @@ import { DecoratorBase } from '../../utils/base-decorator';
  * }
  */
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-export function propertyType<T = Constructor<unknown>>(
+export function propertyType<T extends Constructor<unknown>>(
   defineType: T,
   typeCondition?: (value: unknown) => boolean,
 )/* : PropertyDecorator | ParameterDecorator */ {

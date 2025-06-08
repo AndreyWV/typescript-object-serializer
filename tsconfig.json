@@ -23,7 +23,8 @@
         "strictPropertyInitialization": true,
         "target": "ESNext",
         "types": [
-            "reflect-metadata"
+            "reflect-metadata",
+            "jest"
         ]
     },
     "exclude": [

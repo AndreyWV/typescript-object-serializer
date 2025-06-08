@@ -6,17 +6,15 @@ import {
   SnakeCaseExtractor,
 } from '../../src';
 import { Constructor } from '../../src/utils/constructor';
-import {
-  propertyValidators,
-  RequiredValidator,
-  StringRegexpValidator,
-  validate,
-  ValidationError,
-  Validator,
-} from '../../src/validators';
+import { StringRegexpValidator } from '../../src/validators/common/validators/regexp';
+import { RequiredValidator } from '../../src/validators/common/validators/required';
+import { propertyValidators } from '../../src/validators/core/decorators/property-validators';
+import { validate } from '../../src/validators/core/methods/validate';
+import { ValidationError } from '../../src/validators/core/types/validation-error';
+import { Validator } from '../../src/validators/core/types/validator';
 
 export class NotEmptyStringValidator extends Validator {
-  public validate(value: any, path: string): ValidationError | undefined {
+  public validate(value: unknown, path: string): ValidationError | undefined {
     if (typeof value !== 'string' || value.length) {
       return;
     }
@@ -27,8 +25,8 @@ export class NotEmptyStringValidator extends Validator {
 export class CustomStringLengthValidator extends Validator {
 
   constructor(
-    public minLength: number,
-    public maxLength: number,
+    public readonly minLength: number,
+    public readonly maxLength: number,
   ) {
     super();
   }
@@ -41,7 +39,7 @@ export class CustomStringLengthValidator extends Validator {
     };
   }
 
-  public validate(value: any, path: string): ValidationError | undefined {
+  public validate(value: unknown, path: string): ValidationError | undefined {
     if (typeof value !== 'string' || value.length) {
       return;
     }
@@ -60,7 +58,7 @@ describe('validate', () => {
     class Test {
       @property()
       @propertyValidators([RequiredValidator])
-      public property: any;
+      public property: unknown;
     }
 
     it('should return validation errors if object is invalid', () => {
@@ -90,7 +88,7 @@ describe('validate', () => {
       class CustomValidationError extends ValidationError { }
 
       class AlwaysInvalidValidator extends Validator {
-        public validate(value: any, path: string): ValidationError | undefined {
+        public validate(value: unknown, path: string): ValidationError | undefined {
           return new CustomValidationError('Property is always invalid', path);
         }
       }
@@ -443,7 +441,7 @@ describe('validate', () => {
       class Test {
         @property()
         @propertyValidators([TestValidator])
-        public property: any;
+        public property: unknown;
       }
 
       const result = validate(Test, {});
@@ -506,7 +504,7 @@ describe('validate', () => {
   it('should validate by all validators of current class and all it\'s parent', () => {
 
     class StringStartsWithAValidator extends Validator {
-      public validate(value: any, path: string): ValidationError | undefined {
+      public validate(value: unknown, path: string): ValidationError | undefined {
         if (typeof value !== 'string') {
           return;
         }

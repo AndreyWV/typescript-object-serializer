@@ -1,14 +1,16 @@
 import { propertyType } from '../../src';
-import { property } from '../../src/core/decorators/property';
 import { OverrideNameExtractor } from '../../src/common/extractors/override-name-extractor';
 import {
   NotStringPropertyKeyError,
   SnakeCaseExtractor,
 } from '../../src/common/extractors/snake-case-extractor';
 import { StraightExtractor } from '../../src/common/extractors/straight-extractor';
-import { create } from '../../src/methods/create';
-import { deserialize } from '../../src/methods/deserialize';
-import { serialize } from '../../src/methods/serialize';
+import { modifier } from '../../src/core/decorators/modifier';
+import { property } from '../../src/core/decorators/property';
+import { create } from '../../src/core/methods/create';
+import { deserialize } from '../../src/core/methods/deserialize';
+import { serialize } from '../../src/core/methods/serialize';
+import { Modifier } from '../../src/core/types/modifier';
 import { SerializableObject } from '../../src/serializable-object';
 
 describe('Decorator @property', () => {
@@ -47,11 +49,20 @@ describe('Decorator @property', () => {
 
       describe('with value transformation', () => {
 
+        class TestModifier extends Modifier {
+          public afterSerialize(value: number): unknown {
+            return value && String(value);
+          }
+          public beforeDeserialize(value: unknown): number | undefined {
+            return value
+              ? Number(value)
+              : undefined;
+          }
+        }
+
         class Test extends SerializableObject {
-          @property(StraightExtractor.transform({
-            onDeserialize: (value: any) => value && Number(value),
-            onSerialize: (value: number) => value && String(value),
-          }))
+          @property(StraightExtractor)
+          @modifier(TestModifier)
           public declare test: number;
         }
 
@@ -112,23 +123,36 @@ describe('Decorator @property', () => {
 
         const symbolKey = Symbol('property');
 
+        class Test2 {
+          @property(SnakeCaseExtractor)
+          public [symbolKey]?: string;
+        }
+
         expect(() => {
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          class Test2 extends SerializableObject {
-            @property(SnakeCaseExtractor)
-            public [symbolKey]?: string;
-          }
-        }).toThrowError(new NotStringPropertyKeyError(symbolKey));
+          deserialize(Test2, {});
+        })
+          .toThrow(
+            new NotStringPropertyKeyError(symbolKey),
+          );
 
       });
 
       describe('with value transformation', () => {
 
+        class TestModifier extends Modifier {
+          public afterSerialize(value: number): unknown {
+            return value && String(value);
+          }
+          public beforeDeserialize(value: unknown): number | undefined {
+            return value
+              ? Number(value)
+              : undefined;
+          }
+        }
+
         class Test2 extends SerializableObject {
-          @property(SnakeCaseExtractor.transform({
-            onDeserialize: (value: any) => value && Number(value),
-            onSerialize: (value: number) => value && String(value),
-          }))
+          @property(SnakeCaseExtractor)
+          @modifier(TestModifier)
           public declare testProperty: number;
         }
 
@@ -157,17 +181,26 @@ describe('Decorator @property', () => {
 
         class DepartmentId {
           constructor(
-            public value: string,
+            public readonly value: string,
           ) {
+          }
+        }
+
+        class DepartmentIdModifier extends Modifier {
+          public afterSerialize(value: DepartmentId): unknown {
+            return value?.value;
+          }
+          public beforeDeserialize(value: unknown): DepartmentId | undefined {
+            return value
+              ? new DepartmentId(value as string)
+              : undefined;
           }
         }
 
         class Department extends SerializableObject {
 
-          @property(StraightExtractor.transform({
-            onDeserialize: value => new DepartmentId(value),
-            onSerialize: (value: DepartmentId) => value.value,
-          }))
+          @property(StraightExtractor)
+          @modifier(DepartmentIdModifier)
           public declare id: DepartmentId;
 
         }
@@ -227,11 +260,20 @@ describe('Decorator @property', () => {
 
       describe('with value transformation', () => {
 
+        class TestModifier extends Modifier {
+          public afterSerialize(value: number): unknown {
+            return value && String(value);
+          }
+          public beforeDeserialize(value: unknown): number | undefined {
+            return value
+              ? Number(value)
+              : undefined;
+          }
+        }
+
         class Department2 extends SerializableObject {
-          @property(OverrideNameExtractor.use('department_id').transform({
-            onDeserialize: (value: any) => value && Number(value),
-            onSerialize: (value: number) => value && String(value),
-          }))
+          @property(OverrideNameExtractor.use('department_id'))
+          @modifier(TestModifier)
           public declare id: number;
         }
 
@@ -294,11 +336,20 @@ describe('Decorator @property', () => {
 
       describe('with value transformation', () => {
 
+        class TestModifier extends Modifier {
+          public afterSerialize(value: number): unknown {
+            return value && String(value);
+          }
+          public beforeDeserialize(value: unknown): number | undefined {
+            return value
+              ? Number(value)
+              : undefined;
+          }
+        }
+
         class Test {
-          @property(StraightExtractor.transform({
-            onDeserialize: (value: any) => value && Number(value),
-            onSerialize: (value: number) => value && String(value),
-          }))
+          @property(StraightExtractor)
+          @modifier(TestModifier)
           public declare test: number;
         }
 
@@ -324,7 +375,7 @@ describe('Decorator @property', () => {
       });
     });
 
-    describe('with extractor camelCase', () => {
+    describe('with extractor snakeCase', () => {
 
       class Test {
 
@@ -359,23 +410,36 @@ describe('Decorator @property', () => {
 
         const symbolKey = Symbol('property');
 
+        class Test2 {
+          @property(SnakeCaseExtractor)
+          public [symbolKey]?: string;
+        }
+
         expect(() => {
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          class Test2 {
-            @property(SnakeCaseExtractor)
-            public [symbolKey]?: string;
-          }
-        }).toThrow(new NotStringPropertyKeyError(symbolKey));
+          deserialize(Test2, {});
+        })
+          .toThrow(
+            new NotStringPropertyKeyError(symbolKey),
+          );
 
       });
 
       describe('with value transformation', () => {
 
+        class TestModifier extends Modifier {
+          public afterSerialize(value: number): unknown {
+            return value && String(value);
+          }
+          public beforeDeserialize(value: unknown): number | undefined {
+            return value
+              ? Number(value)
+              : undefined;
+          }
+        }
+
         class Test2 {
-          @property(SnakeCaseExtractor.transform({
-            onDeserialize: (value: any) => value && Number(value),
-            onSerialize: (value: number) => value && String(value),
-          }))
+          @property(SnakeCaseExtractor)
+          @modifier(TestModifier)
           public declare testProperty: number;
         }
 
@@ -409,12 +473,21 @@ describe('Decorator @property', () => {
           }
         }
 
+        class DepartmentIdModifier extends Modifier {
+          public afterSerialize(value: DepartmentId): unknown {
+            return value && value.value;
+          }
+          public beforeDeserialize(value: unknown): DepartmentId | undefined {
+            return value
+              ? new DepartmentId(value as string)
+              : undefined;
+          }
+        }
+
         class Department {
 
-          @property(StraightExtractor.transform({
-            onDeserialize: value => new DepartmentId(value),
-            onSerialize: (value: DepartmentId) => value.value,
-          }))
+          @property(StraightExtractor)
+          @modifier(DepartmentIdModifier)
           public declare id: DepartmentId;
 
         }
@@ -474,18 +547,26 @@ describe('Decorator @property', () => {
 
       describe('with value transformation', () => {
 
-        // eslint-disable-next-line @typescript-eslint/no-shadow
-        class Department {
-          @property(OverrideNameExtractor.use('department_id').transform({
-            onDeserialize: (value: any) => value && Number(value),
-            onSerialize: (value: number) => value && String(value),
-          }))
+        class DepartmentIdModifier extends Modifier {
+          public afterSerialize(value: string): unknown {
+            return value && String(value);
+          }
+          public beforeDeserialize(value: unknown): number | undefined {
+            return value
+              ? Number(value)
+              : undefined;
+          }
+        }
+
+        class TestDepartment {
+          @property(OverrideNameExtractor.use('department_id'))
+          @modifier(DepartmentIdModifier)
           public declare id: number;
         }
 
         it('should transform property on serialize', () => {
 
-          const instance = create(Department, {
+          const instance = create(TestDepartment, {
             id: 123,
           });
 
@@ -496,7 +577,7 @@ describe('Decorator @property', () => {
 
         it('should transform property on deserialize', () => {
 
-          const deserialized = deserialize(Department, {
+          const deserialized = deserialize(TestDepartment, {
             department_id: '123',
           });
           expect(deserialized.id).toBe(123);

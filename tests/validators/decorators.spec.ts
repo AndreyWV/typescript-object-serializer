@@ -1,7 +1,5 @@
-import {
-  propertyValidators,
-  RequiredValidator,
-} from '../../src/validators';
+import { RequiredValidator } from '../../src/validators/common/validators/required';
+import { propertyValidators } from '../../src/validators/core/decorators/property-validators';
 
 describe('@propertyValidators', () => {
 

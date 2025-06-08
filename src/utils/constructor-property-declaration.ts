@@ -24,9 +24,9 @@ export class ConstructorPropertyDeclaration {
     if (!names) {
       return;
     }
-    const ctorName = names.split(',')[index];
-    if (ctorName) {
-      const ownPropertyRegExp = new RegExp(`this\\.([a-zA-Z\\d]*?)\\s?=\\s?${ctorName.trim()}`);
+    const propertyInConstructorName = names.split(',')[index];
+    if (propertyInConstructorName) {
+      const ownPropertyRegExp = new RegExp(`this\\.([a-zA-Z\\d]*?)\\s?=\\s?${propertyInConstructorName.trim()}`);
       const ownPropertyMatch = ownPropertyRegExp.exec(constructorString);
       return ownPropertyMatch?.[1];
     }

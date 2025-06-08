@@ -6,6 +6,8 @@ import {
   SnakeCaseExtractor,
   StraightExtractor,
 } from '../src';
+import { modifier } from '../src/core/decorators/modifier';
+import { Modifier } from '../src/core/types/modifier';
 
 describe('Common', () => {
 
@@ -254,17 +256,18 @@ describe('Common', () => {
 
       it('should serialize and deserialize getter + setter properties', () => {
 
+        class VoidModifier extends Modifier {
+          public afterSerialize(): void { }
+          public beforeDeserialize(): void { }
+        }
+
         class Person extends SerializableObject {
 
-          @property(StraightExtractor.transform({
-            onSerialize: () => { },
-            onDeserialize: () => { },
-          }))
+          @property(StraightExtractor)
+          @modifier(VoidModifier)
           public firstName?: string;
-          @property(StraightExtractor.transform({
-            onSerialize: () => { },
-            onDeserialize: () => { },
-          }))
+          @property(StraightExtractor)
+          @modifier(VoidModifier)
           public lastName?: string;
 
           @property()
@@ -280,7 +283,7 @@ describe('Common', () => {
 
         }
 
-        const instance = Person.create({
+        const instance = Person.createPartial({
           firstName: 'John',
           lastName: 'Doe',
         });
@@ -298,15 +301,17 @@ describe('Common', () => {
 
       describe('getter', () => {
 
+        class MotSerializableModifier extends Modifier {
+          public afterSerialize(): void { }
+        }
+
         class Person extends SerializableObject {
 
-          @property(StraightExtractor.transform({
-            onSerialize: () => { },
-          }))
+          @property(StraightExtractor)
+          @modifier(MotSerializableModifier)
           public firstName?: string;
-          @property(StraightExtractor.transform({
-            onSerialize: () => { },
-          }))
+          @property(StraightExtractor)
+          @modifier(MotSerializableModifier)
           public lastName?: string;
 
           @property()
@@ -317,7 +322,7 @@ describe('Common', () => {
         }
 
         it('should serialize getter property', () => {
-          const instance = Person.create({
+          const instance = Person.createPartial({
             firstName: 'John',
             lastName: 'Doe',
           });
@@ -329,24 +334,27 @@ describe('Common', () => {
         it('should not throw error on deserialize getter property', () => {
           expect(() => Person.deserialize({
             fullName: 'John Doe',
-          })).not.toThrowError();
+          }))
+            .not
+            .toThrow();
         });
 
       });
 
       describe('setter', () => {
 
+        class VoidModifier extends Modifier {
+          public afterSerialize(): void { }
+          public beforeDeserialize(): void { }
+        }
+
         class Person extends SerializableObject {
 
-          @property(StraightExtractor.transform({
-            onDeserialize: () => { },
-            onSerialize: () => { },
-          }))
+          @property(StraightExtractor)
+          @modifier(VoidModifier)
           public firstName?: string;
-          @property(StraightExtractor.transform({
-            onDeserialize: () => { },
-            onSerialize: () => { },
-          }))
+          @property(StraightExtractor)
+          @modifier(VoidModifier)
           public lastName?: string;
 
           @property()
@@ -367,7 +375,7 @@ describe('Common', () => {
         });
 
         it('should not serialize setter property', () => {
-          const instance = Person.create({
+          const instance = Person.createPartial({
             firstName: 'John',
             lastName: 'Doe',
           });
@@ -375,7 +383,7 @@ describe('Common', () => {
         });
 
         it('should not throw error on serialize setter property', () => {
-          const instance = Person.create({
+          const instance = Person.createPartial({
             firstName: 'John',
             lastName: 'Doe',
           });

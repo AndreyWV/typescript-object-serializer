@@ -6,9 +6,9 @@ import { ModifiersClassStore } from '../store/modifier-store';
 /**
  * @method serialize Serialize instance data
  * @param object Serializable object instance
- * @returns { object } Object of serialized data
+ * @returns { Record<string, unknown> } Object of serialized data
  */
-export function serialize<T extends object>(object: T): object {
+export function serialize<T extends object>(object: T): Record<string, unknown> {
   return new Serializer(object).serialize();
 }
 
@@ -25,7 +25,7 @@ class Serializer<T extends object> {
     this.modifiersStore = new ModifiersClassStore((objectToSerialize as any).constructor);
   }
 
-  public serialize(): object {
+  public serialize(): Record<string, unknown> {
     const data = {};
 
     const extractorsStore = this.extractorsStore?.findStoreMap();
