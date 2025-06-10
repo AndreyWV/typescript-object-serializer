@@ -59,13 +59,7 @@ class ObjectCreator<T> {
 
           const dataValue = (data as T)[key];
 
-          // If force passed null or undefined then set it as is
-          if (dataValue === undefined || dataValue === null) {
-            this.instance[key] = dataValue;
-            return;
-          }
-
-          if (!keyType) {
+          if (ObjectCreator.isValueShouldApplyWithoutModify(keyType, dataValue)) {
             this.instance[key] = dataValue;
             return;
           }
@@ -84,13 +78,20 @@ class ObjectCreator<T> {
                 ) as never;
             } else {
               this.instance[key] = new ObjectCreator(keyType as Constructor<unknown>)
-                .create(dataValue) as never;
+                .create(dataValue as RecursiveObject<never>) as never;
             }
           }
         },
       );
 
     return this.instance;
+  }
+
+  static isValueShouldApplyWithoutModify(keyType: unknown, value: unknown): boolean {
+    return value === undefined
+      || value === null
+      || typeof value !== 'object'
+      || !keyType;
   }
 
   private getKeyType(key: keyof T): unknown {

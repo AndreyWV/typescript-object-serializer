@@ -257,8 +257,8 @@ describe('Common', () => {
       it('should serialize and deserialize getter + setter properties', () => {
 
         class VoidModifier extends Modifier {
-          public afterSerialize(): void { }
-          public beforeDeserialize(): void { }
+          public onSerialize(): void { }
+          public onDeserialize(): void { }
         }
 
         class Person extends SerializableObject {
@@ -302,7 +302,7 @@ describe('Common', () => {
       describe('getter', () => {
 
         class MotSerializableModifier extends Modifier {
-          public afterSerialize(): void { }
+          public onSerialize(): void { }
         }
 
         class Person extends SerializableObject {
@@ -344,8 +344,8 @@ describe('Common', () => {
       describe('setter', () => {
 
         class VoidModifier extends Modifier {
-          public afterSerialize(): void { }
-          public beforeDeserialize(): void { }
+          public onSerialize(): void { }
+          public onDeserialize(): void { }
         }
 
         class Person extends SerializableObject {

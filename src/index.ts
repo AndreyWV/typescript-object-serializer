@@ -1,6 +1,7 @@
 export * from './common/extractors/override-name-extractor';
 export * from './common/extractors/snake-case-extractor';
 export * from './common/extractors/straight-extractor';
+export * from './core/decorators/modifier';
 export * from './core/decorators/property-type';
 export * from './core/decorators/property';
 export * from './core/methods/clone';
@@ -8,4 +9,5 @@ export * from './core/methods/create';
 export * from './core/methods/deserialize';
 export * from './core/methods/serialize';
 export * from './core/types/extractor';
+export * from './core/types/modifier';
 export * from './serializable-object';

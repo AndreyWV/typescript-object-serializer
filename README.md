@@ -1,7 +1,7 @@
 # typescript-object-serializer
 Typescript library to convert javascript object to typescript class and vice versa
 
-[CHANGELOG](CHANGELOG.md)<br>
+[CHANGELOG](CHANGELOG.md)
 [Useful snippets](https://github.com/AndreyWV/typescript-object-serializer/wiki)
 
 ## Installation and configuration

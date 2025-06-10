@@ -63,7 +63,7 @@ describe('Custom extractor', () => {
           };
         }
         return {
-          data: this.modifier.beforeDeserialize(
+          data: this.modifier.onDeserialize(
             DeepExtractor.getObjectByPath(data, this.key.split('.')),
           ),
           path: this.key,
@@ -76,18 +76,18 @@ describe('Custom extractor', () => {
           applyObject as Record<string, unknown>,
           keys.slice(0, -1),
         );
-        dataObject[keys[keys.length - 1]] = this.modifier.afterSerialize(value);
+        dataObject[keys[keys.length - 1]] = this.modifier.onSerialize(value);
       }
 
     }
 
     class StringAgeModifier extends Modifier {
 
-      public beforeDeserialize(value: unknown): number {
+      public onDeserialize(value: unknown): number {
         return Number(value);
       }
 
-      public afterSerialize(value: unknown): string {
+      public onSerialize(value: unknown): string {
         return String(value);
       }
     }

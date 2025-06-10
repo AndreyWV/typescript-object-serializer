@@ -29,13 +29,13 @@ export class StraightExtractor extends Extractor {
       );
     } else {
       return new ExtractionResult(
-        this.modifier.beforeDeserialize(data[this.key as keyof typeof data]),
+        this.modifier.onDeserialize(data[this.key as keyof typeof data]),
         this.key,
       );
     };
   }
 
   public apply(applyObject: Record<string, unknown>, value: unknown): void {
-    applyObject[this.key] = this.modifier.afterSerialize(value);
+    applyObject[this.key] = this.modifier.onSerialize(value);
   }
 }

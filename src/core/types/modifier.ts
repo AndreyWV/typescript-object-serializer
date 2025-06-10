@@ -1,14 +1,24 @@
 /**
  * @class Modifier
- * @description Class to modify data before and after serialization
+ * @description Class to modify data on serialization and deserialization
+ * @example
+ * class StringToNumberModifier extends Modifier {
+ *   public onDeserialize(data: string): number {
+ *     return Number(data);
+ *   }
+ *   public onSerialize(data: number): string {
+ *     return data.toString();
+ *   }
+ * }
+ * It is possible to defile only one of methods, second method by default will be used
  */
 export class Modifier {
 
-  public beforeDeserialize(data: unknown): unknown {
+  public onDeserialize(data: unknown): unknown {
     return data;
   }
 
-  public afterSerialize(data: unknown): unknown {
+  public onSerialize(data: unknown): unknown {
     return data;
   }
 

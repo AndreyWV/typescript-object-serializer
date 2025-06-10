@@ -1,0 +1,13 @@
+{
+    "extends": "../tsconfig.json",
+    "compilerOptions": {
+        "lib": [
+            "ESNext",
+            "dom"
+        ]
+    },
+    "include": [
+        "../src",
+        "./"
+    ]
+}
