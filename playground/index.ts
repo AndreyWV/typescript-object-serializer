@@ -434,7 +434,7 @@ new Sample('Serialize serializable object', () => {
   console.log(serialize(person)); // { first_name: "John", last_name: "Doe" }
 }).run();
 
-new Sample('Transform property value (type mismatch)', () => {
+new Sample('Modify property value (type mismatch)', () => {
 
   class StringAgeModifier extends Modifier {
     public onSerialize(data: number): string {
@@ -462,7 +462,7 @@ new Sample('Transform property value (type mismatch)', () => {
   console.log(serialize(person)); // { age: "25" }
 }).run();
 
-new Sample('Transform property value format', () => {
+new Sample('Modify property value format', () => {
 
   // Like if database required full string date format
   class BirthDateModifier extends Modifier {
