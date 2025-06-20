@@ -160,6 +160,92 @@ describe('validate', () => {
 
     });
 
+    it(
+      'should return serializable errors if property is array of serializable items with deep properties  with arrays',
+      () => {
+
+        class Address {
+          @property()
+          @propertyValidators([RequiredValidator])
+          public declare city: string;
+        }
+
+        class Employee {
+          @property()
+          @propertyValidators([RequiredValidator])
+          public declare name: string;
+
+          @property()
+          @propertyValidators([RequiredValidator])
+          @propertyType(Address)
+          public declare address: Address;
+        }
+
+        class Department {
+          @property(OverrideNameExtractor.use('department_employees'))
+          @propertyType(Employee)
+          public declare employees: Employee[];
+        }
+
+        class Organization {
+
+          @property()
+          @propertyType(Department)
+          public declare departments: Department[];
+
+        }
+
+        const data = {
+          departments: [
+            {
+              department_employees: [
+                {
+                  name: 'John Doe',
+                  address: {
+                    city: 'New York',
+                  },
+                },
+                {
+                  address: {
+                    city: 'London',
+                  },
+                },
+
+              ],
+            },
+            {
+              department_employees: [
+                {
+                  name: 'Jane Doe',
+                  address: {
+                  },
+                },
+                {
+                  name: 'Jane Smith',
+                  address: {
+                    city: 'Berlin',
+                  },
+                },
+              ],
+            },
+          ],
+        };
+
+        const validationResult = validate(Organization, data);
+
+        expect(validationResult).toEqual([
+          new ValidationError(
+            'Property is required',
+            'departments.[0].department_employees.[1].name',
+          ),
+          new ValidationError(
+            'Property is required',
+            'departments.[1].department_employees.[0].address.city',
+          ),
+        ]);
+
+      });
+
   });
 
   describe('multiple validators', () => {

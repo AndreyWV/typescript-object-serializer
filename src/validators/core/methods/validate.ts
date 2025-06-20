@@ -60,11 +60,11 @@ class Validator<T> {
 
           const extractionResult = this.extractKey(data, key as keyof T);
 
-          return this.validateKeyItself(key as keyof T, extractionResult)
-            .concat(
-              this.validateKeyAsArray(key as keyof T, extractionResult),
-              this.validateKeyDeepProperties(key as keyof T, extractionResult),
-            );
+          return errors.concat(
+            this.validateKeyItself(key as keyof T, extractionResult),
+            this.validateKeyAsArray(key as keyof T, extractionResult),
+            this.validateKeyDeepProperties(key as keyof T, extractionResult),
+          );
         },
         [] as ValidationError[],
       );
@@ -168,7 +168,11 @@ class Validator<T> {
   private validateKeyDeepProperties(key: keyof T, extractionResult: ExtractionResult): ValidationError[] {
     const value = extractionResult.data;
 
-    if (typeof value !== 'object' || value === null) {
+    const isObject = (() => Boolean(
+      typeof value === 'object' && value !== null && !Array.isArray(value),
+    ))();
+
+    if (!isObject) {
       return [];
     }
 
@@ -188,14 +192,19 @@ class Validator<T> {
       return [];
     }
 
-    return new Validator(KeyTypeConstructor as Constructor<never>)
-      .validate(value as never)
-      .map(
-        error => {
-          error.path = `${extractionResult?.path}${Validator.PATH_SEPARATOR}${error.path}`;
-          return error;
-        },
-      );
+    const validator = new Validator(KeyTypeConstructor as Constructor<never>);
+
+    const errors = Array.isArray(value)
+      ? validator.validateArray(value as never[])
+      : validator.validate(value as never);
+
+    return errors.map(
+      error => {
+        error.path = `${extractionResult?.path}${Validator.PATH_SEPARATOR}${error.path}`;
+        return error;
+      },
+    );
+
 
   }
 

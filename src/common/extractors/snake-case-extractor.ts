@@ -31,7 +31,7 @@ export class SnakeCaseExtractor extends StraightExtractor {
 
   constructor(
     key: string,
-    modifier: Modifier,
+    modifier?: Modifier,
   ) {
     if (typeof key !== 'string') {
       throw new NotStringPropertyKeyError(key);
