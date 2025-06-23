@@ -23,7 +23,7 @@
         "strictFunctionTypes": true,
         "strictNullChecks": true,
         "strictPropertyInitialization": true,
-        "target": "es2023",
+        "target": "es2015",
         "types": [
             "reflect-metadata",
             "jest"
