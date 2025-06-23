@@ -1,7 +1,7 @@
 # Changelog
 
 ## 2.0.0 (-)
-This release focuses on a more declarative API and stronger type checking
+v2 focuses on a more declarative API and stronger type checking
 1. Added a base class and decorator for value modifiers
 2. Changed the propertyType decorator with a condition - each class requires its own condition
 3. All data/value types (at Extractor|Modifier|Validator) are now declared as `unknown` instead of `any`. This is required for better type checking and to reduce runtime errors

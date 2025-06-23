@@ -39,7 +39,7 @@ class Serializer<T extends object> {
       return this.objectToSerialize;
     }
 
-    (extractorsStore.keys() as unknown as (keyof T)[]).forEach(
+    (Array.from(extractorsStore.keys()) as (keyof T)[]).forEach(
       (key: keyof T) => {
 
         const value = this.objectToSerialize[key];

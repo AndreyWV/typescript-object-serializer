@@ -7,7 +7,7 @@ Typescript library to convert javascript object to typescript class and vice ver
 
 ## Installation and configuration
 ```sh
-npm install typescript-object-serializer
+> npm install typescript-object-serializer
 ```
 Required configure `tsconfig.json`:
 ```json
@@ -21,7 +21,7 @@ And it is ready to use!
 **If necessary enable auto-detection types of serializable properties:** - required additional configuration:
 1. Install `reflect-metadata` dependency:
 ```sh
-npm install reflect-metadata
+> npm install reflect-metadata
 ```
 2. Configure `tsconfig.json`:
 ```json
