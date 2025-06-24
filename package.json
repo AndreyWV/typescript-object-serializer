@@ -3,7 +3,8 @@
     "version": "2.0.0",
     "description": "Powerful Scalable Typescript object serializer",
     "scripts": {
-        "build": "tsc -p prod.tsconfig.json",
+        "build": "tsc -p prod.tsconfig.json && npm run build:copy-files",
+        "build:copy-files": "cp package.json dist && cp README.md dist && cp validators-package.json dist/validators/package.json",
         "test": "jest",
         "test:coverage": "jest --coverage",
         "lint": "eslint",
