@@ -379,49 +379,58 @@ class FailedResult {
   @property()
   public declare error: string;
 }
-
-class Response {
-
-  @property()
-  @propertyType(SuccessResult, (value: any) => value?.is_success)
-  @propertyType(FailedResult, (value: any) => !value?.is_success)
-  public declare results: Array<SuccessResult | FailedResult>;
+class UnmatchedResult {
 
 }
 
-const response = deserialize(Response, {
+class Results {
+
+  @property()
+  @propertyType(SuccessResult, (value: any) => value?.state === 'SUCCESS')
+  @propertyType(FailedResult, (value: any) => value?.state === 'FAIL')
+  @propertyType(UnmatchedResult) // <- Default if no one other matched
+  public declare results: Array<SuccessResult | FailedResult | UnmatchedResult>;
+
+}
+
+const results = deserialize(Results, {
   results: [
     {
-      is_success: true,
+      state: 'SUCCESS',
       data: {
         some_data: 'data',
       },
     },
     {
-      is_success: false,
+      state: 'UNKNOWN',
+    },
+    {
+      state: 'FAIL',
       error: 'result error',
     },
   ],
 });
 
-console.log(response.results[0]); // SuccessResult { data: { some_data: "data" } }
-console.log(response.results[1]); // FailedResult { error: "result error" }
+console.log(results.results[0]); // SuccessResult { data: { some_data: "data" } }
+console.log(results.results[1]); // UnmatchedResult {  }
+console.log(results.results[2]); // FailedResult { error: "result error" }
 
 // For strict type check (fewer possible runtime errors)
-class ResponseWithStrictTypeCheck {
+class ResultsWithStrictTypeCheck {
 
   @property()
   @propertyType(SuccessResult, (value: unknown) => typeof value === 'object'
     && value !== null
-    && 'is_success' in value
-    && value.is_success === true
+    && 'state' in value
+    && value.state === 'SUCCESS',
   )
   @propertyType(FailedResult, (value: unknown) => typeof value === 'object'
     && value !== null
-    && 'is_success' in value
-    && value.is_success === false
+    && 'state' in value
+    && value.state === 'FAIL',
   )
-  public declare results: Array<SuccessResult | FailedResult>;
+  @propertyType(UnmatchedResult)
+  public declare results: Array<SuccessResult | FailedResult | UnmatchedResult>;
 
 }
 ```

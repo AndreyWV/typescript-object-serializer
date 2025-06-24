@@ -495,4 +495,60 @@ describe('Deserialize', () => {
 
   });
 
+  it('should deserialize conditional property types regardless of decorators order', () => {
+
+    class SuccessResult {
+      @property()
+      public declare data: Record<string, unknown>;
+    }
+    class FailedResult {
+      @property()
+      public declare error: string;
+    }
+    class UnmatchedResult {
+    }
+
+    class Results {
+
+      @property()
+      @property()
+      @propertyType(SuccessResult, (value: unknown) => typeof value === 'object'
+        && value !== null
+        && 'state' in value
+        && value.state === 'SUCCESS',
+      )
+      @propertyType(UnmatchedResult)
+      @propertyType(FailedResult, (value: unknown) => typeof value === 'object'
+        && value !== null
+        && 'state' in value
+        && value.state === 'FAIL',
+      )
+      public declare results: Array<SuccessResult | FailedResult | UnmatchedResult>;
+
+    }
+
+    const results = deserialize(Results, {
+      results: [
+        {
+          state: 'SUCCESS',
+          data: {
+            some_data: 'data',
+          },
+        },
+        {
+          state: 'FAIL',
+          error: 'result error',
+        },
+        {
+          state: 'UNKNOWN',
+        },
+      ],
+    });
+
+    expect(results.results[0]).toBeInstanceOf(SuccessResult);
+    expect(results.results[1]).toBeInstanceOf(FailedResult);
+    expect(results.results[2]).toBeInstanceOf(UnmatchedResult);
+
+  });
+
 });

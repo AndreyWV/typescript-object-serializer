@@ -1,6 +1,7 @@
-import { Constructor } from '../../utils/constructor';
-import { TypesClassStore } from '../store/types-store';
 import { DecoratorBase } from '../../utils/base-decorator';
+import { Constructor } from '../../utils/constructor';
+import { KeyType } from '../../utils/key-type';
+import { TypesClassStore } from '../store/types-store';
 
 /**
  * @function property Declares type for current property
@@ -71,7 +72,7 @@ class PropertyTypeDecorator<T = Constructor<never>> extends DecoratorBase {
     propertyTypeMap.set(
       this.defineType as Constructor<never>,
       this.typeCondition
-      ?? ((): boolean => true),
+      ?? KeyType.defaultPropertyTypeCondition,
     );
 
     propertiesStore.set(
