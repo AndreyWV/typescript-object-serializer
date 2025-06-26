@@ -6,9 +6,9 @@ export class KeyType<T> {
   public static readonly defaultPropertyTypeCondition = (): boolean => true;
 
   constructor(
-    private store: TypesClassStore,
-    private instance: object,
-    private key: keyof T,
+    private readonly store: TypesClassStore,
+    private readonly instance: object,
+    private readonly key: keyof T,
   ) {
   }
 
@@ -17,7 +17,7 @@ export class KeyType<T> {
       ?? Reflect?.getMetadata?.('design:type', this.instance, this.key as string | symbol);
   }
 
-  private getTypeFromDecorator(objectData: unknown): Constructor<T> | undefined {
+  public getTypeFromDecorator(objectData: unknown): Constructor<T> | undefined {
     const typesMap = this.store.findStoreMap()
       ?.get(this.key);
 
@@ -25,21 +25,21 @@ export class KeyType<T> {
       return;
     }
 
-    const MatchConstructor = Array.from(typesMap.keys())
-      // Check only conditional types first
-      .filter(
-        (KeyConstructor: Constructor<never>) => typesMap.get(KeyConstructor) !== KeyType.defaultPropertyTypeCondition,
+    return Array.from(typesMap.keys())
+      // Sort for positioning default type at the end
+      .sort(
+        (a: Constructor<never>, b: Constructor<never>) =>
+          (
+            typesMap.get(b) !== KeyType.defaultPropertyTypeCondition
+            && typesMap.get(a) === KeyType.defaultPropertyTypeCondition
+          )
+            ? 1
+            : -1,
       )
+      // Find matched type
       .find(
         (KeyConstructor: Constructor<never>) => typesMap.get(KeyConstructor)!(objectData),
-    )
-      // If No one condition matched - apply default type 
-      ?? Array.from(typesMap.keys())
-        .find(
-          (KeyConstructor: Constructor<never>) => typesMap.get(KeyConstructor) === KeyType.defaultPropertyTypeCondition,
-        );
-
-    return MatchConstructor;
+    );
 
   }
 

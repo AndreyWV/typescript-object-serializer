@@ -2,63 +2,78 @@ name: CI
 
 on:
   push:
-    branches:
-      - master
+    branches: [master]
+    paths:
+      - "**/*.ts"
+      - "**/*.js"
+      - "package.json"
+      - "package-lock.json"
   pull_request:
-    branches:
-      - master
+    branches: [master]
 
 jobs:
-
-  testV5:
+  setup:
     runs-on: ubuntu-latest
+    outputs:
+      cache-hit: ${{ steps.cache-deps.outputs.cache-hit }}
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: "20"
+          cache: "npm"
       - name: Install dependencies
         run: npm ci
-      - name: Build
-        run: npm run build
-      - name: Test
-        run: npm run test
+      - name: Cache dependencies
+        id: cache-deps
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.npm
+            node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
 
-  testV4:
-    needs: testV5
+  build:
+    needs: setup
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: '18'
-      - name: Change dependency
-        run: |
-          sed -i 's/"typescript": "\~[0-9]\+\.[0-9]\+\.[0-9]\+"/"typescript": "~4.x"/' package.json
-      - name: Install dependencies
-        run: npm i --force
+          node-version: "20"
+          cache: "npm"
       - name: Build
         run: npm run build
-      - name: Test
-        run: npm run test
 
-  testV3:
-    needs: testV4
+  lint:
+    needs: setup
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: '18'
-      - name: Change dependency
+          node-version: "20"
+          cache: "npm"
+      - name: Run Lint
+        run: npm run lint
+        continue-on-error: true
+
+  test:
+    needs: setup
+    strategy:
+      matrix:
+        ts-version: ["~5.x", "~4.x", "~3.x"]
+      fail-fast: false
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+      - name: Change TypeScript version
         run: |
-          sed -i 's/"typescript": "\~4.x"/"typescript": "~3.x"/' package.json
-      - name: Install dependencies
-        run: npm i --force
-      - name: Build
-        run: npm run build
-      - name: Test
-        run: npm run test
+          sed -i 's/"typescript": ".*"/"typescript": "${{ matrix.ts-version }}"/' package.json
+          npm i --force
+      - name: Run Tests
+        run: npm test

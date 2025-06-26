@@ -7,7 +7,7 @@
         "build:copy-files": "cp package.json dist && cp README.md dist && cp validators-package.json dist/validators/package.json",
         "test": "jest",
         "test:coverage": "jest --coverage",
-        "lint": "eslint",
+        "lint": "eslint src tests",
         "playground": "TS_NODE_PROJECT=\"playground\/tsconfig.json\" ts-node playground\/index.ts"
     },
     "keywords": [

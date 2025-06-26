@@ -83,7 +83,7 @@ class Deserializer<T> {
         key,
         objectData
           .map(item => {
-            const itemTypeConstructor = keyType.getConstructorForObject(item);
+            const itemTypeConstructor = keyType.getTypeFromDecorator(item);
             return itemTypeConstructor
               ? new Deserializer(itemTypeConstructor).deserialize(item)
               : item;
