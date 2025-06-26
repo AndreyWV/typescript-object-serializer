@@ -3,35 +3,22 @@ name: CI
 on:
   push:
     branches: [master]
-    paths:
-      - "**/*.ts"
-      - "**/*.js"
-      - "package.json"
-      - "package-lock.json"
   pull_request:
     branches: [master]
 
 jobs:
   setup:
     runs-on: ubuntu-latest
-    outputs:
-      cache-hit: ${{ steps.cache-deps.outputs.cache-hit }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
           cache: "npm"
-      - name: Install dependencies
+      - name: Install base dependencies
         run: npm ci
-      - name: Cache dependencies
-        id: cache-deps
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.npm
-            node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+      - name: Save original package.json
+        run: cp package.json package.json.original
 
   build:
     needs: setup
@@ -42,6 +29,8 @@ jobs:
         with:
           node-version: "20"
           cache: "npm"
+      - name: Restore original package.json
+        run: mv package.json.original package.json
       - name: Build
         run: npm run build
 
@@ -54,6 +43,8 @@ jobs:
         with:
           node-version: "20"
           cache: "npm"
+      - name: Restore original package.json
+        run: mv package.json.original package.json
       - name: Run Lint
         run: npm run lint
         continue-on-error: true
@@ -74,6 +65,9 @@ jobs:
       - name: Change TypeScript version
         run: |
           sed -i 's/"typescript": ".*"/"typescript": "${{ matrix.ts-version }}"/' package.json
-          npm i --force
+          npm install --no-save --force  # Ключевое изменение!
       - name: Run Tests
         run: npm test
+      - name: Restore original package.json
+        if: always()
+        run: mv package.json.original package.json
