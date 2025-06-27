@@ -1,6 +1,6 @@
 import { Config } from 'jest';
 
-export default {
+const config: Config = {
   clearMocks: true,
   collectCoverage: false,
   coverageDirectory: "./coverage",
@@ -15,4 +15,6 @@ export default {
     'tests',
   ],
   testEnvironment: "node",
-} satisfies Config;
+};
+
+export default config;
