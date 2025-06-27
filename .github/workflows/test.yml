@@ -23,9 +23,7 @@ jobs:
         id: cache-deps
         uses: actions/cache@v3
         with:
-          path: |
-            ~/.npm
-            node_modules
+          path: node_modules
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
 
   build:
