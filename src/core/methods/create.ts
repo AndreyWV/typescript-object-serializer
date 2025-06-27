@@ -80,6 +80,9 @@ class ObjectCreator<T> {
               this.instance[key] = new ObjectCreator(keyType as Constructor<unknown>)
                 .create(dataValue as RecursiveObject<never>) as never;
             }
+          } else {
+            // If by some reasons previous conditions are not met
+            this.instance[key] = dataValue;
           }
         },
       );
