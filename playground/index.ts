@@ -445,10 +445,10 @@ new Sample('Serialize serializable object', () => {
 new Sample('Modify property value (type mismatch)', () => {
 
   class StringAgeModifier extends Modifier {
-    public onSerialize(data: number): string {
+    public override onSerialize(data: number): string {
       return String(data);
     }
-    public onDeserialize(data: string): number {
+    public override onDeserialize(data: string): number {
       return Number(data);
     }
   }
@@ -474,7 +474,7 @@ new Sample('Modify property value format', () => {
 
   // Like if database required full string date format
   class BirthDateModifier extends Modifier {
-    public onSerialize(value: string): string {
+    public override onSerialize(value: string): string {
       return new Date(value).toISOString();
     }
   }
@@ -591,10 +591,10 @@ new Sample('DeepExtractor', () => {
   }
 
   class AgeModifier extends Modifier {
-    public onDeserialize(value: string): number {
+    public override onDeserialize(value: string): number {
       return Number(value);
     }
-    public onSerialize(value: number): string {
+    public override onSerialize(value: number): string {
       return String(value);
     }
   }
@@ -659,10 +659,10 @@ new Sample('Only deserializable property by extractor', () => {
 new Sample('Only deserializable property by modifier', () => {
 
   class OnlyDeserializableModifier extends Modifier {
-    public onSerialize(value: unknown): undefined {
+    public override onSerialize(value: unknown): undefined {
       return undefined;
     }
-    public onDeserialize(data: unknown): unknown {
+    public override onDeserialize(data: unknown): unknown {
       return data;
     }
   }

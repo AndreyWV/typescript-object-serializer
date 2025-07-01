@@ -79,7 +79,7 @@ describe('Serialize', () => {
         + 'but has value from modifier', () => {
 
           class PropertyModifier extends Modifier {
-            public onSerialize(data: unknown): unknown {
+            public override onSerialize(data: unknown): unknown {
               return data === undefined
                 ? null
                 : data;
@@ -204,7 +204,7 @@ describe('Serialize', () => {
         + 'but has value from transformer', () => {
 
         class PropertyModifier extends Modifier {
-          public onSerialize(data: unknown): unknown {
+          public override onSerialize(data: unknown): unknown {
             return data === undefined
               ? null
               : data;

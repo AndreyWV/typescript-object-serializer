@@ -50,10 +50,10 @@ describe('Decorator @property', () => {
       describe('with value transformation', () => {
 
         class TestModifier extends Modifier {
-          public onSerialize(value: number): unknown {
+          public override onSerialize(value: number): unknown {
             return value && String(value);
           }
-          public onDeserialize(value: unknown): number | undefined {
+          public override onDeserialize(value: unknown): number | undefined {
             return value
               ? Number(value)
               : undefined;
@@ -140,10 +140,10 @@ describe('Decorator @property', () => {
       describe('with value transformation', () => {
 
         class TestModifier extends Modifier {
-          public onSerialize(value: number): unknown {
+          public override onSerialize(value: number): unknown {
             return value && String(value);
           }
-          public onDeserialize(value: unknown): number | undefined {
+          public override onDeserialize(value: unknown): number | undefined {
             return value
               ? Number(value)
               : undefined;
@@ -187,10 +187,10 @@ describe('Decorator @property', () => {
         }
 
         class DepartmentIdModifier extends Modifier {
-          public onSerialize(value: DepartmentId): unknown {
+          public override onSerialize(value: DepartmentId): unknown {
             return value?.value;
           }
-          public onDeserialize(value: unknown): DepartmentId | undefined {
+          public override onDeserialize(value: unknown): DepartmentId | undefined {
             return value
               ? new DepartmentId(value as string)
               : undefined;
@@ -261,10 +261,10 @@ describe('Decorator @property', () => {
       describe('with value transformation', () => {
 
         class TestModifier extends Modifier {
-          public onSerialize(value: number): unknown {
+          public override onSerialize(value: number): unknown {
             return value && String(value);
           }
-          public onDeserialize(value: unknown): number | undefined {
+          public override onDeserialize(value: unknown): number | undefined {
             return value
               ? Number(value)
               : undefined;
@@ -337,10 +337,10 @@ describe('Decorator @property', () => {
       describe('with value transformation', () => {
 
         class TestModifier extends Modifier {
-          public onSerialize(value: number): unknown {
+          public override onSerialize(value: number): unknown {
             return value && String(value);
           }
-          public onDeserialize(value: unknown): number | undefined {
+          public override onDeserialize(value: unknown): number | undefined {
             return value
               ? Number(value)
               : undefined;
@@ -427,10 +427,10 @@ describe('Decorator @property', () => {
       describe('with value transformation', () => {
 
         class TestModifier extends Modifier {
-          public onSerialize(value: number): unknown {
+          public override onSerialize(value: number): unknown {
             return value && String(value);
           }
-          public onDeserialize(value: unknown): number | undefined {
+          public override onDeserialize(value: unknown): number | undefined {
             return value
               ? Number(value)
               : undefined;
@@ -474,10 +474,10 @@ describe('Decorator @property', () => {
         }
 
         class DepartmentIdModifier extends Modifier {
-          public onSerialize(value: DepartmentId): unknown {
+          public override onSerialize(value: DepartmentId): unknown {
             return value && value.value;
           }
-          public onDeserialize(value: unknown): DepartmentId | undefined {
+          public override onDeserialize(value: unknown): DepartmentId | undefined {
             return value
               ? new DepartmentId(value as string)
               : undefined;
@@ -548,10 +548,10 @@ describe('Decorator @property', () => {
       describe('with value transformation', () => {
 
         class DepartmentIdModifier extends Modifier {
-          public onSerialize(value: string): unknown {
+          public override onSerialize(value: string): unknown {
             return value && String(value);
           }
-          public onDeserialize(value: unknown): number | undefined {
+          public override onDeserialize(value: unknown): number | undefined {
             return value
               ? Number(value)
               : undefined;

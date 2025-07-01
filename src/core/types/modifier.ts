@@ -3,14 +3,14 @@
  * @description Class to modify data on serialization and deserialization
  * @example
  * class StringToNumberModifier extends Modifier {
- *   public onDeserialize(data: string): number {
+ *   public override onDeserialize(data: string): number {
  *     return Number(data);
  *   }
- *   public onSerialize(data: number): string {
+ *   public override onSerialize(data: number): string {
  *     return data.toString();
  *   }
  * }
- * It is possible to defile only one of methods, second method by default will be used
+ * Methods override is optional. By default data is not modified.
  */
 export class Modifier {
 

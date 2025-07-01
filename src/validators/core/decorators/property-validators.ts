@@ -40,7 +40,7 @@ class ValidatorsDecorator extends DecoratorBase {
     const {
       targetConstructor,
       propertyKey: propertyName,
-    } = ValidatorsDecorator.getTargetAndPropertyKey(target, propertyKey, indexOrDescriptor);
+    } = ValidatorsDecorator.getTargetConstructorAndPropertyKey(target, propertyKey, indexOrDescriptor);
 
     const validatorsStore = new ValidatorsClassStore(targetConstructor)
       .getStoreMapOrDeclareFromParent();

@@ -41,7 +41,7 @@ class ExtractorDecorator extends DecoratorBase {
     const {
       targetConstructor,
       propertyKey: propertyName,
-    } = ExtractorDecorator.getTargetAndPropertyKey(target, propertyKey, indexOrDescriptor);
+    } = ExtractorDecorator.getTargetConstructorAndPropertyKey(target, propertyKey, indexOrDescriptor);
 
     const propertiesStore = new ExtractorsClassStore(targetConstructor)
       .getStoreMapOrDeclareFromParent();

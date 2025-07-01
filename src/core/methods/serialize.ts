@@ -26,14 +26,14 @@ class Serializer<T extends object> {
   }
 
   public serialize(): Record<string, unknown> {
-    const data = {};
+    const serializationResult = {};
 
     const extractorsStore = this.extractorsStore?.findStoreMap();
 
     if (!extractorsStore) {
       // Return empty object if no serializable properties
       if (typeof this.objectToSerialize === 'object') {
-        return data;
+        return serializationResult;
       }
       // Return value without changes (string / number / boolean) if it passed
       return this.objectToSerialize;
@@ -62,12 +62,12 @@ class Serializer<T extends object> {
             : value;
         }
 
-        this.applySerializedValue(data, key, serializedValue);
+        this.applySerializedValue(serializationResult, key, serializedValue);
 
       },
     );
 
-    return deleteUndefinedRecursive(data);
+    return deleteUndefinedRecursive(serializationResult);
   }
 
   private applySerializedValue(

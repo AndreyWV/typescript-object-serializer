@@ -36,10 +36,10 @@ export function propertyType<T extends Constructor<unknown>>(
 }
 
 
-class PropertyTypeDecorator<T = Constructor<never>> extends DecoratorBase {
+class PropertyTypeDecorator extends DecoratorBase {
 
   constructor(
-    private readonly defineType: T,
+    private readonly defineType: Constructor<unknown>,
     private readonly typeCondition?: (value: unknown) => boolean,
   ) {
     super();
@@ -54,7 +54,7 @@ class PropertyTypeDecorator<T = Constructor<never>> extends DecoratorBase {
     const {
       targetConstructor,
       propertyKey: propertyName,
-    } = PropertyTypeDecorator.getTargetAndPropertyKey(target, propertyKey, indexOrDescriptor);
+    } = PropertyTypeDecorator.getTargetConstructorAndPropertyKey(target, propertyKey, indexOrDescriptor);
 
     const propertiesStore = new TypesClassStore(targetConstructor)
       .getStoreMapOrDeclareFromParent();

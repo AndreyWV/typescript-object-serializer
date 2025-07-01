@@ -83,11 +83,11 @@ describe('Custom extractor', () => {
 
     class StringAgeModifier extends Modifier {
 
-      public onDeserialize(value: unknown): number {
+      public override onDeserialize(value: unknown): number {
         return Number(value);
       }
 
-      public onSerialize(value: unknown): string {
+      public override onSerialize(value: unknown): string {
         return String(value);
       }
     }

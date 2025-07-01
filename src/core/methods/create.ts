@@ -99,10 +99,10 @@ class ObjectCreator<T> {
 
   private getKeyType(key: keyof T): unknown {
     const keysMap = this.typesStore.findStoreMap()?.get(key);
-    if (keysMap) {
-      return Array.from(keysMap.keys())[0];
-    }
-    return Reflect?.getMetadata?.('design:type', this.instance as object, key as string | symbol);
+
+    return keysMap
+      ? Array.from(keysMap.keys())[0]
+      : Reflect?.getMetadata?.('design:type', this.instance as object, key as string | symbol);
   }
 
 }

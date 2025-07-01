@@ -12,8 +12,8 @@ import { TypesClassStore } from '../store/types-store';
  * @returns Instance of serializable class constructor
  */
 export function deserialize<T>(dataConstructor: Constructor<T>, data: unknown): T {
-  const deserializer = new Deserializer(dataConstructor);
-  return deserializer.deserialize(data);
+  return new Deserializer(dataConstructor)
+    .deserialize(data);
 }
 
 class Deserializer<T> {
@@ -103,14 +103,13 @@ class Deserializer<T> {
       new ExtractorsClassStore(keyTypeConstructor as never).findStoreMap(),
     );
 
-    if (isKeyHasSerializableProperties) {
-      this.applyValue(
-        key,
-        new Deserializer(keyTypeConstructor).deserialize(objectData),
-      );
-    } else {
-      this.applyValue(key, objectData);
-    }
+    this.applyValue(
+      key,
+      isKeyHasSerializableProperties
+        ? new Deserializer(keyTypeConstructor).deserialize(objectData)
+        : objectData,
+    );
+
   }
 
   private applyValue(key: keyof T, value: any): void {

@@ -26,7 +26,7 @@ export class KeyType<T> {
     }
 
     return Array.from(typesMap.keys())
-      // Sort for positioning default type at the end
+      // Sort to place default type at the end
       .sort(
         (a: Constructor<never>, b: Constructor<never>) =>
           (

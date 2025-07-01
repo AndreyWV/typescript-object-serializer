@@ -161,7 +161,7 @@ describe('validate', () => {
     });
 
     it(
-      'should return serializable errors if property is array of serializable items with deep properties  with arrays',
+      'should return serializable errors if property is array of serializable items with deep properties with arrays',
       () => {
 
         class Address {

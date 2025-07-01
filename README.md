@@ -533,10 +533,10 @@ import {
 } from 'typescript-object-serializer';
 
 class StringAgeModifier extends Modifier {
-  public onSerialize(data: number): string {
+  public override onSerialize(data: number): string {
     return String(data);
   }
-  public onDeserialize(data: string): number {
+  public override onDeserialize(data: string): number {
     return Number(data);
   }
 }
@@ -568,7 +568,7 @@ import {
 
 // Like if database required full string date format
 class BirthDateModifier extends Modifier {
-  public onSerialize(value: string): string {
+  public override onSerialize(value: string): string {
     return new Date(value).toISOString();
   }
 }
@@ -702,10 +702,10 @@ class DeepExtractor extends Extractor {
 }
 
 class AgeModifier extends Modifier {
-  public onDeserialize(value: string): number {
+  public override onDeserialize(value: string): number {
     return Number(value);
   }
-  public onSerialize(value: number): string {
+  public override onSerialize(value: number): string {
     return String(value);
   }
 }
@@ -785,10 +785,10 @@ import {
 } from 'typescript-object-serializer';
 
 class OnlyDeserializableModifier extends Modifier {
-  public onSerialize(value: unknown): undefined {
+  public override onSerialize(value: unknown): undefined {
     return undefined;
   }
-  public onDeserialize(data: unknown): unknown {
+  public override onDeserialize(data: unknown): unknown {
     return data;
   }
 }

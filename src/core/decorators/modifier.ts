@@ -49,7 +49,7 @@ class ModifierDecorator extends DecoratorBase {
     const {
       targetConstructor,
       propertyKey: propertyName,
-    } = ModifierDecorator.getTargetAndPropertyKey(target, propertyKey, indexOrDescriptor);
+    } = ModifierDecorator.getTargetConstructorAndPropertyKey(target, propertyKey, indexOrDescriptor);
 
     const propertiesStore = new ModifiersClassStore(targetConstructor).getStoreMapOrDeclareFromParent();
 

@@ -3,7 +3,7 @@ import { ConstructorPropertyDeclaration } from './constructor-property-declarati
 
 export abstract class DecoratorBase {
 
-  protected static getTargetAndPropertyKey(
+  protected static getTargetConstructorAndPropertyKey(
     target: object,
     propertyKey: string | symbol | undefined,
     indexOrDescriptor?: number | PropertyDescriptor,

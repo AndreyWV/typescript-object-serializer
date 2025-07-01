@@ -314,7 +314,7 @@ describe('Instance create', () => {
 
         const instance1 = Parent.createPartial();
         const instance2 = Parent.createPartial();
-        expect(instance1.test !== instance2.test);
+        expect(instance1.test).not.toBe(instance2.test);
 
       });
 
@@ -376,7 +376,7 @@ describe('Instance create', () => {
 
         const instance1 = Parent.createPartial();
         const instance2 = Parent.createPartial();
-        expect(instance1.test !== instance2.test);
+        expect(instance1.test).not.toBe(instance2.test);
 
       });
 
@@ -822,7 +822,7 @@ describe('Instance create', () => {
 
         const instance1 = Parent.create({});
         const instance2 = Parent.create({});
-        expect(instance1.test !== instance2.test);
+        expect(instance1.test).not.toBe(instance2.test);
 
       });
 
@@ -884,7 +884,7 @@ describe('Instance create', () => {
 
         const instance1 = Parent.create({});
         const instance2 = Parent.create({});
-        expect(instance1.test !== instance2.test);
+        expect(instance1.test).not.toBe(instance2.test);
 
       });
 
