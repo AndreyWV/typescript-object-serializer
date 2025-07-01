@@ -11,14 +11,14 @@ import { DecoratorBase } from '../../utils/base-decorator';
  * class SomeClass extends SerializableObject {
  *
  *   @property()
- *   @modifier(OnlyDeserializeModifier)
+ *   @modifier(NotSerializeModifier)
  *   public id: string;
  *
  * }
  * 
- * class OnlyDeserializeModifier extends Modifier {
+ * class NotSerializeModifier extends Modifier {
  * 
- *   public override afterSerialize(data: unknown): unknown {
+ *   public override onSerialize(data: unknown): unknown {
  *      return undefined;
  *   }
  * 
