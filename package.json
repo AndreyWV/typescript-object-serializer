@@ -1,6 +1,6 @@
 {
     "name": "typescript-object-serializer",
-    "version": "2.0.0",
+    "version": "2.0.0-alpha.0",
     "description": "Powerful Scalable Typescript object serializer",
     "scripts": {
         "build": "tsc -p prod.tsconfig.json && npm run build:copy-files",
@@ -8,7 +8,7 @@
         "test": "jest",
         "test:coverage": "jest --coverage",
         "lint": "eslint src tests",
-        "playground": "TS_NODE_PROJECT=\"playground\/tsconfig.json\" ts-node playground\/index.ts"
+        "playground": "TS_NODE_PROJECT=\"playground/tsconfig.json\" ts-node playground/index.ts"
     },
     "keywords": [
         "typescript",
