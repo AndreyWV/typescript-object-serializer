@@ -164,7 +164,34 @@ class SomeExtractor extends Extractor {
 }
 ```
 
-### 5. Change function/method `create` to `createPartial` (if need, not recommended)
+### 5. Change extractor's `extract` return type
+Method `extract` expected to return instance of class `ExtractionResult`
+
+Before:
+```typescript
+class SomeExtractor extends Extractor<T> {
+  public extract(data: unknown): ExtractionResult<T> {
+    return {
+      data: {} as T // Some extracted and modified data
+      path: 'path/to/property',
+    };
+  }
+}
+```
+
+After:
+```typescript
+class SomeExtractor extends Extractor {
+  public extract(data: unknown): ExtractionResult {
+    return new ExtractionResult(
+      {} // Some extracted and modified data
+      'path/to/property',
+    );
+  }
+}
+```
+
+### 6. Change function/method `create` to `createPartial` (if need, not recommended)
 Function `create` now expects all required properties of the object to be passed. `createPartial` has same behavior as old `create`. If property is optional it should be declared with `optional` syntax - `?:`.
 
 Before:
