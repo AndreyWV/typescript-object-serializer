@@ -1,11 +1,26 @@
 import { SerializerClassDataStore } from '../../utils/class-data-store';
 import { Constructor } from '../../utils/constructor';
 
-export class TypesClassStore extends SerializerClassDataStore<
-  Map<
-    Constructor<never>,
-    (data: unknown) => boolean
-  >
-> {
+type TypesStoreType = Map<
+  Constructor<never>,
+  (data: unknown) => boolean
+  >;
+
+export class TypesClassStore extends SerializerClassDataStore<TypesStoreType> {
+
   protected readonly storeKey = 'typescript-object-serializer_types';
+
+  public override defineStoreMap(parentProperties?: Map<keyof never, TypesStoreType>): void {
+    const storeMap = this.getOrCreateStoreMap();
+    if (!storeMap.get(this.SerializerClassConstructor)) {
+      storeMap.set(
+        this.SerializerClassConstructor,
+        new Map(
+          // Create copy of property conditions to not affect parent class
+          parentProperties?.entries()
+            .map(([key, value]) => [key, new Map(value)]),
+        ),
+      );
+    }
+  }
 }

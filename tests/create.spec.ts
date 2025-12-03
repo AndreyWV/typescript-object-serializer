@@ -29,6 +29,16 @@ describe('Instance create', () => {
         expect(testInstance).toBeInstanceOf(Test);
       });
 
+      it('should create class instance extending parent', () => {
+        class TestExtended extends Test {
+          @property()
+          public declare extendedProperty: string;
+        }
+        const testInstance = TestExtended.createPartial();
+        expect(testInstance).toBeInstanceOf(Test);
+        expect(testInstance).toBeInstanceOf(TestExtended);
+      });
+
       describe('should create class instance with serializable property', () => {
 
         it('value which was passed', () => {
@@ -151,6 +161,16 @@ describe('Instance create', () => {
       it('should create class instance', () => {
         const testInstance = createPartial(Test);
         expect(testInstance).toBeInstanceOf(Test);
+      });
+
+      it('should create class instance extending parent', () => {
+        class TestExtended extends Test {
+          @property()
+          public declare extendedProperty: string;
+        }
+        const testInstance = createPartial(TestExtended);
+        expect(testInstance).toBeInstanceOf(Test);
+        expect(testInstance).toBeInstanceOf(TestExtended);
       });
 
       describe('should create class instance with serializable property', () => {
@@ -318,6 +338,30 @@ describe('Instance create', () => {
 
       });
 
+      it('should create extended instance of nested serializable class', () => {
+
+        class DeepNestedPropertyExtended extends DeepNestedProperty {
+          @property()
+          public test: number = 0;
+          @property()
+          public declare extendedProperty: string;
+        }
+
+        const instance = Test.createPartial({
+          nestedProperty: {
+            deepNestedProperty: DeepNestedPropertyExtended.createPartial({
+              test: 78,
+              extendedProperty: 'extended',
+            }),
+          },
+        });
+
+        expect(instance.nestedProperty.deepNestedProperty.test).toBe(78);
+        expect(instance.nestedProperty.deepNestedProperty).toBeInstanceOf(DeepNestedPropertyExtended);
+        expect(instance.nestedProperty).toBeInstanceOf(NestedProperty);
+
+      });
+
     });
 
     describe('class with nested serializable properties', () => {
@@ -380,6 +424,30 @@ describe('Instance create', () => {
 
       });
 
+      it('should create extended instance of nested serializable class', () => {
+
+        class DeepNestedPropertyExtended extends DeepNestedProperty {
+          @property()
+          public test: number = 0;
+          @property()
+          public declare extendedProperty: string;
+        }
+
+        const instance = createPartial(Test, {
+          nestedProperty: {
+            deepNestedProperty: createPartial(DeepNestedPropertyExtended, {
+              test: 78,
+              extendedProperty: 'extended',
+            }),
+          },
+        });
+
+        expect(instance.nestedProperty.deepNestedProperty.test).toBe(78);
+        expect(instance.nestedProperty.deepNestedProperty).toBeInstanceOf(DeepNestedPropertyExtended);
+        expect(instance.nestedProperty).toBeInstanceOf(NestedProperty);
+
+      });
+
     });
 
     describe('class with nested serializable array property descendant of SerializableObject', () => {
@@ -409,6 +477,34 @@ describe('Instance create', () => {
         expect(instance.array[0].test).toBe('123');
       });
 
+      it('should create instance with serializable array property extended item class', () => {
+
+        class ArrayItemExtended extends ArrayItem {
+          @property()
+          public declare extendedProperty: string;
+        }
+
+        const instance = Test.createPartial({
+          array: [
+            {
+              test: '123',
+            },
+            ArrayItemExtended.createPartial({
+              test: '321',
+              extendedProperty: 'extended',
+            }),
+          ],
+        });
+        expect(instance.array.length).toBe(2);
+        expect(instance.array[0]).toBeInstanceOf(ArrayItem);
+        expect(instance.array[0].test).toBe('123');
+        expect(instance.array[1]).toBeInstanceOf(ArrayItem);
+        expect(instance.array[1]).toBeInstanceOf(ArrayItemExtended);
+        expect(instance.array[1].test).toBe('321');
+        expect((instance.array[1] as ArrayItemExtended).extendedProperty).toBe('extended');
+
+      });
+
     });
 
     describe('class with nested serializable array property', () => {
@@ -436,6 +532,34 @@ describe('Instance create', () => {
         expect(instance.array.length).toBe(2);
         expect(instance.array[0]).toBeInstanceOf(ArrayItem);
         expect(instance.array[0].test).toBe('123');
+      });
+
+      it('should create instance with serializable array property extended item class', () => {
+
+        class ArrayItemExtended extends ArrayItem {
+          @property()
+          public declare extendedProperty: string;
+        }
+
+        const instance = createPartial(Test, {
+          array: [
+            {
+              test: '123',
+            },
+            createPartial(ArrayItemExtended, {
+              test: '321',
+              extendedProperty: 'extended',
+            }),
+          ],
+        });
+        expect(instance.array.length).toBe(2);
+        expect(instance.array[0]).toBeInstanceOf(ArrayItem);
+        expect(instance.array[0].test).toBe('123');
+        expect(instance.array[1]).toBeInstanceOf(ArrayItem);
+        expect(instance.array[1]).toBeInstanceOf(ArrayItemExtended);
+        expect(instance.array[1].test).toBe('321');
+        expect((instance.array[1] as ArrayItemExtended).extendedProperty).toBe('extended');
+
       });
 
     });
@@ -528,6 +652,17 @@ describe('Instance create', () => {
         const testInstance = Test.create({
         } as never);
         expect(testInstance).toBeInstanceOf(Test);
+      });
+
+      it('should create class instance extending parent', () => {
+        class TestExtended extends Test {
+          @property()
+          public declare extendedProperty: string;
+        }
+        const testInstance = TestExtended.create({
+        } as never);
+        expect(testInstance).toBeInstanceOf(Test);
+        expect(testInstance).toBeInstanceOf(TestExtended);
       });
 
       describe('should create class instance with serializable property', () => {
@@ -652,6 +787,17 @@ describe('Instance create', () => {
       it('should create class instance', () => {
         const testInstance = create(Test, {} as never);
         expect(testInstance).toBeInstanceOf(Test);
+      });
+
+      it('should create class instance extending parent', () => {
+        class TestExtended extends Test {
+          @property()
+          public declare extendedProperty: string;
+        }
+        const testInstance = create(TestExtended, {
+        } as never);
+        expect(testInstance).toBeInstanceOf(Test);
+        expect(testInstance).toBeInstanceOf(TestExtended);
       });
 
       describe('should create class instance with serializable property', () => {
@@ -826,6 +972,30 @@ describe('Instance create', () => {
 
       });
 
+      it('should create extended instance of nested serializable class', () => {
+
+        class DeepNestedPropertyExtended extends DeepNestedProperty {
+          @property()
+          public test: number = 0;
+          @property()
+          public declare extendedProperty: string;
+        }
+
+        const instance = Test.create({
+          nestedProperty: {
+            deepNestedProperty: DeepNestedPropertyExtended.create({
+              test: 78,
+              extendedProperty: 'extended',
+            }),
+          },
+        });
+
+        expect(instance.nestedProperty?.deepNestedProperty?.test).toBe(78);
+        expect(instance.nestedProperty?.deepNestedProperty).toBeInstanceOf(DeepNestedPropertyExtended);
+        expect(instance.nestedProperty).toBeInstanceOf(NestedProperty);
+
+      });
+
     });
 
     describe('class with nested serializable properties', () => {
@@ -888,6 +1058,30 @@ describe('Instance create', () => {
 
       });
 
+      it('should create extended instance of nested serializable class', () => {
+
+        class DeepNestedPropertyExtended extends DeepNestedProperty {
+          @property()
+          public test: number = 0;
+          @property()
+          public declare extendedProperty: string;
+        }
+
+        const instance = create(Test, {
+          nestedProperty: {
+            deepNestedProperty: create(DeepNestedPropertyExtended, {
+              test: 78,
+              extendedProperty: 'extended',
+            }),
+          },
+        });
+
+        expect(instance.nestedProperty?.deepNestedProperty?.test).toBe(78);
+        expect(instance.nestedProperty?.deepNestedProperty).toBeInstanceOf(DeepNestedPropertyExtended);
+        expect(instance.nestedProperty).toBeInstanceOf(NestedProperty);
+
+      });
+
     });
 
     describe('class with nested serializable array property descendant of SerializableObject', () => {
@@ -917,6 +1111,34 @@ describe('Instance create', () => {
         expect(instance.array[0].test).toBe('123');
       });
 
+      it('should create instance with serializable array property extended item class', () => {
+
+        class ArrayItemExtended extends ArrayItem {
+          @property()
+          public declare extendedProperty: string;
+        }
+
+        const instance = Test.create({
+          array: [
+            {
+              test: '123',
+            },
+            ArrayItemExtended.create({
+              test: '321',
+              extendedProperty: 'extended',
+            }),
+          ],
+        });
+        expect(instance.array.length).toBe(2);
+        expect(instance.array[0]).toBeInstanceOf(ArrayItem);
+        expect(instance.array[0].test).toBe('123');
+        expect(instance.array[1]).toBeInstanceOf(ArrayItem);
+        expect(instance.array[1]).toBeInstanceOf(ArrayItemExtended);
+        expect(instance.array[1].test).toBe('321');
+        expect((instance.array[1] as ArrayItemExtended).extendedProperty).toBe('extended');
+
+      });
+
     });
 
     describe('class with nested serializable array property', () => {
@@ -944,6 +1166,34 @@ describe('Instance create', () => {
         expect(instance.array.length).toBe(2);
         expect(instance.array[0]).toBeInstanceOf(ArrayItem);
         expect(instance.array[0].test).toBe('123');
+      });
+
+      it('should create instance with serializable array property extended item class', () => {
+
+        class ArrayItemExtended extends ArrayItem {
+          @property()
+          public declare extendedProperty: string;
+        }
+
+        const instance = create(Test, {
+          array: [
+            {
+              test: '123',
+            },
+            create(ArrayItemExtended, {
+              test: '321',
+              extendedProperty: 'extended',
+            }),
+          ],
+        });
+        expect(instance.array.length).toBe(2);
+        expect(instance.array[0]).toBeInstanceOf(ArrayItem);
+        expect(instance.array[0].test).toBe('123');
+        expect(instance.array[1]).toBeInstanceOf(ArrayItem);
+        expect(instance.array[1]).toBeInstanceOf(ArrayItemExtended);
+        expect(instance.array[1].test).toBe('321');
+        expect((instance.array[1] as ArrayItemExtended).extendedProperty).toBe('extended');
+
       });
 
     });

@@ -31,7 +31,7 @@ export abstract class SerializerClassDataStore<S, T = never> {
     /**
      * Constructor of serializable class for declaring and extracting serializer rules
      */
-    private readonly SerializerClassConstructor: Constructor<never>,
+    protected readonly SerializerClassConstructor: Constructor<never>,
   ) {
   }
 
@@ -120,7 +120,7 @@ export abstract class SerializerClassDataStore<S, T = never> {
     }
   }
 
-  private getOrCreateStoreMap(): Map<unknown, Map<keyof T, S>> {
+  protected getOrCreateStoreMap(): Map<unknown, Map<keyof T, S>> {
     const serializerClassConstructor = this.SerializerClassConstructor as
       unknown as
       SerializerClassDataStoreContainer<T, S>;

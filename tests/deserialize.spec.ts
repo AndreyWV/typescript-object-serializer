@@ -347,6 +347,39 @@ describe('Deserialize', () => {
         expect(deserialized.property).toBe(null);
       });
 
+      it('should deserialize data with extended item class', () => {
+
+        class ArrayItemExtended extends ArrayItem {
+          @property()
+          public declare extendedProperty: string;
+        }
+
+        class TestExtended extends Test {
+          @property()
+          @propertyType(ArrayItemExtended)
+          public declare property: ArrayItemExtended[];
+        }
+
+        const deserialized = TestExtended.deserialize({
+          property: [
+            {
+              value: 1,
+              extendedProperty: 'test1',
+            },
+            {
+              value: 2,
+              extendedProperty: 'test2',
+            },
+          ],
+        });
+
+        expect(deserialized.property.length).toBe(2);
+        expect(deserialized.property[0]).toBeInstanceOf(ArrayItem);
+        expect(deserialized.property[0]).toBeInstanceOf(ArrayItemExtended);
+        expect(deserialized.property[0].value).toBe(1);
+        expect(deserialized.property[0].extendedProperty).toBe('test1');
+      });
+
     });
 
     describe('simple class', () => {
@@ -391,6 +424,39 @@ describe('Deserialize', () => {
           property: null,
         });
         expect(deserialized.property).toBe(null);
+      });
+
+      it('should deserialize data with extended item class', () => {
+
+        class ArrayItemExtended extends ArrayItem {
+          @property()
+          public declare extendedProperty: string;
+        }
+
+        class TestExtended extends Test {
+          @property()
+          @propertyType(ArrayItemExtended)
+          public declare property: ArrayItemExtended[];
+        }
+
+        const deserialized = deserialize(TestExtended, {
+          property: [
+            {
+              value: 1,
+              extendedProperty: 'test1',
+            },
+            {
+              value: 2,
+              extendedProperty: 'test2',
+            },
+          ],
+        });
+
+        expect(deserialized.property.length).toBe(2);
+        expect(deserialized.property[0]).toBeInstanceOf(ArrayItem);
+        expect(deserialized.property[0]).toBeInstanceOf(ArrayItemExtended);
+        expect(deserialized.property[0].value).toBe(1);
+        expect(deserialized.property[0].extendedProperty).toBe('test1');
       });
 
     });

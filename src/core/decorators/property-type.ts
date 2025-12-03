@@ -69,6 +69,16 @@ class PropertyTypeDecorator extends DecoratorBase {
       propertyTypeMap = propertiesStore.get(propertyName)!;
     }
 
+    // Remove default property type declared in parent
+    if (!this.typeCondition) {
+      const parentDefaultType = propertyTypeMap.entries()
+        .find(([, typeCondition]) => typeCondition === KeyType.defaultPropertyTypeCondition);
+
+      if (parentDefaultType) {
+        propertyTypeMap.delete(parentDefaultType[0]);
+      }
+    }
+
     propertyTypeMap.set(
       this.defineType as Constructor<never>,
       this.typeCondition

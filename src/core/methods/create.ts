@@ -55,7 +55,8 @@ class ObjectCreator<T> {
     (Object.keys(data) as Array<keyof T>)
       .forEach(
         key => {
-          const keyType = this.getKeyType(key);
+          const keyType = this.getKeyTypeFromInstance((data as T)[key])
+            ?? this.getKeyType(key);
 
           const dataValue = (data as T)[key];
 
@@ -73,7 +74,10 @@ class ObjectCreator<T> {
             if (Array.isArray(dataValue)) {
               this.instance[key] = dataValue
                 .map(
-                  item => new ObjectCreator(keyType as Constructor<unknown>)
+                  item => new ObjectCreator(
+                    this.getKeyTypeFromInstance(item) as Constructor<unknown>
+                    ?? keyType as Constructor<unknown>,
+                  )
                     .create(item),
                 ) as never;
             } else {
@@ -103,6 +107,24 @@ class ObjectCreator<T> {
     return keysMap
       ? Array.from(keysMap.keys())[0]
       : Reflect?.getMetadata?.('design:type', this.instance as object, key as string | symbol);
+  }
+
+  private getKeyTypeFromInstance(data: unknown): unknown {
+    if (typeof data !== 'object' || data === null) {
+      return null;
+    }
+    const dataConstructor = data.constructor;
+    if (!dataConstructor) {
+      return null;
+    }
+
+    const classExtractors = new ExtractorsClassStore(dataConstructor as Constructor<never>)
+      .findStoreMap();
+
+    // Check if object is extends class declared in parent declaration
+    return classExtractors
+      ? dataConstructor
+      : null;
   }
 
 }

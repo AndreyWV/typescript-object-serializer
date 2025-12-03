@@ -7,6 +7,7 @@ v2 focuses on a more declarative API and stronger type checking
 3. All data/value types (at Extractor|Modifier|Validator) are now declared as `unknown` instead of `any`. This is required for better type checking and to reduce runtime errors
 4. The method for creating an instance of a serializable class now expects all required properties of the class. Partial instance creation is also allowed by the `createPartial` function, but this does not guarantee that all properties will be defined
 5. Removed useless Extractor generic type
+6. Migrated from webpack to TypeScript compiler (`tsc`)
 
 ## 1.2.2 (2024-07-12)
 

@@ -304,6 +304,33 @@ describe('Serialize', () => {
         });
       });
 
+      it('should serialize all properties if object is extended', () => {
+
+        class NestedPropertyExtended extends NestedProperty {
+          @property()
+          public declare extendedProperty: string;
+        }
+
+        const instance = Test.create({
+          nestedProperty: NestedPropertyExtended.create({
+            deepNestedProperty: {
+              property: 'test',
+            },
+            extendedProperty: 'extended',
+          }),
+        });
+
+        const serialized = instance.serialize();
+        expect(serialized).toEqual({
+          nestedProperty: {
+            deepNestedProperty: {
+              property: 'test',
+            },
+            extendedProperty: 'extended',
+          },
+        });
+      });
+
     });
 
     describe('simple class', () => {
@@ -338,6 +365,33 @@ describe('Serialize', () => {
             deepNestedProperty: {
               property: 'test',
             },
+          },
+        });
+      });
+
+      it('should serialize all properties if object is extended', () => {
+
+        class NestedPropertyExtended extends NestedProperty {
+          @property()
+          public declare extendedProperty: string;
+        }
+
+        const instance = create(Test, {
+          nestedProperty: create(NestedPropertyExtended, {
+            deepNestedProperty: {
+              property: 'test',
+            },
+            extendedProperty: 'extended',
+          }),
+        });
+
+        const serialized = serialize(instance);
+        expect(serialized).toEqual({
+          nestedProperty: {
+            deepNestedProperty: {
+              property: 'test',
+            },
+            extendedProperty: 'extended',
           },
         });
       });
@@ -394,13 +448,52 @@ describe('Serialize', () => {
         });
       });
 
+      it('should serialize all properties if object is extended', () => {
+
+        class ArrayItemExtended extends ArrayItem {
+          @property(SnakeCaseExtractor)
+          public declare extendedProperty: string;
+        }
+
+        const instance = Test.create({
+          property: [
+            {
+              valueNumber: 1,
+            },
+            {
+              valueNumber: 3,
+            },
+            ArrayItemExtended.create({
+              valueNumber: 5,
+              extendedProperty: 'extended',
+            }),
+          ],
+        });
+
+        const serialized = instance.serialize();
+        expect(serialized).toEqual({
+          property: [
+            {
+              value_number: 1,
+            },
+            {
+              value_number: 3,
+            },
+            {
+              value_number: 5,
+              extended_property: 'extended',
+            },
+          ],
+        });
+      });
+
     });
 
     describe('simple class', () => {
 
       class ArrayItem {
-        @property()
-        public declare value: number;
+        @property(SnakeCaseExtractor)
+        public declare valueNumber: number;
       }
 
       const defaultArray: ArrayItem[] = [];
@@ -415,13 +508,13 @@ describe('Serialize', () => {
         const instance = create(Test, {
           property: [
             {
-              value: 1,
+              valueNumber: 1,
             },
             {
-              value: 3,
+              valueNumber: 3,
             },
             {
-              value: 5,
+              valueNumber: 5,
             },
           ],
         });
@@ -430,13 +523,52 @@ describe('Serialize', () => {
         expect(serialized).toEqual({
           property: [
             {
-              value: 1,
+              value_number: 1,
             },
             {
-              value: 3,
+              value_number: 3,
             },
             {
-              value: 5,
+              value_number: 5,
+            },
+          ],
+        });
+      });
+
+      it('should serialize all properties if object is extended', () => {
+
+        class ArrayItemExtended extends ArrayItem {
+          @property(SnakeCaseExtractor)
+          public declare extendedProperty: string;
+        }
+
+        const instance = create(Test, {
+          property: [
+            {
+              valueNumber: 1,
+            },
+            {
+              valueNumber: 3,
+            },
+            create(ArrayItemExtended, {
+              valueNumber: 5,
+              extendedProperty: 'extended',
+            }),
+          ],
+        });
+
+        const serialized = serialize(instance);
+        expect(serialized).toEqual({
+          property: [
+            {
+              value_number: 1,
+            },
+            {
+              value_number: 3,
+            },
+            {
+              value_number: 5,
+              extended_property: 'extended',
             },
           ],
         });
