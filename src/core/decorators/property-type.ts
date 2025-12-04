@@ -71,7 +71,9 @@ class PropertyTypeDecorator extends DecoratorBase {
 
     // Remove default property type declared in parent
     if (!this.typeCondition) {
-      const parentDefaultType = propertyTypeMap.entries()
+      // backward compatibility with node 20 and less
+      // Change `Array.from(propertyTypeMap.entries())` -> `propertyTypeMap.entries()` later
+      const parentDefaultType = Array.from(propertyTypeMap.entries())
         .find(([, typeCondition]) => typeCondition === KeyType.defaultPropertyTypeCondition);
 
       if (parentDefaultType) {
