@@ -2,17 +2,20 @@ import 'reflect-metadata';
 import {
   clone,
   create,
+  createPartial,
   deserialize,
   ExtractionResult,
   Extractor,
+  modifier,
+  Modifier,
   OverrideNameExtractor,
+  property,
   propertyType,
   SerializableObject,
   serialize,
   SnakeCaseExtractor,
   StraightExtractor,
 } from '../src';
-import { property } from '../src/decorators/property';
 import {
   propertyValidators,
   RequiredValidator,
@@ -22,18 +25,30 @@ import {
   Validator,
 } from '../src/validators';
 
-// Basic usage
-(() => {
+class Sample {
 
-  console.log('Basic usage');
+  constructor(
+    private readonly title: string,
+    private readonly content: VoidFunction
+  ) {
+  }
+
+  public run(): void {
+    console.log(`\n\x1b[36m# ${this.title}\x1b[0m`);
+    this.content();
+  }
+
+}
+
+new Sample('BasicUsage', () => {
 
   class Person {
 
     @property()
-    public name: string;
+    public declare name: string;
 
     @property(SnakeCaseExtractor)
-    public lastName: string;
+    public declare lastName: string;
 
   }
 
@@ -45,32 +60,29 @@ import {
   console.log(person instanceof Person); // true
   console.log(person.name); // "John"
   console.log(person.lastName); // "Doe"
-  console.log(serialize(person)) // { name: "John", last_name: "Doe" }
-})();
+  console.log(serialize(person)); // { name: "John", last_name: "Doe" }
 
-// Deep serializable property
-(() => {
+}).run();
 
-  console.log(' Deep serializable property');
-
+new Sample('Deep serializable property', () => {
   class Person {
 
     @property()
-    public name: string;
+    public declare name: string;
 
     @property(SnakeCaseExtractor)
-    public lastName: string;
+    public declare lastName: string;
 
   }
 
   class Employee {
 
     @property()
-    id: number;
+    public declare id: number;
 
     @property()
     @propertyType(Person)
-    public person: Person;
+    public declare person: Person;
 
   }
 
@@ -83,21 +95,18 @@ import {
   });
 
   console.log(employee.person); // Person { name: "John", lastName: "Doe" }
-})();
+}).run();
 
-// Extend serializable class
-(() => {
-
-  console.log('Extend serializable class');
+new Sample('Extend serializable class', () => {
 
   class Person {
     @property()
-    public name: string;
+    public declare name: string;
   }
 
   class Employee extends Person {
     @property()
-    id: number;
+    public declare id: number;
   }
 
   const employee = deserialize(Employee, {
@@ -106,24 +115,21 @@ import {
   });
 
   console.log(employee); // Employee { name: "John", id: 1 }
-})();
+}).run();
 
-// Auto-detect property types
-(() => {
-
-  console.log('Auto-detect property types');
+new Sample('Auto-detect property types', () => {
 
   class Person {
     @property()
-    public name: string;
+    public declare name: string;
   }
 
   class Employee {
     @property()
-    public id: number;
+    public declare id: number;
 
     @property()
-    public person: Person; // <- Type will be extracted from property metadata
+    public declare person: Person; // <- Type will be extracted from property metadata
   }
 
   const employee = deserialize(Employee, {
@@ -134,42 +140,40 @@ import {
   });
 
   console.log(employee); // Employee { id: 1, person: Person { name: 'John' } }
-})();
 
-// Handle arrays of data
-(() => {
+}).run();
 
-  console.log('Handle arrays of data');
+new Sample('Handle arrays of data', () => {
 
   class Person {
 
     @property()
-    public name: string;
+    public declare name: string;
 
     @property(SnakeCaseExtractor)
-    public lastName: string;
+    public declare lastName: string;
 
   }
 
   class Employee {
 
     @property()
-    id: number;
+    public declare id: number;
 
     @property()
     @propertyType(Person)
-    public person: Person;
+    public declare person: Person;
 
   }
 
   class Department {
 
     @property()
-    public title: string;
+    public declare title: string;
 
     @property()
     @propertyType(Employee)
-    public employees: Employee[];
+    public declare employees: Employee[];
 
   }
 
@@ -213,22 +217,19 @@ import {
     ],
   });
 
-  console.log(department); // Department { title: "Department title", employees [ Employee { id: 1, person: Person { name: "John", lastName: "Doe" } }, Employee { id: 2, person: Person { name: "Jane", lastName: "Doe" } } ] }
-  console.log('serialized department', serialize(department)); // {title: "Department title", employees: [{id: 1, person: {name: "John", last_name: "Doe"}}, {id: 2, person: {name: "Jane", last_name: "Doe"}}]}
-})();
+  console.dir(department, { depth: 3 }); // Department { title: "Department title", employees [ Employee { id: 1, person: Person { name: "John", lastName: "Doe" } }, Employee { id: 2, person: Person { name: "Jane", lastName: "Doe" } } ] }
+  console.dir(serialize(department), { depth: 3 }); // {title: "Department title", employees: [{id: 1, person: {name: "John", last_name: "Doe"}}, {id: 2, person: {name: "Jane", last_name: "Doe"}}]}
 
-// StraightExtractor [Default]
-(() => {
+}).run();
 
-  console.log('StraightExtractor [Default]');
-
+new Sample('StraightExtractor [Default]', () => {
   class Person {
 
     @property()
-    public name: string;
+    public declare name: string;
 
     @property(StraightExtractor) // Same as @property()
-    public lastName: string;
+    public declare lastName: string;
 
   }
 
@@ -237,21 +238,18 @@ import {
     lastName: 'Doe',
   });
 
-  console.log(person); // Person { name: "John", lastName: "Doe" }
-})();
+  console.log(person); // Person { name: "John", lastName: "Doe" }
+}).run();
 
-// SnakeCaseExtractor
-(() => {
-
-  console.log('SnakeCaseExtractor');
+new Sample('SnakeCaseExtractor', () => {
 
   class Person {
 
     @property()
-    public name: string;
+    public declare name: string;
 
     @property(SnakeCaseExtractor)
-    public lastName: string;
+    public declare lastName: string;
 
   }
 
@@ -261,17 +259,15 @@ import {
   });
 
   console.log(person); // Person { name: "John", lastName: "Doe" }
-})();
 
-// OverrideNameExtractor
-(() => {
+}).run();
 
-  console.log('OverrideNameExtractor');
+new Sample('OverrideNameExtractor', () => {
 
   class Department {
 
     @property(OverrideNameExtractor.use('department_id'))
-    public id: string;
+    public declare id: string;
 
   }
 
@@ -280,31 +276,29 @@ import {
   });
 
   console.log(department); // Department { id: "123" }
-})();
 
-// Property type basic
-(() => {
+}).run();
 
-  console.log('Property type basic');
+new Sample('Property type basic', () => {
 
   class Person {
 
     @property()
-    public name: string;
+    public declare name: string;
 
     @property(SnakeCaseExtractor)
-    public lastName: string;
+    public declare lastName: string;
 
   }
 
   class Employee {
 
     @property()
-    id: number;
+    declare id: number;
 
     @property()
     @propertyType(Person) // <- Not required if auto-detection types enabled
-    public person: Person;
+    public declare person: Person;
 
   }
 
@@ -312,90 +306,109 @@ import {
 
     @property()
     @propertyType(Employee) // <- Required because not possible to detect type from property declaration (property metadata seems like Array)
-    public employees: Employee[];
+    public declare employees: Employee[];
 
   }
-})();
+}).run();
 
-// Conditional property type
-(() => {
-
-  console.log('Conditional property type');
+new Sample('Conditional property type', () => {
 
   class SuccessResult {
     @property()
-    public data: any;
+    public declare data: Record<string, unknown>;
   }
   class FailedResult {
     @property()
-    public error: string;
+    public declare error: string;
+  }
+  class UnmatchedResult {
   }
 
-  class Response {
+  class Results {
 
     @property()
-    @propertyType(value => value?.is_success ? SuccessResult : FailedResult)
-    public results: Array<SuccessResult | FailedResult>;
+    @propertyType(SuccessResult, (value: any) => value?.state === 'SUCCESS')
+    @propertyType(FailedResult, (value: any) => value?.state === 'FAIL')
+    @propertyType(UnmatchedResult)
+    public declare results: Array<SuccessResult | FailedResult | UnmatchedResult>;
 
   }
 
-  const response = deserialize(Response, {
+  const results = deserialize(Results, {
     results: [
       {
-        is_success: true,
+        state: 'SUCCESS',
         data: {
           some_data: 'data',
         },
       },
       {
-        is_success: false,
+        state: 'UNKNOWN',
+      },
+      {
+        state: 'FAIL',
         error: 'result error',
       },
     ],
   });
 
-  console.log(response.results[0]); // SuccessResult { data: { some_data: "data" } }
-  console.log(response.results[1]); // FailedResult { error: "result error" }
-})();
+  console.log(results.results[0]); // SuccessResult { data: { some_data: "data" } }
+  console.log(results.results[1]); // UnmatchedResult {  }
+  console.log(results.results[2]); // FailedResult { error: "result error" }
 
-// Create serializable object
-(() => {
-
-  console.log('Create serializable object');
-
-  class Person {
+  // For strict type check (fewer possible runtime errors)
+  class ResultsWithStrictTypeCheck {
 
     @property()
-    public lastName: string;
-
-    @property()
-    public firstName: string;
+    @propertyType(SuccessResult, (value: unknown) => typeof value === 'object'
+      && value !== null
+      && 'state' in value
+      && value.state === 'SUCCESS',
+    )
+    @propertyType(FailedResult, (value: unknown) => typeof value === 'object'
+      && value !== null
+      && 'state' in value
+      && value.state === 'FAIL',
+    )
+    @propertyType(UnmatchedResult)
+    public declare results: Array<SuccessResult | FailedResult | UnmatchedResult>;
 
   }
 
-  const person = create(Person);
-  console.log(person); // Person { }
+}).run();
 
-  const personWithData = create(Person, {
-    firstName: 'John',
-    lastName: 'Doe',
-  });
-  console.log(personWithData); // Person { firstName: "John", lastName: "Doe" }
-
-})();
-
-// Clone serializable object
-(() => {
-
-  console.log('Clone serializable object');
+new Sample('Create serializable object', () => {
 
   class Person {
 
     @property()
-    public lastName: string;
+    public declare lastName: string;
 
     @property()
-    public firstName: string;
+    public declare firstName: string;
+
+  }
+
+  // Recommended instead of createPartial()
+  const person = create(Person, {
+    firstName: 'John',
+    lastName: 'Doe',
+  });
+  console.log(person); // Person { firstName: "John", lastName: "Doe" }
+
+  const partialPerson = createPartial(Person);
+  console.log(partialPerson); // Person { }
+
+}).run();
+
+new Sample('Clone serializable object', () => {
+  class Person {
+
+    @property()
+    public declare lastName: string;
+
+    @property()
+    public declare firstName: string;
 
   }
 
@@ -408,20 +421,16 @@ import {
 
   console.log(personClone); // Person { firstName: "John", lastName: "Doe" }
   console.log(person === personClone); // false
-})();
+}).run();
 
-// Serialize serializable object
-(() => {
-
-  console.log('Serialize serializable object');
-
+new Sample('Serialize serializable object', () => {
   class Person {
 
     @property(SnakeCaseExtractor)
-    public lastName: string;
+    public declare lastName: string;
 
     @property(SnakeCaseExtractor)
-    public firstName: string;
+    public declare firstName: string;
 
   }
 
@@ -431,20 +440,24 @@ import {
   });
 
   console.log(serialize(person)); // { first_name: "John", last_name: "Doe" }
-})();
+}).run();
 
-// Transform property value (type mismatch)
-(() => {
+new Sample('Modify property value (type mismatch)', () => {
 
-  console.log('Transform property value (type mismatch)');
+  class StringAgeModifier extends Modifier {
+    public override onSerialize(data: number): string {
+      return String(data);
+    }
+    public override onDeserialize(data: string): number {
+      return Number(data);
+    }
+  }
 
   class Person {
 
-    @property(StraightExtractor.transform({
-      onDeserialize: value => Number(value),
-      onSerialize: value => String(value),
-    }))
-    public age: number;
+    @property()
+    @modifier(StringAgeModifier)
+    public declare age: number;
 
   }
 
@@ -455,60 +468,52 @@ import {
   console.log(person); // Person { age: 25 }
   console.log(typeof person.age); // number;
   console.log(serialize(person)); // { age: "25" }
-})();
+}).run();
 
-// Transform property value (class or any other type)
-(() => {
+new Sample('Modify property value format', () => {
 
-  console.log('Transform property value (class or any other type)');
-
-  class DepartmentId {
-
-    constructor(
-      public value: string,
-    ) {
+  // Like if database required full string date format
+  class BirthDateModifier extends Modifier {
+    public override onSerialize(value: string): string {
+      return new Date(value).toISOString();
     }
+  }
 
-    // Some DepartmentId logic
+  class Person {
+
+    @property()
+    @modifier(BirthDateModifier)
+    public declare birthDate: string;
 
   }
 
-  class Department {
-
-    @property(StraightExtractor.transform({
-      onDeserialize: value => new DepartmentId(value),
-      onSerialize: (value: DepartmentId) => value?.value,
-    }))
-    public id: DepartmentId; // <- Non-serializable object type
-
-  }
-
-  const department = deserialize(Department, {
-    id: '1',
+  const person = create(Person, {
+    birthDate: '2000-05-06',
   });
 
-  console.log(department); // Department { id: DepartmentId { value: "1" } }
-  console.log(serialize(department)); // { id: "1" }
-})();
 
-// Custom extractor
-(() => {
+  console.log(person); // Person { birthDate: "2000-05-06"}
+  console.log(serialize(person)); // { birthDate: "2000-05-06T00:00:00.000Z" }
+}).run();
 
-  console.log('Custom extractor');
-
+new Sample('PrivateSnakeCaseExtractor', () => {
   /* Extract value from `snake_case` property to "private" `camelCase` property  */
-  class PrivateSnakeCaseExtractor<T> extends SnakeCaseExtractor<T> {
+  class PrivateSnakeCaseExtractor extends SnakeCaseExtractor {
     constructor(
       key: string,
+      modifier?: Modifier,
     ) {
-      super(key.replace(/^_/, ''));
+      super(
+        key.replace(/^_/, ''),
+        modifier,
+      );
     }
   }
 
   class Department {
 
     @property(PrivateSnakeCaseExtractor)
-    private _departmentId: string;
+    private declare _departmentId: string;
 
   }
 
@@ -516,15 +521,19 @@ import {
     department_id: '123',
   });
 
-  console.log(department); // Department { _departmentId: "123" }
+  console.log(department); // Department { _departmentId: "123" }
+}).run();
+
+
+new Sample('DeepExtractor', () => {
 
   /* Extract value from deep object (transform to plane object) */
-  class DeepExtractor<T = any> extends Extractor<T> {
+  class DeepExtractor extends Extractor {
 
     public static byPath<C extends typeof DeepExtractor>(path: string): C {
       return class extends DeepExtractor {
-        constructor() {
-          super(path);
+        constructor(_: string, modifier?: Modifier) {
+          super(path, modifier);
         }
       } as any;
     }
@@ -552,12 +561,13 @@ import {
     }
 
     constructor(
-      protected key: string,
+      key: string,
+      modifier?: Modifier,
     ) {
-      super(key);
+      super(key, modifier);
     }
 
-    public extract(data: any): ExtractionResult<T> {
+    public extract(data: any): ExtractionResult {
       if (typeof data !== 'object' || data === null) {
         return {
           data: undefined,
@@ -565,37 +575,44 @@ import {
         };
       }
       return {
-        data: this.transformBeforeExtract(
+        data: this.modifier.onDeserialize(
           DeepExtractor.getObjectByPath(data, this.key.split('.')),
         ),
         path: this.key,
       };
     }
 
-    public apply(applyObject: any, value: T): void {
+    public apply(applyObject: any, value: unknown): void {
       const keys = this.key.split('.');
       const dataObject = DeepExtractor.getOrCreateObjectByPath(applyObject, keys.slice(0, -1));
-      dataObject[keys[keys.length - 1]] = this.transformBeforeApply(value);
+      dataObject[keys[keys.length - 1]] = this.modifier.onSerialize(value);
     }
 
+  }
+
+  class AgeModifier extends Modifier {
+    public override onDeserialize(value: string): number {
+      return Number(value);
+    }
+    public override onSerialize(value: number): string {
+      return String(value);
+    }
   }
 
   class Person {
 
     @property()
-    public id: number;
+    public declare id: number;
 
-    @property(DeepExtractor.byPath('data.person.age').transform({
-      onDeserialize: value => value && Number(value),
-      onSerialize: value => value && String(value),
-    }))
-    public age: number;
+    @property(DeepExtractor.byPath('data.person.age'))
+    @modifier(AgeModifier)
+    public declare age: number;
 
     @property(DeepExtractor.byPath('data.person.last_name'))
-    public lastName: string = 'Default';
+    public declare lastName: string;
 
     @property(DeepExtractor.byPath('data.person.first_name'))
-    public firstName: string;
+    public declare firstName: string;
 
   }
 
@@ -610,28 +627,24 @@ import {
     },
   });
 
-  console.log(person); // Person { lastName: "John", id: 123, age: 25, firstName: "Doe" }
+  console.log(person); // Person { lastName: "John", id: 123, age: 25, firstName: "Doe" }
 
   console.log(serialize(person)); // { id : 123, data: { person: {age: "25", last_name: "John", first_name: "Doe" } } }
+}).run();
 
-})();
+new Sample('Only deserializable property by extractor', () => {
 
-// Only deserializable property by extractor
-(() => {
-
-  console.log('Only deserializable property by extractor');
-
-  class OnlyDeserializeStraightExtractor<T> extends StraightExtractor<T> {
-    public apply(applyObject: any, value: T): void {
+  class OnlyDeserializeStraightExtractor extends StraightExtractor {
+    public apply(applyObject: any, value: unknown): void {
     }
   }
 
   class Department {
     @property(OnlyDeserializeStraightExtractor)
-    public id: number;
+    public declare id: number;
 
     @property()
-    public title: string;
+    public declare title: string;
   }
 
   const department = deserialize(Department, {
@@ -641,22 +654,26 @@ import {
   console.log(department); // Department { id: 123, title: "Department title" }
 
   console.log(serialize(department)); // { title: "Department title" }
+}).run();
 
-})();
+new Sample('Only deserializable property by modifier', () => {
 
-// Only deserializable property by transformation
-(() => {
-
-  console.log('Only deserializable property by transformation');
+  class OnlyDeserializableModifier extends Modifier {
+    public override onSerialize(value: unknown): undefined {
+      return undefined;
+    }
+    public override onDeserialize(data: unknown): unknown {
+      return data;
+    }
+  }
 
   class Department {
-    @property(StraightExtractor.transform({
-      onSerialize: () => { },
-    }))
-    public id: number;
+    @property()
+    @modifier(OnlyDeserializableModifier)
+    public declare id: number;
 
     @property()
-    public title: string;
+    public declare title: string;
   }
 
   const department = deserialize(Department, {
@@ -666,14 +683,9 @@ import {
   console.log(department); // Department { id: 123, title: "Department title" }
 
   console.log(serialize(department)); // { title: "Department title" }
+}).run();
 
-})();
-
-// Getters and setters
-(() => {
-
-  console.log('Getters and setters');
-
+new Sample('Getters and setters', () => {
   class PersonWithGetter {
     constructor(
       public firstName: string,
@@ -683,7 +695,7 @@ import {
 
     @property()
     public get fullName(): string {
-      return this.firstName + ' ' + this.lastName
+      return this.firstName + ' ' + this.lastName;
     }
   }
 
@@ -691,8 +703,8 @@ import {
   console.log(serialize(personWithGetter)); // { fullName: "John Doe" }
 
   class PersonWithSetter {
-    public firstName: string;
-    public lastName: string;
+    public declare firstName: string;
+    public declare lastName: string;
 
     @property()
     public set fullName(value: string) {
@@ -707,19 +719,14 @@ import {
   });
 
   console.log(deserialized); // PersonWithSetter { firstName: "John", lastName: "Doe" }
+}).run();
 
-})();
-
-// Syntactic sugar - SerializableObject class
-(() => {
-
-  console.log('Syntactic sugar - SerializableObject class');
-
+new Sample('Syntactic sugar - SerializableObject class', () => {
   class Item extends SerializableObject {
     @property()
-    public id: number;
+    public declare id: number;
     @property()
-    public title: string;
+    public declare title: string;
   }
 
   const items = Item.deserializeArray([
@@ -745,18 +752,13 @@ import {
     title: 'New item',
   });
   console.log(newItem); // Item { id: 3, title: "New item" }
+}).run();
 
-})();
-
-// Basic validation
-(() => {
-
-  console.log('Basic validation');
-
+new Sample('Basic validation', () => {
   class Person {
     @property()
     @propertyValidators([RequiredValidator, StringLengthValidator.with({ min: 1 })])
-    public name: string;
+    public declare name: string;
   }
 
   const resultRequired = validate(Person, {});
@@ -766,76 +768,84 @@ import {
     name: '',
   });
   console.log(resultEmpty); // [ ValidationError { message: "Property length should be greater than or equal 1", path: "name" } ]
+}).run();
 
-})();
-
-// Deep validation
-(() => {
-
-  console.log('Deep validation');
-
+new Sample('deep validation', () => {
   class Address {
     @property()
     @propertyValidators([RequiredValidator])
-    public city: string;
+    public declare city: string;
   }
 
   class Employee {
     @property()
     @propertyValidators([RequiredValidator])
-    public name: string;
+    public declare name: string;
 
     @property()
     @propertyValidators([RequiredValidator])
-    public address: Address;
+    @propertyType(Address)
+    public declare address: Address;
   }
 
   class Department {
-    @property(SnakeCaseExtractor)
+    @property(OverrideNameExtractor.use('department_employees'))
     @propertyType(Employee)
-    public departmentEmployees: Employee[];
+    public declare employees: Employee[];
+  }
+
+  class Organization {
+
+    @property()
+    @propertyType(Department)
+    public declare departments: Department[];
+
   }
 
   const data = {
-    department_employees: [
+    departments: [
       {
-        name: 'John Doe',
-        address: {
-          city: 'New York',
-        },
+        department_employees: [
+          {
+            name: 'John Doe',
+            address: {
+              city: 'New York',
+            },
+          },
+          {
+            address: {
+              city: 'London',
+            },
+          },
+        ],
       },
       {
-        address: {
-          city: 'London',
-        },
-      },
-      {
-        name: 'Jane Doe',
-        address: {
-        },
-      },
-      {
-        name: 'Jane Smith',
-        address: {
-          city: 'Berlin'
-        },
+        department_employees: [
+          {
+            name: 'Jane Doe',
+            address: {
+            },
+          },
+          {
+            name: 'Jane Smith',
+            address: {
+              city: 'Berlin',
+            },
+          },
+        ],
       },
     ],
   };
 
-  const validationResult = validate(Department, data);
+  const validationResult = validate(Organization, data);
 
-  console.log(validationResult); // [ ValidationError { message: 'Property is required', path: "department_employees.[1].name" }, ValidationError { message: "Property is required", path: "department_employees.[2].address.city" } ]
+  console.log(validationResult); // [ ValidationError { message: 'Property is required', path: "departments.[0].department_employees.[1].name" }, ValidationError { message: "Property is required", path: "departments.[1].department_employees.[0].address.city" } ]
+}).run();
 
-})();
-
-// Custom validator
-(() => {
-
-  console.log('Custom validator');
+new Sample('Custom validator', () => {
 
   class VINValidator extends Validator {
-    public validate(value: any, path: string): ValidationError | undefined {
+    public validate(value: unknown, path: string): ValidationError | undefined {
       if (typeof value !== 'string') {
         return;
       }
@@ -848,20 +858,16 @@ import {
   class Vehicle {
     @property()
     @propertyValidators([VINValidator])
-    public vin: string;
+    public declare vin: string;
   }
 
   const validationResult = validate(Vehicle, { vin: '345435' });
 
   console.log(validationResult); // [ ValidationError { message: "Invalid VIN", path: "vin" } ]
 
+}).run();
 
-})();
-
-// Custom validation error
-(() => {
-
-  console.log('Custom validation error');
+new Sample('Custom validation error', () => {
 
   class PasswordCriticalValidationError extends ValidationError {
     constructor(
@@ -870,6 +876,7 @@ import {
       super('Password too short', path);
     }
   }
+
   class PasswordWarnValidationError extends ValidationError {
     constructor(
       path: string,
@@ -880,7 +887,7 @@ import {
 
   class PasswordValidator extends Validator {
 
-    public validate(value: any, path: string): ValidationError | undefined {
+    public validate(value: unknown, path: string): ValidationError | undefined {
       if (typeof value !== 'string') {
         return;
       }
@@ -898,7 +905,7 @@ import {
   class LoginCredentials {
     @property()
     @propertyValidators([PasswordValidator])
-    public password: string;
+    public declare password: string;
   }
 
   const shortPasswordResult = validate(LoginCredentials, { password: '123' });
@@ -910,4 +917,4 @@ import {
   const criticalErrors = weakPasswordResult.filter(error => !(error instanceof PasswordWarnValidationError));
   console.log(criticalErrors); // []
 
-})();
+}).run();

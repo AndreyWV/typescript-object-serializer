@@ -1,7 +1,7 @@
-import { property } from '../src/decorators/property';
-import { propertyType } from '../src/decorators/property-type';
-import { clone } from '../src/methods/clone';
-import { create } from '../src/methods/create';
+import { property } from '../src/core/decorators/property';
+import { propertyType } from '../src/core/decorators/property-type';
+import { clone } from '../src/core/methods/clone';
+import { create } from '../src/core/methods/create';
 import { SerializableObject } from '../src/serializable-object';
 
 describe('Clone', () => {
@@ -9,17 +9,17 @@ describe('Clone', () => {
   describe('descendant of SerializableObject', () => {
     class Property extends SerializableObject {
       @property()
-      public deepProperty: string;
+      public declare deepProperty: string;
     }
 
     class Test extends SerializableObject {
       @property()
       @propertyType(Property)
-      public property: Property;
+      public declare property: Property;
 
       @property()
       @propertyType(Property)
-      public arrayOfProperty: Property[];
+      public declare arrayOfProperty: Property[];
     }
 
     it('should return new class instance with same values', () => {
@@ -55,17 +55,17 @@ describe('Clone', () => {
   describe('simple class', () => {
     class Property {
       @property()
-      public deepProperty: string;
+      public declare deepProperty: string;
     }
 
     class Test {
       @property()
       @propertyType(Property)
-      public property: Property;
+      public declare property: Property;
 
       @property()
       @propertyType(Property)
-      public arrayOfProperty: Property[];
+      public declare arrayOfProperty: Property[];
     }
 
     it('should return new class instance with same values', () => {

@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.0.0 (2025-12-10)
+v2 focuses on a more declarative API and stronger type checking
+1. Added a base class and decorator for value modifiers
+2. Changed propertyType decorator with a condition - each class requires its own condition
+3. All data/value types (at Extractor|Modifier|Validator) are now declared as `unknown` instead of `any`. This is required for better type checking and to reduce runtime errors
+4. The method for creating an instance of a serializable class now expects all required properties of the class. Partial instance creation is also allowed by the `createPartial` function, but this does not guarantee that all properties will be defined
+5. Removed useless Extractor generic type
+6. Migrated from webpack to TypeScript compiler (`tsc`)
+
 ## 1.2.2 (2024-07-12)
 
 - Bugfix: Issue 44 - Fixed StringLengthValidator - validation on borders

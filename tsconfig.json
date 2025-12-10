@@ -2,31 +2,39 @@
     "compileOnSave": false,
     "compilerOptions": {
         "baseUrl": ".",
+        "declaration": true,
+        "emitDecoratorMetadata": true,
+        "esModuleInterop": true,
+        "experimentalDecorators": true,
+        "lib": [
+            "ES2015",
+            "ES2017",
+            "ES2018",
+            "ESNext",
+            "dom"
+        ],
+        "module": "CommonJS",
+        "moduleResolution": "node",
+        "noImplicitAny": true,
         "outDir": "./dist",
         "sourceMap": true,
-        "moduleResolution": "node",
-        "module": "CommonJS",
-        "emitDecoratorMetadata": true,
-        "experimentalDecorators": true,
-        "declaration": true,
         "strict": true,
-        "strictPropertyInitialization": false,
-        "noImplicitAny": true,
+        "strictBindCallApply": true,
+        "strictFunctionTypes": true,
+        "strictNullChecks": true,
+        "strictPropertyInitialization": true,
         "target": "es2015",
-        "lib": [
-            "es2015",
-            "es2017",
-            "es2018",
-            "esnext",
-            "dom"
+        "types": [
+            "reflect-metadata",
+            "jest"
         ]
     },
+    "exclude": [
+        "node_modules"
+    ],
     "include": [
         "src",
         "playground",
         "tests"
-    ],
-    "exclude": [
-        "node_modules"
     ]
 }

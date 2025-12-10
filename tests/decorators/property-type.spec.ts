@@ -1,7 +1,9 @@
-import { property } from '../../src/decorators/property';
-import { propertyType } from '../../src/decorators/property-type';
-import { deserialize } from '../../src/methods/deserialize';
+import { property } from '../../src/core/decorators/property';
+import { propertyType } from '../../src/core/decorators/property-type';
+import { deserialize } from '../../src/core/methods/deserialize';
+import { TypesClassStore } from '../../src/core/store/types-store';
 import { SerializableObject } from '../../src/serializable-object';
+import { Constructor } from '../../src/utils/constructor';
 
 describe('Decorator @propertyType', () => {
 
@@ -9,12 +11,12 @@ describe('Decorator @propertyType', () => {
 
     class TestProperty extends SerializableObject {
       @property()
-      public value: string;
+      public declare value: string;
     }
 
     class SuccessResult extends SerializableObject {
       @property()
-      public data?: any;
+      public data?: unknown;
     }
     class FailedResult extends SerializableObject {
       @property()
@@ -25,19 +27,45 @@ describe('Decorator @propertyType', () => {
 
       @property()
       @propertyType(TestProperty)
-      public property: any;
+      public property: unknown;
 
       @property()
       @propertyType(TestProperty)
-      public arrayProperty: TestProperty[];
+      public declare arrayProperty: TestProperty[];
 
       @property()
-      @propertyType((value: any) => value?.success ? SuccessResult : FailedResult)
-      public conditionalPropertyType: SuccessResult | FailedResult;
+      @propertyType(
+        SuccessResult,
+        (value: unknown) => Boolean(
+          typeof value === 'object'
+          && (value as Record<string, unknown>)?.success,
+        ),
+      )
+      @propertyType(
+        FailedResult,
+        (value: unknown) => Boolean(
+          typeof value === 'object'
+          && !(value as Record<string, unknown>)?.success,
+        ),
+      )
+      public declare conditionalPropertyType: SuccessResult | FailedResult;
 
       @property()
-      @propertyType((value: any) => value?.success ? SuccessResult : FailedResult)
-      public arrayWithConditionalPropertyType: Array<SuccessResult | FailedResult>;
+      @propertyType(
+        SuccessResult,
+        (value: unknown) => Boolean(
+          typeof value === 'object'
+          && (value as Record<string, unknown>)?.success,
+        ),
+      )
+      @propertyType(
+        FailedResult,
+        (value: unknown) => Boolean(
+          typeof value === 'object'
+          && !(value as Record<string, unknown>)?.success,
+        ),
+      )
+      public declare arrayWithConditionalPropertyType: Array<SuccessResult | FailedResult>;
 
     }
 
@@ -113,18 +141,59 @@ describe('Decorator @propertyType', () => {
 
     });
 
+    it('should override default type in extended class if declared in parent class', () => {
+
+      class BaseProperty extends SerializableObject {
+        @property()
+        public declare value: string;
+      }
+
+      class ExtendedProperty extends BaseProperty {
+        @property()
+        public declare extendedProperty: string;
+      }
+
+      class TestBase extends SerializableObject {
+        @property()
+        @propertyType(BaseProperty)
+        public declare property: BaseProperty;
+      }
+
+      class TestExtended extends TestBase {
+        @property()
+        @propertyType(ExtendedProperty)
+        public declare property: ExtendedProperty;
+      }
+
+      const propertiesStore = new TypesClassStore(TestExtended as unknown as Constructor<never>)
+        .getStoreMapOrDeclareFromParent();
+
+      let propertyTypeMap = propertiesStore.get('property');
+
+      expect(propertyTypeMap?.size).toBe(1);
+
+      const parentPropertiesStore = new TypesClassStore(TestBase as unknown as Constructor<never>)
+        .getStoreMapOrDeclareFromParent();
+
+      let parentPropertyTypeMap = parentPropertiesStore.get('property');
+
+      expect(Array.from(parentPropertyTypeMap?.keys() ?? [])[0] as never)
+        .toBe(BaseProperty);
+
+    });
+
   });
 
   describe('in simple serializable class', () => {
 
     class TestProperty {
       @property()
-      public value: string;
+      public declare value: string;
     }
 
     class SuccessResult {
       @property()
-      public data?: any;
+      public data?: unknown;
     }
     class FailedResult {
       @property()
@@ -135,19 +204,45 @@ describe('Decorator @propertyType', () => {
 
       @property()
       @propertyType(TestProperty)
-      public property: any;
+      public property: unknown;
 
       @property()
       @propertyType(TestProperty)
-      public arrayProperty: TestProperty[];
+      public declare arrayProperty: TestProperty[];
 
       @property()
-      @propertyType((value: any) => value?.success ? SuccessResult : FailedResult)
-      public conditionalPropertyType: SuccessResult | FailedResult;
+      @propertyType(
+        SuccessResult,
+        (value: unknown) => Boolean(
+          typeof value === 'object'
+          && (value as Record<string, unknown>)?.success,
+        ),
+      )
+      @propertyType(
+        FailedResult,
+        (value: unknown) => Boolean(
+          typeof value === 'object'
+          && !(value as Record<string, unknown>)?.success,
+        ),
+      )
+      public declare conditionalPropertyType: SuccessResult | FailedResult;
 
       @property()
-      @propertyType((value: any) => value?.success ? SuccessResult : FailedResult)
-      public arrayWithConditionalPropertyType: Array<SuccessResult | FailedResult>;
+      @propertyType(
+        SuccessResult,
+        (value: unknown) => Boolean(
+          typeof value === 'object'
+          && (value as Record<string, unknown>)?.success,
+        ),
+      )
+      @propertyType(
+        FailedResult,
+        (value: unknown) => Boolean(
+          typeof value === 'object'
+          && !(value as Record<string, unknown>)?.success,
+        ),
+      )
+      public declare arrayWithConditionalPropertyType: Array<SuccessResult | FailedResult>;
 
     }
 
@@ -220,6 +315,47 @@ describe('Decorator @propertyType', () => {
         expect(deserialized.arrayWithConditionalPropertyType[0]).toBeInstanceOf(SuccessResult);
         expect(deserialized.arrayWithConditionalPropertyType[1]).toBeInstanceOf(FailedResult);
       });
+
+    });
+
+    it('should override default type in extended class if declared in parent class', () => {
+
+      class BaseProperty {
+        @property()
+        public declare value: string;
+      }
+
+      class ExtendedProperty extends BaseProperty {
+        @property()
+        public declare extendedProperty: string;
+      }
+
+      class TestBase {
+        @property()
+        @propertyType(BaseProperty)
+        public declare property: BaseProperty;
+      }
+
+      class TestExtended extends TestBase {
+        @property()
+        @propertyType(ExtendedProperty)
+        public declare property: ExtendedProperty;
+      }
+
+      const propertiesStore = new TypesClassStore(TestExtended as Constructor<never>)
+        .getStoreMapOrDeclareFromParent();
+
+      let propertyTypeMap = propertiesStore.get('property');
+
+      expect(propertyTypeMap?.size).toBe(1);
+
+      const parentPropertiesStore = new TypesClassStore(TestBase as Constructor<never>)
+        .getStoreMapOrDeclareFromParent();
+
+      let parentPropertyTypeMap = parentPropertiesStore.get('property');
+
+      expect(Array.from(parentPropertyTypeMap?.keys() ?? [])[0] as never)
+        .toBe(BaseProperty);
 
     });
 

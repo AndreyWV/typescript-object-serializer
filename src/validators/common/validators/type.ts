@@ -1,0 +1,88 @@
+import { Constructor } from '../../../utils/constructor';
+import { ValidationError } from '../../core/types/validation-error';
+import { Validator } from '../../core/types/validator';
+
+/**
+ * @class TypeValidator Validates that the value is of the specified type.
+ * @example
+ * class SomeClass extends SerializableObject {
+ *
+ *   @property()
+ *   @propertyValidators([TypeValidator.Number()])
+ *   public numberProperty: number;
+ *
+ *   @property()
+ *   @propertyValidators([TypeValidator.String()])
+ *   public stringProperty: string;
+ *
+ *   @property()
+ *   @propertyValidators([TypeValidator.Boolean()])
+ *   public booleanProperty: boolean;
+ *
+ *   @property()
+ *   @propertyValidators([TypeValidator.Object()])
+ *   public someObjectProperty: any;
+ *
+ * }
+ *
+ * This Validator doesn't return validation error if value is empty or null.
+ */
+export abstract class TypeValidator extends Validator {
+
+  protected isEmpty(value: unknown): boolean {
+    return value === undefined || value === null;
+  }
+
+  public static String(): Constructor<TypeValidator> {
+    return class extends TypeValidator {
+      public validate(value: unknown, path: string): ValidationError | undefined {
+        if (this.isEmpty(value)) {
+          return;
+        }
+        if (typeof value !== 'string') {
+          return new ValidationError('Value must be of type String', path);
+        }
+      }
+    };
+  }
+
+  public static Number(): Constructor<TypeValidator> {
+    return class extends TypeValidator {
+      public validate(value: unknown, path: string): ValidationError | undefined {
+        if (this.isEmpty(value)) {
+          return;
+        }
+        if (typeof value !== 'number') {
+          return new ValidationError('Value must be of type Number', path);
+        }
+      }
+    };
+  }
+
+  public static Boolean(): Constructor<TypeValidator> {
+    return class extends TypeValidator {
+      public validate(value: unknown, path: string): ValidationError | undefined {
+        if (this.isEmpty(value)) {
+          return;
+        }
+        if (typeof value !== 'boolean') {
+          return new ValidationError('Value must be of type Boolean', path);
+        }
+      }
+    };
+  }
+
+  public static Object(): Constructor<TypeValidator> {
+    return class extends TypeValidator {
+      public validate(value: unknown, path: string): ValidationError | undefined {
+        if (this.isEmpty(value)) {
+          return;
+        }
+        if (typeof value !== 'object') {
+          return new ValidationError('Value must be of type Object', path);
+        }
+      }
+    };
+  }
+
+}

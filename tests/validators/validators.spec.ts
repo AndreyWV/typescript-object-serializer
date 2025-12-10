@@ -1,8 +1,8 @@
-import { NumberValueValidator } from '../../src/validators/validators/number-value';
-import { StringRegexpValidator } from '../../src/validators/validators/regexp';
-import { RequiredValidator } from '../../src/validators/validators/required';
-import { StringLengthValidator } from '../../src/validators/validators/string-length';
-import { TypeValidator } from '../../src/validators/validators/type';
+import { NumberValueValidator } from '../../src/validators/common/validators/number-value';
+import { StringRegexpValidator } from '../../src/validators/common/validators/regexp';
+import { RequiredValidator } from '../../src/validators/common/validators/required';
+import { StringLengthValidator } from '../../src/validators/common/validators/string-length';
+import { TypeValidator } from '../../src/validators/common/validators/type';
 
 describe('RequiredValidator', () => {
 

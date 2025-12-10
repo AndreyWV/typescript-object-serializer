@@ -1,6 +1,6 @@
-import { property } from '../src/decorators/property';
-import { deserialize } from '../src/methods/deserialize';
-import { serialize } from '../src/methods/serialize';
+import { property } from '../src/core/decorators/property';
+import { deserialize } from '../src/core/methods/deserialize';
+import { serialize } from '../src/core/methods/serialize';
 import { SerializableObject } from '../src/serializable-object';
 
 describe('Serializable class constructor', () => {
@@ -10,12 +10,12 @@ describe('Serializable class constructor', () => {
     it('descendant of SerializableObject', () => {
       class Person extends SerializableObject {
         @property()
-        public name: string;
+        public declare name: string;
       }
 
       class User extends Person {
         @property()
-        public id: number;
+        public declare id: number;
       }
 
       const user = User.deserialize({
@@ -33,12 +33,12 @@ describe('Serializable class constructor', () => {
     it('simple class', () => {
       class Person {
         @property()
-        public name: string;
+        public declare name: string;
       }
 
       class User extends Person {
         @property()
-        public id: number;
+        public declare id: number;
       }
 
       const user = deserialize(User, {

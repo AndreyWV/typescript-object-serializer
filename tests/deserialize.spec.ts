@@ -1,7 +1,7 @@
-import { property } from '../src/decorators/property';
-import { propertyType } from '../src/decorators/property-type';
-import { create } from '../src/methods/create';
-import { deserialize } from '../src/methods/deserialize';
+import { property } from '../src/core/decorators/property';
+import { propertyType } from '../src/core/decorators/property-type';
+import { create } from '../src/core/methods/create';
+import { deserialize } from '../src/core/methods/deserialize';
 import {
   NonArrayDataError,
   SerializableObject,
@@ -16,9 +16,9 @@ describe('Deserialize', () => {
       public stringProperty: string = 'test';
 
       @property()
-      public numberProperty: number;
+      public declare numberProperty: number;
 
-      public nonSerializableProperty: string;
+      public declare nonSerializableProperty: string;
     }
 
     it('should deserialize data', () => {
@@ -63,12 +63,12 @@ describe('Deserialize', () => {
 
     it('should deserialize array of objects without serializable type', () => {
 
-      class Test extends SerializableObject {
+      class Test2 extends SerializableObject {
         @property()
-        public list: any[];
+        public declare list: any[];
       }
 
-      const instance = Test.deserialize({
+      const instance = Test2.deserialize({
         list: [
           {
             property: 123,
@@ -102,9 +102,9 @@ describe('Deserialize', () => {
       public stringProperty: string = 'test';
 
       @property()
-      public numberProperty: number;
+      public declare numberProperty: number;
 
-      public nonSerializableProperty: string;
+      public declare nonSerializableProperty: string;
     }
 
     it('should deserialize data', () => {
@@ -149,12 +149,12 @@ describe('Deserialize', () => {
 
     it('should deserialize array of objects without serializable type', () => {
 
-      class Test {
+      class Test2 {
         @property()
-        public list: any[];
+        public declare list: any[];
       }
 
-      const instance = deserialize(Test, {
+      const instance = deserialize(Test2, {
         list: [
           {
             property: 123,
@@ -187,13 +187,13 @@ describe('Deserialize', () => {
 
       class DeepNestedProperty extends SerializableObject {
         @property()
-        public property: string;
+        public declare property: string;
       }
 
       class NestedProperty extends SerializableObject {
         @property()
         @propertyType(DeepNestedProperty)
-        public deepNestedProperty: DeepNestedProperty;
+        public declare deepNestedProperty: DeepNestedProperty;
 
         @property()
         @propertyType(DeepNestedProperty)
@@ -205,7 +205,7 @@ describe('Deserialize', () => {
       class Test extends SerializableObject {
         @property()
         @propertyType(NestedProperty)
-        public nestedProperty: NestedProperty;
+        public declare nestedProperty: NestedProperty;
       }
 
       it('should deserialize data', () => {
@@ -224,7 +224,7 @@ describe('Deserialize', () => {
 
       it('should apply default value of property if it defined and value of serialized property not passed', () => {
         const deserialized = Test.deserialize({
-          nestedProperty: {}
+          nestedProperty: {},
         });
         expect(deserialized.nestedProperty.deepNestedPropertyWithDefaultValue).toBeInstanceOf(DeepNestedProperty);
         expect(deserialized.nestedProperty.deepNestedPropertyWithDefaultValue.property).toBe('default');
@@ -245,13 +245,13 @@ describe('Deserialize', () => {
 
       class DeepNestedProperty {
         @property()
-        public property: string;
+        public declare property: string;
       }
 
       class NestedProperty {
         @property()
         @propertyType(DeepNestedProperty)
-        public deepNestedProperty: DeepNestedProperty;
+        public declare deepNestedProperty: DeepNestedProperty;
 
         @property()
         @propertyType(DeepNestedProperty)
@@ -263,7 +263,7 @@ describe('Deserialize', () => {
       class Test {
         @property()
         @propertyType(NestedProperty)
-        public nestedProperty: NestedProperty;
+        public declare nestedProperty: NestedProperty;
       }
 
       it('should deserialize data', () => {
@@ -282,7 +282,7 @@ describe('Deserialize', () => {
 
       it('should apply default value of property if it defined and value of serialized property not passed', () => {
         const deserialized = deserialize(Test, {
-          nestedProperty: {}
+          nestedProperty: {},
         });
         expect(deserialized.nestedProperty.deepNestedPropertyWithDefaultValue).toBeInstanceOf(DeepNestedProperty);
         expect(deserialized.nestedProperty.deepNestedPropertyWithDefaultValue.property).toBe('default');
@@ -307,7 +307,7 @@ describe('Deserialize', () => {
 
       class ArrayItem extends SerializableObject {
         @property()
-        public value: number;
+        public declare value: number;
       }
 
       const defaultArray: ArrayItem[] = [];
@@ -347,13 +347,46 @@ describe('Deserialize', () => {
         expect(deserialized.property).toBe(null);
       });
 
+      it('should deserialize data with extended item class', () => {
+
+        class ArrayItemExtended extends ArrayItem {
+          @property()
+          public declare extendedProperty: string;
+        }
+
+        class TestExtended extends Test {
+          @property()
+          @propertyType(ArrayItemExtended)
+          public declare property: ArrayItemExtended[];
+        }
+
+        const deserialized = TestExtended.deserialize({
+          property: [
+            {
+              value: 1,
+              extendedProperty: 'test1',
+            },
+            {
+              value: 2,
+              extendedProperty: 'test2',
+            },
+          ],
+        });
+
+        expect(deserialized.property.length).toBe(2);
+        expect(deserialized.property[0]).toBeInstanceOf(ArrayItem);
+        expect(deserialized.property[0]).toBeInstanceOf(ArrayItemExtended);
+        expect(deserialized.property[0].value).toBe(1);
+        expect(deserialized.property[0].extendedProperty).toBe('test1');
+      });
+
     });
 
     describe('simple class', () => {
 
       class ArrayItem {
         @property()
-        public value: number;
+        public declare value: number;
       }
 
       const defaultArray: ArrayItem[] = [];
@@ -393,6 +426,39 @@ describe('Deserialize', () => {
         expect(deserialized.property).toBe(null);
       });
 
+      it('should deserialize data with extended item class', () => {
+
+        class ArrayItemExtended extends ArrayItem {
+          @property()
+          public declare extendedProperty: string;
+        }
+
+        class TestExtended extends Test {
+          @property()
+          @propertyType(ArrayItemExtended)
+          public declare property: ArrayItemExtended[];
+        }
+
+        const deserialized = deserialize(TestExtended, {
+          property: [
+            {
+              value: 1,
+              extendedProperty: 'test1',
+            },
+            {
+              value: 2,
+              extendedProperty: 'test2',
+            },
+          ],
+        });
+
+        expect(deserialized.property.length).toBe(2);
+        expect(deserialized.property[0]).toBeInstanceOf(ArrayItem);
+        expect(deserialized.property[0]).toBeInstanceOf(ArrayItemExtended);
+        expect(deserialized.property[0].value).toBe(1);
+        expect(deserialized.property[0].extendedProperty).toBe('test1');
+      });
+
     });
 
   });
@@ -403,7 +469,7 @@ describe('Deserialize', () => {
 
       class Test extends SerializableObject {
         @property()
-        public property: any[];
+        public declare property: any[];
       }
 
       it('should deserialize array data directly', () => {
@@ -427,7 +493,7 @@ describe('Deserialize', () => {
 
       class Test {
         @property()
-        public property: any[];
+        public declare property: any[];
       }
 
       it('should deserialize array data directly', () => {
@@ -453,7 +519,7 @@ describe('Deserialize', () => {
 
     class Test extends SerializableObject {
       @property()
-      public property: string;
+      public declare property: string;
     }
 
     it('should deserialize array of serializable items', () => {
@@ -474,7 +540,7 @@ describe('Deserialize', () => {
 
       expect(() => {
         return Test.deserializeArray({} as any);
-      }).toThrowError(NonArrayDataError);
+      }).toThrow(new NonArrayDataError());
 
     });
 
@@ -483,7 +549,7 @@ describe('Deserialize', () => {
   it('should return basic class instance if passed not-serializable class constructor', () => {
 
     class Test {
-      public property: string;
+      public declare property: string;
     }
 
     const instance = deserialize(Test, {
@@ -492,6 +558,62 @@ describe('Deserialize', () => {
 
     expect(instance).toEqual(new Test());
     expect(instance.property).toBeUndefined();
+
+  });
+
+  it('should deserialize conditional property types regardless of decorators order', () => {
+
+    class SuccessResult {
+      @property()
+      public declare data: Record<string, unknown>;
+    }
+    class FailedResult {
+      @property()
+      public declare error: string;
+    }
+    class UnmatchedResult {
+    }
+
+    class Results {
+
+      @property()
+      @property()
+      @propertyType(SuccessResult, (value: unknown) => typeof value === 'object'
+        && value !== null
+        && 'state' in value
+        && value.state === 'SUCCESS',
+      )
+      @propertyType(UnmatchedResult)
+      @propertyType(FailedResult, (value: unknown) => typeof value === 'object'
+        && value !== null
+        && 'state' in value
+        && value.state === 'FAIL',
+      )
+      public declare results: Array<SuccessResult | FailedResult | UnmatchedResult>;
+
+    }
+
+    const results = deserialize(Results, {
+      results: [
+        {
+          state: 'SUCCESS',
+          data: {
+            some_data: 'data',
+          },
+        },
+        {
+          state: 'FAIL',
+          error: 'result error',
+        },
+        {
+          state: 'UNKNOWN',
+        },
+      ],
+    });
+
+    expect(results.results[0]).toBeInstanceOf(SuccessResult);
+    expect(results.results[1]).toBeInstanceOf(FailedResult);
+    expect(results.results[2]).toBeInstanceOf(UnmatchedResult);
 
   });
 
