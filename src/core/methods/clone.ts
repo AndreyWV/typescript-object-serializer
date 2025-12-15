@@ -31,15 +31,23 @@ class ObjectCloner<T extends object> {
   }
 
   private static cloneValue<U>(value: U): U {
-    const isValueHasSerializableProperties = Boolean(
-      new ExtractorsClassStore((value as any)?.constructor)
-        .findStoreMap(),
-    );
+    const isValueHasSerializableProperties = new ExtractorsClassStore((value as any)?.constructor)
+      .findStoreMap() !== undefined;
     if (Array.isArray(value)) {
       return value
         .map(
-          item => new ObjectCloner(item)
-            .clone(),
+          item => {
+
+            const isItemHasSerializableProperties = new ExtractorsClassStore((item as any)?.constructor)
+              .findStoreMap() !== undefined;
+
+            if (!isItemHasSerializableProperties) {
+              return item;
+            }
+
+            return new ObjectCloner(item)
+              .clone();
+          },
         ) as U;
     } else if (isValueHasSerializableProperties) {
       return new ObjectCloner(value as any)
