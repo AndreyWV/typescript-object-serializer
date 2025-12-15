@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.0.1 (2025-12-15)
+- Bugfix: Issue 51 - Fixed cloning array of items as property with basic types (boolean | string | number).
+
 ## 2.0.0 (2025-12-10)
 v2 focuses on a more declarative API and stronger type checking
 1. Added a base class and decorator for value modifiers
