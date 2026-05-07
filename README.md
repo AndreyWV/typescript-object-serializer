@@ -1,5 +1,5 @@
 # typescript-object-serializer
-Typescript library to convert javascript object to typescript class and vice versa
+TypeScript library to convert JavaScript object to TypeScript class and vice versa
 
 [CHANGELOG](CHANGELOG.md)<br>
 [Useful snippets](https://github.com/AndreyWV/typescript-object-serializer/wiki)<br>
@@ -9,7 +9,7 @@ Typescript library to convert javascript object to typescript class and vice ver
 ```sh
 > npm install typescript-object-serializer
 ```
-Required configure `tsconfig.json`:
+Requires `tsconfig.json` configuration:
 ```json
 {
     "compilerOptions": {
@@ -18,7 +18,7 @@ Required configure `tsconfig.json`:
 }
 ```
 And it is ready to use!
-**If necessary enable auto-detection types of serializable properties:** - required additional configuration:
+**If necessary, enable auto-detection of serializable property types: required additional configuration:**
 1. Install `reflect-metadata` dependency:
 ```sh
 > npm install reflect-metadata
@@ -32,7 +32,7 @@ And it is ready to use!
     }
 }
 ```
-3. Import `reflect-metadata` in `polyfills.ts` or in top of `index.ts` file
+3. Import `reflect-metadata` in `polyfills.ts` or at the top of `index.ts` file
 ```typescript
 import 'reflect-metadata';
 ```
@@ -65,7 +65,7 @@ const person = deserialize(Person, {
 console.log(person instanceof Person); // true
 console.log(person.name); // "John"
 console.log(person.lastName); // "Doe"
-console.log(serialize(person)) // { name: "John", last_name: "Doe" }
+console.log(serialize(person)); // { name: "John", last_name: "Doe" }
 ```
 
 ### Deep serializable property
@@ -244,7 +244,7 @@ const department = deserialize(Department, {
   ],
 });
 
-console.dir(department, { depth: 3 }); // Department { title: "Department title", employees [ Employee { id: 1, person: Person { name: "John", lastName: "Doe" } }, Employee { id: 2, person: Person { name: "Jane", lastName: "Doe" } } ] }
+console.dir(department, { depth: 3 }); // Department { title: "Department title", employees: [ Employee { id: 1, person: Person { name: "John", lastName: "Doe" } }, Employee { id: 2, person: Person { name: "Jane", lastName: "Doe" } } ] }
 console.dir(serialize(department), { depth: 3 }); // {title: "Department title", employees: [{id: 1, person: {name: "John", last_name: "Doe"}}, {id: 2, person: {name: "Jane", last_name: "Doe"}}]}
 ```
 
@@ -357,7 +357,7 @@ class Employee {
 class Department {
 
   @property()
-  @propertyType(Employee) // <- Required because not possible to detect type from property declaration (property metadata seems like Array)
+  @propertyType(Employee) // <- Required because not possible to detect type from property declaration (property metadata appears to be Array)
   public declare employees: Employee[];
 
 }
@@ -439,6 +439,7 @@ class ResultsWithStrictTypeCheck {
 ```typescript
 import {
   create,
+  createPartial,
   property,
 } from 'typescript-object-serializer';
 
@@ -562,6 +563,8 @@ console.log(serialize(person)); // { age: "25" }
 import {
   serialize,
   deserialize,
+  modifier,
+  Modifier,
   property,
   StraightExtractor,
 } from 'typescript-object-serializer';
@@ -589,7 +592,7 @@ const person = create(Person, {
 console.log(person); // Person { birthDate: "2000-05-06"}
 console.log(serialize(person)); // { birthDate: "2000-05-06T00:00:00.000Z" }
 ```
-3. Modification also handful to serialize non-json values like Date, or custom non-serializable classes
+3. Modification also handy to serialize non-json values like Date, or custom non-serializable classes
 
 ## Advanced usage
 ### Custom extractor
@@ -598,6 +601,7 @@ It is possible to develop your own extractor according to your needs
 ```typescript
 import {
   deserialize,
+  Modifier,
   property,
   SnakeCaseExtractor,
 } from 'typescript-object-serializer';
@@ -732,13 +736,13 @@ const person = deserialize(Person, {
   data: {
     person: {
       age: '25',
-      last_name: 'John',
-      first_name: 'Doe',
+      last_name: 'Doe',
+      first_name: 'John',
     },
   },
 });
 
-console.log(person); // Person { lastName: "John", id: 123, age: 25, firstName: "Doe" }
+console.log(person); // Person { lastName: "Doe", id: 123, age: 25, firstName: "John" }
 
 console.log(serialize(person)); // { id : 123, data: { person: {age: "25", last_name: "John", first_name: "Doe" } } }
 ```
@@ -774,7 +778,7 @@ console.log(department); // Department { id: 123, title: "Department title" }
 
 console.log(serialize(department)); // { title: "Department title" }
 ```
-**Example 2**: Using modificator (Recommended)
+**Example 2**: Using modifier (Recommended)
 ```typescript
 import {
   deserialize,
@@ -856,7 +860,7 @@ console.log(deserialized); // PersonWithSetter { firstName: "John", lastName: "D
 ```
 
 # Syntactic sugar: `SerializableObject`
-Class `SerializebleObject` for easy access to serializer methods like `serialize`, `deserialize`, `create`, `clone`, `deserializeArray`. it makes possible to import `'typescript-object-serializer'` only at class declaration file but not to import it where serialization/deserialization used.
+Class `SerializableObject` for easy access to serializer methods like `serialize`, `deserialize`, `create`, `clone`, `deserializeArray`. it makes possible to import `'typescript-object-serializer'` only at class declaration file but not to import it where serialization/deserialization used.
 ```typescript
 import {
   SerializableObject,
@@ -926,6 +930,7 @@ console.log(resultEmpty); // [ ValidationError { message: "Property length shoul
 ## Deep validation
 ```typescript
 import {
+  OverrideNameExtractor,
   property,
   propertyType,
   SnakeCaseExtractor,
@@ -1100,3 +1105,20 @@ console.log(weakPasswordResult); // [ PasswordWarnValidationError { message: "Pa
 const criticalErrors = weakPasswordResult.filter(error => !(error instanceof PasswordWarnValidationError));
 console.log(criticalErrors); // []
 ```
+
+# For AI Agents and LLM
+If you are using an AI agent (like GitHub Copilot, Cursor, or ChatGPT) to generate code using this library, provide it with the following context to ensure correct implementation:
+
+## Core Rules for Code Generation
+- **Decorator-Based**: Always use the `@property()` decorator for any class property that should be serialized or deserialized.
+- **Property Initialization**: Use the `public declare propertyName: type;` syntax to avoid issues with property initialization in TypeScript.
+- **Nested Objects**: For nested serializable objects, use `@propertyType(Class)` if auto-detection is not configured or for arrays.
+- **Naming Conventions**: Use `SnakeCaseExtractor` for camelCase (TS) to snake_case (JSON) mapping.
+- **Modifying Values**: Use `@modifier(ModifierClass)` for type conversions (e.g., `String` to `Number`) or formatting (e.g., Dates).
+
+## Configuration Requirement
+The library requires `experimentalDecorators: true` in `tsconfig.json`. If the agent suggests auto-detection of types, remind it that `emitDecoratorMetadata: true` and `reflect-metadata` must also be present.
+
+## Common Patterns
+- **Base Class**: Recommend extending `SerializableObject` for a cleaner API (`Item.deserialize(data)`).
+- **Validation**: Use `validate(Class, data)` from `typescript-object-serializer/validators` to check data integrity before deserialization.

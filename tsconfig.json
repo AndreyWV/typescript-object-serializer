@@ -17,7 +17,7 @@
         "moduleResolution": "NodeNext",
         "noImplicitAny": true,
         "outDir": "./dist",
-        "rootDir": "./",
+        "rootDir": "./src",
         "sourceMap": true,
         "strict": true,
         "strictBindCallApply": true,

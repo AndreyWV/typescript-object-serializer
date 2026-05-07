@@ -621,13 +621,13 @@ new Sample('DeepExtractor', () => {
     data: {
       person: {
         age: '25',
-        last_name: 'John',
-        first_name: 'Doe',
+        last_name: 'Doe',
+        first_name: 'John',
       },
     },
   });
 
-  console.log(person); // Person { lastName: "John", id: 123, age: 25, firstName: "Doe" }
+  console.log(person); // Person { lastName: "Doe", id: 123, age: 25, firstName: "John" }
 
   console.log(serialize(person)); // { id : 123, data: { person: {age: "25", last_name: "John", first_name: "Doe" } } }
 }).run();
