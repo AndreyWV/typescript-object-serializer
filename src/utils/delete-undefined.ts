@@ -6,7 +6,7 @@ export function deleteUndefinedRecursive<T extends object>(sourceObject: T): T {
 
   }
 
-  const resultObject: T = {} as any;
+  const resultObject = {} as Partial<T>;
 
   (Object.keys(sourceObject) as Array<keyof T>).forEach(key => {
 
@@ -20,10 +20,10 @@ export function deleteUndefinedRecursive<T extends object>(sourceObject: T): T {
 
     }
 
-    resultObject[key] = deleteUndefinedRecursive(sourceObject[key] as any);
+    resultObject[key] = deleteUndefinedRecursive(sourceObject[key] as never);
 
   });
 
-  return resultObject;
+  return resultObject as T;
 
 }

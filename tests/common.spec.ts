@@ -167,7 +167,7 @@ describe('Common', () => {
 
           expect(() => deserialize(Person, {
             fullName: 'John Doe',
-          })).not.toThrowError();
+          })).not.toThrow();
 
         });
 
@@ -220,7 +220,7 @@ describe('Common', () => {
         it('should not throw error on serialize setter property', () => {
 
           const instance = new Person('John', 'Doe');
-          expect(() => serialize(instance)).not.toThrowError();
+          expect(() => serialize(instance)).not.toThrow();
 
         });
 
@@ -481,7 +481,7 @@ describe('Common', () => {
             firstName: 'John',
             lastName: 'Doe',
           });
-          expect(() => serialize(instance)).not.toThrowError();
+          expect(() => serialize(instance)).not.toThrow();
 
         });
 

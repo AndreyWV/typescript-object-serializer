@@ -5,7 +5,7 @@ import { Modifier } from '../types/modifier';
 
 /**
  * @function property Declares serialize/deserialize rules for current property
- * @param ModifierConstructor { Constructor<Modifier> }
+ * @param modifierConstructor { Constructor<Modifier> }
  *   Modifier for additional property processing
  * @example
  * class SomeClass extends SerializableObject {
@@ -26,10 +26,10 @@ import { Modifier } from '../types/modifier';
  */
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export function modifier(
-  ModifierConstructor: Constructor<Modifier>,
+  modifierConstructor: Constructor<Modifier>,
 )/* : PropertyDecorator | ParameterDecorator */ {
 
-  const decorator = new ModifierDecorator(ModifierConstructor);
+  const decorator = new ModifierDecorator(modifierConstructor);
   return decorator.decorate.bind(decorator);
 
 }

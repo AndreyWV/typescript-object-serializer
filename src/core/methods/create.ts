@@ -9,22 +9,22 @@ import { clone } from './clone';
 
 /**
  * @function create Create Serializable class instance
- * @param ObjectConstructor Constructor of serializable class
+ * @param objectConstructor Constructor of serializable class
  * @param data Plain object structured as current class
  * @returns Instance of serializable class constructor
  */
 export function create<T>(
-  ObjectConstructor: Constructor<T>,
+  objectConstructor: Constructor<T>,
   data: RecursiveObject<T>,
 ): T {
 
-  if (data instanceof ObjectConstructor) {
+  if (data instanceof objectConstructor) {
 
     return clone(data);
 
   }
 
-  return new ObjectCreator(ObjectConstructor)
+  return new ObjectCreator(objectConstructor)
     .create(data);
 
 }
@@ -33,16 +33,16 @@ export function create<T>(
  * @function create Create Serializable class instance
  * !IMPORTANT This method get <RecursivePartial> values and set it as is
  *   Prefer to use create() method with strict type checking
- * @param ObjectConstructor Constructor of serializable class
+ * @param objectConstructor Constructor of serializable class
  * @param data Plain object structured as current class
  * @returns Instance of serializable class constructor
  */
 export function createPartial<T>(
-  ObjectConstructor: Constructor<T>,
+  objectConstructor: Constructor<T>,
   data?: RecursivePartial<T>,
 ): T {
 
-  return create(ObjectConstructor, (data ?? {}) as never);
+  return create(objectConstructor, (data ?? {}) as never);
 
 }
 

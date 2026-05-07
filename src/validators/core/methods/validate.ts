@@ -37,18 +37,18 @@ class Validator<T> {
   private declare readonly validatorsStore?: ValidatorsClassStore;
 
   constructor(
-    DataConstructor: Constructor<T>,
+    dataConstructor: Constructor<T>,
   ) {
 
     try {
 
-      this.instance = new DataConstructor();
+      this.instance = new dataConstructor();
 
     } catch { /* empty */ }
-    this.keyTypesStore = new TypesClassStore(DataConstructor as Constructor<never>);
-    this.extractorsStore = new ExtractorsClassStore(DataConstructor as Constructor<never>);
-    this.modifiersStore = new ModifiersClassStore(DataConstructor as Constructor<never>);
-    this.validatorsStore = new ValidatorsClassStore(DataConstructor as Constructor<never>);
+    this.keyTypesStore = new TypesClassStore(dataConstructor as Constructor<never>);
+    this.extractorsStore = new ExtractorsClassStore(dataConstructor as Constructor<never>);
+    this.modifiersStore = new ModifiersClassStore(dataConstructor as Constructor<never>);
+    this.validatorsStore = new ValidatorsClassStore(dataConstructor as Constructor<never>);
 
   }
 
@@ -120,14 +120,14 @@ class Validator<T> {
 
   private extractKey(data: unknown, key: keyof T): ExtractionResult {
 
-    const KeyExtractor = this.extractorsStore!.findStoreMap()!.get(key as string)!;
-    const KeyModifier = this.modifiersStore?.findStoreMap()
+    const keyExtractorConstructor = this.extractorsStore!.findStoreMap()!.get(key as string)!;
+    const keyModifierConstructor = this.modifiersStore?.findStoreMap()
       ?.get(key as string);
 
-    return new KeyExtractor(
+    return new keyExtractorConstructor(
       key as string,
-      KeyModifier
-        ? new KeyModifier()
+      keyModifierConstructor
+        ? new keyModifierConstructor()
         : undefined,
     )
       .extract(data);
@@ -147,7 +147,7 @@ class Validator<T> {
 
     return keyValidators
       .map(
-        KeyValidator => new KeyValidator()
+        keyValidatorConstructor => new keyValidatorConstructor()
           .validate(
             extractionResult.data,
             extractionResult.path,
@@ -180,7 +180,7 @@ class Validator<T> {
       .map(
         item =>
           new Validator(item.itemType!)
-            .validate(item.itemData as any),
+            .validate(item.itemData as unknown),
       )
       .map(
         (itemErrors, itemIndex) => {
@@ -219,17 +219,17 @@ class Validator<T> {
 
     }
 
-    const KeyTypeConstructor = new KeyType(this.keyTypesStore, this.instance as object, key as string | number)
+    const keyTypeConstructor = new KeyType(this.keyTypesStore, this.instance as object, key as string | number)
       .getConstructorForObject(value);
 
-    if (!KeyTypeConstructor) {
+    if (!keyTypeConstructor) {
 
       return [];
 
     }
 
     const isKeyHasSerializableProperties = Boolean(
-      new ExtractorsClassStore(KeyTypeConstructor as Constructor<never>)
+      new ExtractorsClassStore(keyTypeConstructor as Constructor<never>)
         .findStoreMap(),
     );
 
@@ -239,7 +239,7 @@ class Validator<T> {
 
     }
 
-    const validator = new Validator(KeyTypeConstructor as Constructor<never>);
+    const validator = new Validator(keyTypeConstructor as Constructor<never>);
 
     const errors = Array.isArray(value)
       ? validator.validateArray(value as never[])

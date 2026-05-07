@@ -65,15 +65,15 @@ class Deserializer<T> {
 
   private extractData(key: keyof T, data: unknown): unknown {
 
-    const ExtractorConstructor = this.extractorsStore!.findStoreMap()!.get(key);
-    const ModifierConstructor = this.modifiersStore?.findStoreMap()
+    const extractorConstructor = this.extractorsStore!.findStoreMap()!.get(key);
+    const modifierConstructor = this.modifiersStore?.findStoreMap()
       ?.get(key);
 
-    return ExtractorConstructor
-      ? new ExtractorConstructor(
+    return extractorConstructor
+      ? new extractorConstructor(
         key as string,
-        ModifierConstructor
-          ? new ModifierConstructor()
+        modifierConstructor
+          ? new modifierConstructor()
           : undefined,
       )
         .extract(data)
@@ -105,19 +105,7 @@ class Deserializer<T> {
 
     if (Array.isArray(objectData)) {
 
-      this.applyValue(
-        key,
-        objectData
-          .map(item => {
-
-            const itemTypeConstructor = keyType.getTypeFromDecorator(item);
-            return itemTypeConstructor
-              ? new Deserializer(itemTypeConstructor)
-                .deserialize(item)
-              : item;
-
-          }),
-      );
+      this.deserializeArrayKey(key, objectData, keyType);
       return;
 
     }
@@ -146,12 +134,30 @@ class Deserializer<T> {
 
   }
 
-  private applyValue(key: keyof T, value: any): void {
+  private deserializeArrayKey(key: keyof T, objectData: unknown[], keyType: KeyType<{ [x: string]: object; }>): void {
+
+    this.applyValue(
+      key,
+      objectData
+        .map(item => {
+
+          const itemTypeConstructor = keyType.getTypeFromDecorator(item);
+          return itemTypeConstructor
+            ? new Deserializer(itemTypeConstructor)
+              .deserialize(item)
+            : item;
+
+        }),
+    );
+
+  }
+
+  private applyValue(key: keyof T, value: unknown): void {
 
     const descriptor = getPropertyDescriptor(this.instance, key);
     if (!descriptor || descriptor.writable || descriptor.set) {
 
-      this.instance[key as keyof T] = value;
+      this.instance[key as keyof T] = value as T[keyof T];
 
     }
 

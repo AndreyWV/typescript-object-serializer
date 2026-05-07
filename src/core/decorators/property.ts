@@ -6,7 +6,7 @@ import { Extractor } from '../types/extractor';
 
 /**
  * @function property Declares serialize/deserialize rules for current property
- * @param ExtractorConstructor { Extractor }
+ * @param extractorConstructor { Extractor }
  *   Extractor that extracts data from serialized data and applies data to serialized data
  * @example
  * class SomeClass extends SerializableObject {
@@ -18,10 +18,10 @@ import { Extractor } from '../types/extractor';
  */
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export function property(
-  ExtractorConstructor: Constructor<Extractor> = StraightExtractor,
+  extractorConstructor: Constructor<Extractor> = StraightExtractor,
 )/* : PropertyDecorator | ParameterDecorator */ {
 
-  const decorator = new ExtractorDecorator(ExtractorConstructor);
+  const decorator = new ExtractorDecorator(extractorConstructor);
   return decorator.decorate.bind(decorator);
 
 }

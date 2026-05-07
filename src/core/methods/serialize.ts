@@ -1,4 +1,5 @@
 import { SerializableObject } from '../../serializable-object';
+import { Constructor } from '../../utils/constructor';
 import { deleteUndefinedRecursive } from '../../utils/delete-undefined';
 import { ExtractorsClassStore } from '../store/extractor-store';
 import { ModifiersClassStore } from '../store/modifier-store';
@@ -25,8 +26,12 @@ class Serializer<T extends object> {
     private readonly objectToSerialize: T,
   ) {
 
-    this.extractorsStore = new ExtractorsClassStore((objectToSerialize as any).constructor);
-    this.modifiersStore = new ModifiersClassStore((objectToSerialize as any).constructor);
+    this.extractorsStore = new ExtractorsClassStore(
+      (objectToSerialize as { constructor: Constructor<never>; }).constructor,
+    );
+    this.modifiersStore = new ModifiersClassStore(
+      (objectToSerialize as { constructor: Constructor<never>; }).constructor,
+    );
 
   }
 
@@ -57,21 +62,7 @@ class Serializer<T extends object> {
         let serializedValue: unknown;
         if (Array.isArray(value)) {
 
-          serializedValue = value
-            .map(item => {
-
-              const itemKeysStore = new ExtractorsClassStore((item as any)?.constructor)
-                .findStoreMap();
-              // If array items not serializable, return them as is
-              if (!itemKeysStore) {
-
-                return item;
-
-              }
-              return new Serializer(item)
-                .serialize();
-
-            });
+          serializedValue = this.serializeArray(value as T[keyof T] & never[]);
 
         } else {
 
@@ -91,27 +82,49 @@ class Serializer<T extends object> {
 
   }
 
+  private serializeArray(value: T[keyof T] & never[]): unknown {
+
+    return value
+      .map(item => {
+
+        const itemKeysStore = new ExtractorsClassStore(
+          (item as { constructor: Constructor<never>; })?.constructor,
+        )
+          .findStoreMap();
+        // If array items not serializable, return them as is
+        if (!itemKeysStore) {
+
+          return item;
+
+        }
+        return new Serializer(item)
+          .serialize();
+
+      });
+
+  }
+
   private applySerializedValue(
     data: Record<string, unknown>,
     key: keyof T,
     serializedValue: unknown,
   ): void {
 
-    const PropertyExtractor = this.extractorsStore!.findStoreMap()!.get(key);
+    const propertyExtractorConstructor = this.extractorsStore!.findStoreMap()!.get(key);
 
-    if (!PropertyExtractor) {
+    if (!propertyExtractorConstructor) {
 
       return;
 
     }
 
-    const Modifier = this.modifiersStore?.findStoreMap()
+    const modifierConstructor = this.modifiersStore?.findStoreMap()
       ?.get(key);
 
-    new PropertyExtractor(
+    new propertyExtractorConstructor(
       key as string,
-      Modifier
-        ? new Modifier()
+      modifierConstructor
+        ? new modifierConstructor()
         : undefined,
     )
       .apply(data, serializedValue);
@@ -122,7 +135,10 @@ class Serializer<T extends object> {
 
     return value instanceof SerializableObject
       || Boolean(
-        new ExtractorsClassStore((value as any)?.constructor)
+        new ExtractorsClassStore(
+          (value as { constructor: Constructor<never>; })
+            ?.constructor,
+        )
           .findStoreMap(),
       );
 

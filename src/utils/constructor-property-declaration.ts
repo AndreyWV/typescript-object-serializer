@@ -13,7 +13,7 @@ export class ConstructorPropertyDeclaration {
   ): boolean {
 
     return propertyKey === undefined
-      && (target as any)['prototype']
+      && (target as { prototype: unknown; })['prototype'] !== undefined
       && typeof indexOrDescriptor === 'number';
 
   }

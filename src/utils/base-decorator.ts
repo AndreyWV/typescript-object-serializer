@@ -23,6 +23,7 @@ export abstract class DecoratorBase {
      */
     if (ConstructorPropertyDeclaration.isPropertyDeclaredAtConstructor(target, propertyKey, indexOrDescriptor)) {
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const targetPrototypeConstructor = (target as any)['prototype'].constructor as Constructor<never>;
       const extractedPropertyKey = ConstructorPropertyDeclaration.getConstructorPropertyNameByIndex(
         targetPrototypeConstructor,

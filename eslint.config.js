@@ -406,6 +406,7 @@ export default [
     ],
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/naming-convention': 'off',
       'max-lines-per-function': 'off',
       'max-lines': 'off',
       'no-magic-numbers': 'off',

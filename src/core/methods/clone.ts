@@ -1,3 +1,4 @@
+import { Constructor } from '../../utils/constructor';
 import { ExtractorsClassStore } from '../store/extractor-store';
 import { createPartial } from './create';
 
@@ -21,8 +22,9 @@ class ObjectCloner<T extends object> {
     private readonly data: T,
   ) {
 
-    const DataConstructor = (data as any).constructor;
-    this.instance = createPartial(DataConstructor) as T;
+    const dataConstructor = (data as { constructor: new (...args: never[]) => T; })
+      .constructor as Constructor<T>;
+    this.instance = createPartial(dataConstructor) as T;
 
   }
 
@@ -39,7 +41,10 @@ class ObjectCloner<T extends object> {
 
   private static cloneValue<U>(value: U): U {
 
-    const isValueHasSerializableProperties = new ExtractorsClassStore((value as any)?.constructor)
+    const isValueHasSerializableProperties = new ExtractorsClassStore(
+      (value as { constructor: new (...args: never[]) => never; })
+        ?.constructor as Constructor<never>,
+    )
       .findStoreMap() !== undefined;
     if (Array.isArray(value)) {
 
@@ -47,7 +52,10 @@ class ObjectCloner<T extends object> {
         .map(
           item => {
 
-            const isItemHasSerializableProperties = new ExtractorsClassStore((item as any)?.constructor)
+            const isItemHasSerializableProperties = new ExtractorsClassStore(
+              (item as { constructor: new (...args: never[]) => never; })
+                ?.constructor as Constructor<never>,
+            )
               .findStoreMap() !== undefined;
 
             if (!isItemHasSerializableProperties) {
@@ -64,7 +72,7 @@ class ObjectCloner<T extends object> {
 
     } else if (isValueHasSerializableProperties) {
 
-      return new ObjectCloner(value as any)
+      return new ObjectCloner(value as never)
         .clone();
 
     }

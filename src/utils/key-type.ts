@@ -43,7 +43,7 @@ export class KeyType<T> {
       )
       // Find matched type
       .find(
-        (KeyConstructor: Constructor<never>) => typesMap.get(KeyConstructor)!(objectData),
+        (keyConstructor: Constructor<never>) => typesMap.get(keyConstructor)!(objectData),
       );
 
   }

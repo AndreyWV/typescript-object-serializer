@@ -55,6 +55,7 @@ export abstract class SerializerClassDataStore<S, T = never> {
 
     }
     const parentStore = new (this['constructor'] as Constructor<SerializerClassDataStore<S, T>>)(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (this.SerializerClassConstructor as any).__proto__,
     );
     const parentProperties = parentStore.findStoreMap();
@@ -93,7 +94,7 @@ export abstract class SerializerClassDataStore<S, T = never> {
        * Search rules at parent
        */
       const parentStore = new (this['constructor'] as Constructor<SerializerClassDataStore<S, T>>)(
-        currentIterationConstructor,
+        currentIterationConstructor as unknown,
       );
       const parentStoreMap = parentStore.getStoreMap();
       if (parentStoreMap) {

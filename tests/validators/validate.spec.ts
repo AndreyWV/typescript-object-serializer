@@ -118,7 +118,7 @@ describe('validate', () => {
 
       class AlwaysInvalidValidator extends Validator {
 
-        public validate(value: unknown, path: string): ValidationError | undefined {
+        public validate(_: unknown, path: string): ValidationError | undefined {
 
           return new CustomValidationError('Property is always invalid', path);
 
