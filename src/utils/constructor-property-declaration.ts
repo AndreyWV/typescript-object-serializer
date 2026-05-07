@@ -11,25 +11,33 @@ export class ConstructorPropertyDeclaration {
     propertyKey: string | symbol | undefined,
     indexOrDescriptor?: number | PropertyDescriptor,
   ): boolean {
+
     return propertyKey === undefined
       && (target as any)['prototype']
       && typeof indexOrDescriptor === 'number';
+
   }
 
   public static getConstructorPropertyNameByIndex(constructor: Constructor<never>, index: number): string | undefined {
+
     const regex = /constructor\((.*?)\)/;
     const constructorString = String(constructor);
     const match = regex.exec(constructorString);
     const names = match?.[1];
     if (!names) {
+
       return;
+
     }
     const propertyInConstructorName = names.split(',')[index];
     if (propertyInConstructorName) {
+
       const ownPropertyRegExp = new RegExp(`this\\.([a-zA-Z\\d]*?)\\s?=\\s?${propertyInConstructorName.trim()}`);
       const ownPropertyMatch = ownPropertyRegExp.exec(constructorString);
       return ownPropertyMatch?.[1];
+
     }
+
   }
 
 }

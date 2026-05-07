@@ -10,17 +10,23 @@ describe('Decorator @propertyType', () => {
   describe('in descendant of SerializableObject', () => {
 
     class TestProperty extends SerializableObject {
+
       @property()
       public declare value: string;
+
     }
 
     class SuccessResult extends SerializableObject {
+
       @property()
       public data?: unknown;
+
     }
     class FailedResult extends SerializableObject {
+
       @property()
       public error?: string;
+
     }
 
     class Test extends SerializableObject {
@@ -72,12 +78,15 @@ describe('Decorator @propertyType', () => {
     describe('simple property', () => {
 
       it('should deserialize property to passed type', () => {
+
         const deserialized = Test.deserialize({
           property: {
             value: '123',
           },
         });
-        expect(deserialized.property).toBeInstanceOf(TestProperty);
+        expect(deserialized.property)
+          .toBeInstanceOf(TestProperty);
+
       });
 
     });
@@ -85,6 +94,7 @@ describe('Decorator @propertyType', () => {
     describe('array property', () => {
 
       it('should deserialize array items to passed type', () => {
+
         const deserialized = Test.deserialize({
           arrayProperty: [
             {
@@ -95,8 +105,11 @@ describe('Decorator @propertyType', () => {
             },
           ],
         });
-        expect(deserialized.arrayProperty[0]).toBeInstanceOf(TestProperty);
-        expect(deserialized.arrayProperty[1]).toBeInstanceOf(TestProperty);
+        expect(deserialized.arrayProperty[0])
+          .toBeInstanceOf(TestProperty);
+        expect(deserialized.arrayProperty[1])
+          .toBeInstanceOf(TestProperty);
+
       });
 
     });
@@ -104,6 +117,7 @@ describe('Decorator @propertyType', () => {
     describe('conditional property', () => {
 
       it('should deserialize value to type depends on condition', () => {
+
         const deserializedSuccess = Test.deserialize({
           conditionalPropertyType: {
             success: true,
@@ -115,8 +129,11 @@ describe('Decorator @propertyType', () => {
           },
         });
 
-        expect(deserializedSuccess.conditionalPropertyType).toBeInstanceOf(SuccessResult);
-        expect(deserializedFailed.conditionalPropertyType).toBeInstanceOf(FailedResult);
+        expect(deserializedSuccess.conditionalPropertyType)
+          .toBeInstanceOf(SuccessResult);
+        expect(deserializedFailed.conditionalPropertyType)
+          .toBeInstanceOf(FailedResult);
+
       });
 
     });
@@ -124,6 +141,7 @@ describe('Decorator @propertyType', () => {
     describe('conditional array property', () => {
 
       it('should deserialize array values to type depends on condition', () => {
+
         const deserialized = Test.deserialize({
           arrayWithConditionalPropertyType: [
             {
@@ -135,8 +153,11 @@ describe('Decorator @propertyType', () => {
           ],
         });
 
-        expect(deserialized.arrayWithConditionalPropertyType[0]).toBeInstanceOf(SuccessResult);
-        expect(deserialized.arrayWithConditionalPropertyType[1]).toBeInstanceOf(FailedResult);
+        expect(deserialized.arrayWithConditionalPropertyType[0])
+          .toBeInstanceOf(SuccessResult);
+        expect(deserialized.arrayWithConditionalPropertyType[1])
+          .toBeInstanceOf(FailedResult);
+
       });
 
     });
@@ -144,38 +165,47 @@ describe('Decorator @propertyType', () => {
     it('should override default type in extended class if declared in parent class', () => {
 
       class BaseProperty extends SerializableObject {
+
         @property()
         public declare value: string;
+
       }
 
       class ExtendedProperty extends BaseProperty {
+
         @property()
         public declare extendedProperty: string;
+
       }
 
       class TestBase extends SerializableObject {
+
         @property()
         @propertyType(BaseProperty)
         public declare property: BaseProperty;
+
       }
 
       class TestExtended extends TestBase {
+
         @property()
         @propertyType(ExtendedProperty)
         public declare property: ExtendedProperty;
+
       }
 
       const propertiesStore = new TypesClassStore(TestExtended as unknown as Constructor<never>)
         .getStoreMapOrDeclareFromParent();
 
-      let propertyTypeMap = propertiesStore.get('property');
+      const propertyTypeMap = propertiesStore.get('property');
 
-      expect(propertyTypeMap?.size).toBe(1);
+      expect(propertyTypeMap?.size)
+        .toBe(1);
 
       const parentPropertiesStore = new TypesClassStore(TestBase as unknown as Constructor<never>)
         .getStoreMapOrDeclareFromParent();
 
-      let parentPropertyTypeMap = parentPropertiesStore.get('property');
+      const parentPropertyTypeMap = parentPropertiesStore.get('property');
 
       expect(Array.from(parentPropertyTypeMap?.keys() ?? [])[0] as never)
         .toBe(BaseProperty);
@@ -187,17 +217,23 @@ describe('Decorator @propertyType', () => {
   describe('in simple serializable class', () => {
 
     class TestProperty {
+
       @property()
       public declare value: string;
+
     }
 
     class SuccessResult {
+
       @property()
       public data?: unknown;
+
     }
     class FailedResult {
+
       @property()
       public error?: string;
+
     }
 
     class Test {
@@ -249,12 +285,15 @@ describe('Decorator @propertyType', () => {
     describe('simple property', () => {
 
       it('should deserialize property to passed type', () => {
+
         const deserialized = deserialize(Test, {
           property: {
             value: '123',
           },
         });
-        expect(deserialized.property).toBeInstanceOf(TestProperty);
+        expect(deserialized.property)
+          .toBeInstanceOf(TestProperty);
+
       });
 
     });
@@ -262,6 +301,7 @@ describe('Decorator @propertyType', () => {
     describe('array property', () => {
 
       it('should deserialize array items to passed type', () => {
+
         const deserialized = deserialize(Test, {
           arrayProperty: [
             {
@@ -272,8 +312,11 @@ describe('Decorator @propertyType', () => {
             },
           ],
         });
-        expect(deserialized.arrayProperty[0]).toBeInstanceOf(TestProperty);
-        expect(deserialized.arrayProperty[1]).toBeInstanceOf(TestProperty);
+        expect(deserialized.arrayProperty[0])
+          .toBeInstanceOf(TestProperty);
+        expect(deserialized.arrayProperty[1])
+          .toBeInstanceOf(TestProperty);
+
       });
 
     });
@@ -281,6 +324,7 @@ describe('Decorator @propertyType', () => {
     describe('conditional property', () => {
 
       it('should deserialize value to type depends on condition', () => {
+
         const deserializedSuccess = deserialize(Test, {
           conditionalPropertyType: {
             success: true,
@@ -292,8 +336,11 @@ describe('Decorator @propertyType', () => {
           },
         });
 
-        expect(deserializedSuccess.conditionalPropertyType).toBeInstanceOf(SuccessResult);
-        expect(deserializedFailed.conditionalPropertyType).toBeInstanceOf(FailedResult);
+        expect(deserializedSuccess.conditionalPropertyType)
+          .toBeInstanceOf(SuccessResult);
+        expect(deserializedFailed.conditionalPropertyType)
+          .toBeInstanceOf(FailedResult);
+
       });
 
     });
@@ -301,6 +348,7 @@ describe('Decorator @propertyType', () => {
     describe('conditional array property', () => {
 
       it('should deserialize array values to type depends on condition', () => {
+
         const deserialized = deserialize(Test, {
           arrayWithConditionalPropertyType: [
             {
@@ -312,8 +360,11 @@ describe('Decorator @propertyType', () => {
           ],
         });
 
-        expect(deserialized.arrayWithConditionalPropertyType[0]).toBeInstanceOf(SuccessResult);
-        expect(deserialized.arrayWithConditionalPropertyType[1]).toBeInstanceOf(FailedResult);
+        expect(deserialized.arrayWithConditionalPropertyType[0])
+          .toBeInstanceOf(SuccessResult);
+        expect(deserialized.arrayWithConditionalPropertyType[1])
+          .toBeInstanceOf(FailedResult);
+
       });
 
     });
@@ -321,38 +372,47 @@ describe('Decorator @propertyType', () => {
     it('should override default type in extended class if declared in parent class', () => {
 
       class BaseProperty {
+
         @property()
         public declare value: string;
+
       }
 
       class ExtendedProperty extends BaseProperty {
+
         @property()
         public declare extendedProperty: string;
+
       }
 
       class TestBase {
+
         @property()
         @propertyType(BaseProperty)
         public declare property: BaseProperty;
+
       }
 
       class TestExtended extends TestBase {
+
         @property()
         @propertyType(ExtendedProperty)
         public declare property: ExtendedProperty;
+
       }
 
       const propertiesStore = new TypesClassStore(TestExtended as Constructor<never>)
         .getStoreMapOrDeclareFromParent();
 
-      let propertyTypeMap = propertiesStore.get('property');
+      const propertyTypeMap = propertiesStore.get('property');
 
-      expect(propertyTypeMap?.size).toBe(1);
+      expect(propertyTypeMap?.size)
+        .toBe(1);
 
       const parentPropertiesStore = new TypesClassStore(TestBase as Constructor<never>)
         .getStoreMapOrDeclareFromParent();
 
-      let parentPropertyTypeMap = parentPropertiesStore.get('property');
+      const parentPropertyTypeMap = parentPropertiesStore.get('property');
 
       expect(Array.from(parentPropertyTypeMap?.keys() ?? [])[0] as never)
         .toBe(BaseProperty);

@@ -11,6 +11,7 @@ export abstract class DecoratorBase {
     targetConstructor: Constructor<never>,
     propertyKey: string | symbol,
   } {
+
     let targetConstructor: Constructor<never> | undefined;
 
     /*
@@ -21,29 +22,36 @@ export abstract class DecoratorBase {
      * )
      */
     if (ConstructorPropertyDeclaration.isPropertyDeclaredAtConstructor(target, propertyKey, indexOrDescriptor)) {
+
       const targetPrototypeConstructor = (target as any)['prototype'].constructor as Constructor<never>;
       const extractedPropertyKey = ConstructorPropertyDeclaration.getConstructorPropertyNameByIndex(
         targetPrototypeConstructor,
         indexOrDescriptor as number,
       );
       if (!extractedPropertyKey) {
+
         throw new Error(
           `[Serializer] Error define property name at constructor: "${targetPrototypeConstructor.name.toString()}",`
           + `index: ${indexOrDescriptor}`,
         );
+
       }
       propertyKey = extractedPropertyKey;
       targetConstructor = targetPrototypeConstructor;
+
     }
 
     if (!targetConstructor) {
+
       targetConstructor = target.constructor as Constructor<never>;
+
     }
 
     return {
       targetConstructor,
       propertyKey: propertyKey as string | symbol,
     };
+
   }
 
 }

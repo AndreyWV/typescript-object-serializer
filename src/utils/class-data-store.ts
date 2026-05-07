@@ -40,14 +40,19 @@ export abstract class SerializerClassDataStore<S, T = never> {
    * @returns Map with keys - object properties, values - stored value for current Store
    */
   public getStoreMap(): Map<keyof T, S> | undefined {
+
     return this.getOrCreateStoreMap()
       .get(this.SerializerClassConstructor);
+
   }
 
   public getStoreMapOrDeclareFromParent(): Map<keyof T, S> {
+
     const storeMap = this.getStoreMap();
     if (storeMap) {
+
       return storeMap;
+
     }
     const parentStore = new (this['constructor'] as Constructor<SerializerClassDataStore<S, T>>)(
       (this.SerializerClassConstructor as any).__proto__,
@@ -55,6 +60,7 @@ export abstract class SerializerClassDataStore<S, T = never> {
     const parentProperties = parentStore.findStoreMap();
     this.defineStoreMap(parentProperties);
     return this.getStoreMap()!;
+
   }
 
   /**
@@ -73,12 +79,15 @@ export abstract class SerializerClassDataStore<S, T = never> {
      * Stop search if max depth is reached
      */
     while (currentIterationLevel !== 0) {
-    /**
+
+      /**
      * Stop search if root object prototype is reached
      * Root object can't contain any serializer rules
      */
       if (currentIterationConstructor?.prototype === SerializerClassDataStore.rootObjectPrototype) {
+
         return;
+
       }
       /**
        * Search rules at parent
@@ -88,7 +97,9 @@ export abstract class SerializerClassDataStore<S, T = never> {
       );
       const parentStoreMap = parentStore.getStoreMap();
       if (parentStoreMap) {
+
         return parentStoreMap;
+
       }
       /**
        * Move to parent
@@ -99,10 +110,14 @@ export abstract class SerializerClassDataStore<S, T = never> {
        * Just in case
        */
       if (!currentIterationConstructor) {
+
         break;
+
       }
       currentIterationLevel--;
+
     }
+
   }
 
   /**
@@ -111,23 +126,32 @@ export abstract class SerializerClassDataStore<S, T = never> {
    * If parentProperties are passed - they used as default values of store
    */
   public defineStoreMap(parentProperties?: Map<keyof T, S>): void {
+
     const storeMap = this.getOrCreateStoreMap();
     if (!storeMap.get(this.SerializerClassConstructor)) {
+
       storeMap.set(
         this.SerializerClassConstructor,
         new Map(parentProperties),
       );
+
     }
+
   }
 
   protected getOrCreateStoreMap(): Map<unknown, Map<keyof T, S>> {
+
     const serializerClassConstructor = this.SerializerClassConstructor as
       unknown as
       SerializerClassDataStoreContainer<T, S>;
 
     if (!serializerClassConstructor[this.storeKey]) {
+
       serializerClassConstructor[this.storeKey] = new Map();
+
     }
     return serializerClassConstructor[this.storeKey];
+
   }
+
 }

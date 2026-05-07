@@ -4,15 +4,17 @@ import { Constructor } from '../../utils/constructor';
 type TypesStoreType = Map<
   Constructor<never>,
   (data: unknown) => boolean
-  >;
+>;
 
 export class TypesClassStore extends SerializerClassDataStore<TypesStoreType> {
 
   protected readonly storeKey = 'typescript-object-serializer_types';
 
   public override defineStoreMap(parentProperties?: Map<keyof never, TypesStoreType>): void {
+
     const storeMap = this.getOrCreateStoreMap();
     if (!storeMap.get(this.SerializerClassConstructor)) {
+
       storeMap.set(
         this.SerializerClassConstructor,
         new Map(
@@ -20,9 +22,18 @@ export class TypesClassStore extends SerializerClassDataStore<TypesStoreType> {
           // backward compatibility with node 20 and less
           // Change `Array.from(parentProperties?.entries() ?? [])` -> `parentProperties?.entries()` later
           Array.from(parentProperties?.entries() ?? [])
-            .map(([key, value]) => [key, new Map(value)]),
+            .map(([
+              key,
+              value,
+            ]) => [
+              key,
+              new Map(value),
+            ]),
         ),
       );
+
     }
+
   }
+
 }

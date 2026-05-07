@@ -31,10 +31,11 @@ export function propertyType<T extends Constructor<unknown>>(
   defineType: T,
   typeCondition?: (value: unknown) => boolean,
 )/* : PropertyDecorator | ParameterDecorator */ {
+
   const propertyTypeDecorator = new PropertyTypeDecorator(defineType, typeCondition);
   return propertyTypeDecorator.decorate.bind(propertyTypeDecorator);
-}
 
+}
 
 class PropertyTypeDecorator extends DecoratorBase {
 
@@ -42,7 +43,9 @@ class PropertyTypeDecorator extends DecoratorBase {
     private readonly defineType: Constructor<unknown>,
     private readonly typeCondition?: (value: unknown) => boolean,
   ) {
+
     super();
+
   }
 
   public decorate(
@@ -62,23 +65,31 @@ class PropertyTypeDecorator extends DecoratorBase {
     let propertyTypeMap = propertiesStore.get(propertyName);
 
     if (!propertyTypeMap) {
+
       propertiesStore.set(
         propertyName,
         new Map(),
       );
       propertyTypeMap = propertiesStore.get(propertyName)!;
+
     }
 
     // Remove default property type declared in parent
     if (!this.typeCondition) {
+
       // backward compatibility with node 20 and less
       // Change `Array.from(propertyTypeMap.entries())` -> `propertyTypeMap.entries()` later
       const parentDefaultType = Array.from(propertyTypeMap.entries())
-        .find(([, typeCondition]) => typeCondition === KeyType.defaultPropertyTypeCondition);
+        .find(([
+          , typeCondition,
+        ]) => typeCondition === KeyType.defaultPropertyTypeCondition);
 
       if (parentDefaultType) {
+
         propertyTypeMap.delete(parentDefaultType[0]);
+
       }
+
     }
 
     propertyTypeMap.set(
@@ -91,6 +102,7 @@ class PropertyTypeDecorator extends DecoratorBase {
       propertyName,
       propertyTypeMap,
     );
+
   }
 
 }

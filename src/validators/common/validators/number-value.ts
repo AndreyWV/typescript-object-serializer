@@ -19,26 +19,43 @@ export class NumberValueValidator extends Validator {
     protected readonly min?: number,
     protected readonly max?: number,
   ) {
+
     super();
+
   }
 
   public static with(options: { min?: number; max?: number; }): Constructor<Validator> {
+
     return class extends NumberValueValidator {
+
       constructor() {
+
         super(options.min, options.max);
+
       }
+
     };
+
   }
 
   public validate(value: unknown, path: string): ValidationError | undefined {
+
     if (typeof value !== 'number') {
+
       return;
+
     }
     if (typeof this.min === 'number' && value < this.min) {
+
       return new ValidationError(`Value should be greater than or equal to ${this.min}`, path);
+
     }
     if (typeof this.max === 'number' && value > this.max) {
+
       return new ValidationError(`Value should be less than or equal to ${this.max}`, path);
+
     }
+
   }
+
 }

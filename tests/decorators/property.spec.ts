@@ -20,8 +20,10 @@ describe('Decorator @property', () => {
     describe('without extractor (default Straight Extractor)', () => {
 
       class Test extends SerializableObject {
+
         @property()
         public declare test: string;
+
       }
 
       it('should serialize property to same property key', () => {
@@ -31,7 +33,8 @@ describe('Decorator @property', () => {
         });
 
         const serialized = instance.serialize();
-        expect(serialized.test).toBe('aaa');
+        expect(serialized.test)
+          .toBe('aaa');
 
       });
 
@@ -40,9 +43,11 @@ describe('Decorator @property', () => {
         const deserialized = Test.deserialize({
           test: 'aaa',
         });
-        expect(deserialized.test).toBe('aaa');
+        expect(deserialized.test)
+          .toBe('aaa');
 
       });
+
     });
 
     describe('with Straight Extractor', () => {
@@ -50,20 +55,29 @@ describe('Decorator @property', () => {
       describe('with value transformation', () => {
 
         class TestModifier extends Modifier {
+
           public override onSerialize(value: number): unknown {
+
             return value && String(value);
+
           }
+
           public override onDeserialize(value: unknown): number | undefined {
+
             return value
               ? Number(value)
               : undefined;
+
           }
+
         }
 
         class Test extends SerializableObject {
+
           @property(StraightExtractor)
           @modifier(TestModifier)
           public declare test: number;
+
         }
 
         it('should transform property on serialize', () => {
@@ -73,7 +87,8 @@ describe('Decorator @property', () => {
           });
 
           const serialized = instance.serialize();
-          expect(serialized.test).toBe('123');
+          expect(serialized.test)
+            .toBe('123');
 
         });
 
@@ -82,10 +97,13 @@ describe('Decorator @property', () => {
           const deserialized = Test.deserialize({
             test: '123',
           });
-          expect(deserialized.test).toBe(123);
+          expect(deserialized.test)
+            .toBe(123);
 
         });
+
       });
+
     });
 
     describe('with extractor camelCase', () => {
@@ -104,7 +122,8 @@ describe('Decorator @property', () => {
         });
 
         const serialized = instance.serialize();
-        expect(serialized.test_property).toBe('aaa');
+        expect(serialized.test_property)
+          .toBe('aaa');
         expect(serialized).not.toHaveProperty('testProperty');
 
       });
@@ -114,7 +133,8 @@ describe('Decorator @property', () => {
         const deserialized = Test.deserialize({
           test_property: 'aaa',
         });
-        expect(deserialized.testProperty).toBe('aaa');
+        expect(deserialized.testProperty)
+          .toBe('aaa');
         expect(deserialized).not.toHaveProperty('test_property');
 
       });
@@ -124,12 +144,16 @@ describe('Decorator @property', () => {
         const symbolKey = Symbol('property');
 
         class Test2 {
+
           @property(SnakeCaseExtractor)
           public [symbolKey]?: string;
+
         }
 
         expect(() => {
+
           deserialize(Test2, {});
+
         })
           .toThrow(
             new NotStringPropertyKeyError(symbolKey),
@@ -140,20 +164,29 @@ describe('Decorator @property', () => {
       describe('with value transformation', () => {
 
         class TestModifier extends Modifier {
+
           public override onSerialize(value: number): unknown {
+
             return value && String(value);
+
           }
+
           public override onDeserialize(value: unknown): number | undefined {
+
             return value
               ? Number(value)
               : undefined;
+
           }
+
         }
 
         class Test2 extends SerializableObject {
+
           @property(SnakeCaseExtractor)
           @modifier(TestModifier)
           public declare testProperty: number;
+
         }
 
         it('should transform property on serialize', () => {
@@ -163,7 +196,8 @@ describe('Decorator @property', () => {
           });
 
           const serialized = instance.serialize();
-          expect(serialized.test_property).toBe('123');
+          expect(serialized.test_property)
+            .toBe('123');
 
         });
 
@@ -172,29 +206,40 @@ describe('Decorator @property', () => {
           const deserialized = Test2.deserialize({
             test_property: '123',
           });
-          expect(deserialized.testProperty).toBe(123);
+          expect(deserialized.testProperty)
+            .toBe(123);
 
         });
+
       });
 
       describe('with non-serializable class value transformation', () => {
 
         class DepartmentId {
+
           constructor(
             public readonly value: string,
           ) {
           }
+
         }
 
         class DepartmentIdModifier extends Modifier {
+
           public override onSerialize(value: DepartmentId): unknown {
+
             return value?.value;
+
           }
+
           public override onDeserialize(value: unknown): DepartmentId | undefined {
+
             return value
               ? new DepartmentId(value as string)
               : undefined;
+
           }
+
         }
 
         class Department extends SerializableObject {
@@ -212,7 +257,8 @@ describe('Decorator @property', () => {
           });
 
           const serialized = instance.serialize();
-          expect(serialized.id).toBe('123');
+          expect(serialized.id)
+            .toBe('123');
 
         });
 
@@ -221,10 +267,13 @@ describe('Decorator @property', () => {
           const deserialized = Department.deserialize({
             id: '123',
           });
-          expect(deserialized.id).toBeInstanceOf(DepartmentId);
-          expect(deserialized.id.value).toBe('123');
+          expect(deserialized.id)
+            .toBeInstanceOf(DepartmentId);
+          expect(deserialized.id.value)
+            .toBe('123');
 
         });
+
       });
 
     });
@@ -245,7 +294,8 @@ describe('Decorator @property', () => {
         });
 
         const serialized = instance.serialize();
-        expect(serialized.department_id).toBe('123');
+        expect(serialized.department_id)
+          .toBe('123');
 
       });
 
@@ -254,27 +304,37 @@ describe('Decorator @property', () => {
         const deserialized = Department.deserialize({
           department_id: '123',
         });
-        expect(deserialized.id).toBe('123');
+        expect(deserialized.id)
+          .toBe('123');
 
       });
 
       describe('with value transformation', () => {
 
         class TestModifier extends Modifier {
+
           public override onSerialize(value: number): unknown {
+
             return value && String(value);
+
           }
+
           public override onDeserialize(value: unknown): number | undefined {
+
             return value
               ? Number(value)
               : undefined;
+
           }
+
         }
 
         class Department2 extends SerializableObject {
+
           @property(OverrideNameExtractor.use('department_id'))
           @modifier(TestModifier)
           public declare id: number;
+
         }
 
         it('should transform property on serialize', () => {
@@ -284,7 +344,8 @@ describe('Decorator @property', () => {
           });
 
           const serialized = instance.serialize();
-          expect(serialized.department_id).toBe('123');
+          expect(serialized.department_id)
+            .toBe('123');
 
         });
 
@@ -293,9 +354,11 @@ describe('Decorator @property', () => {
           const deserialized = Department2.deserialize({
             department_id: '123',
           });
-          expect(deserialized.id).toBe(123);
+          expect(deserialized.id)
+            .toBe(123);
 
         });
+
       });
 
     });
@@ -307,8 +370,10 @@ describe('Decorator @property', () => {
     describe('without extractor (default Straight Extractor)', () => {
 
       class Test {
+
         @property()
         public declare test: string;
+
       }
 
       it('should serialize property to same property key', () => {
@@ -318,7 +383,8 @@ describe('Decorator @property', () => {
         });
 
         const serialized = serialize(instance);
-        expect(serialized.test).toBe('aaa');
+        expect(serialized.test)
+          .toBe('aaa');
 
       });
 
@@ -327,9 +393,11 @@ describe('Decorator @property', () => {
         const deserialized = deserialize(Test, {
           test: 'aaa',
         });
-        expect(deserialized.test).toBe('aaa');
+        expect(deserialized.test)
+          .toBe('aaa');
 
       });
+
     });
 
     describe('with Straight Extractor', () => {
@@ -337,20 +405,29 @@ describe('Decorator @property', () => {
       describe('with value transformation', () => {
 
         class TestModifier extends Modifier {
+
           public override onSerialize(value: number): unknown {
+
             return value && String(value);
+
           }
+
           public override onDeserialize(value: unknown): number | undefined {
+
             return value
               ? Number(value)
               : undefined;
+
           }
+
         }
 
         class Test {
+
           @property(StraightExtractor)
           @modifier(TestModifier)
           public declare test: number;
+
         }
 
         it('should transform property on serialize', () => {
@@ -360,7 +437,8 @@ describe('Decorator @property', () => {
           });
 
           const serialized = serialize(instance);
-          expect(serialized.test).toBe('123');
+          expect(serialized.test)
+            .toBe('123');
 
         });
 
@@ -369,10 +447,13 @@ describe('Decorator @property', () => {
           const deserialized = deserialize(Test, {
             test: '123',
           });
-          expect(deserialized.test).toBe(123);
+          expect(deserialized.test)
+            .toBe(123);
 
         });
+
       });
+
     });
 
     describe('with extractor snakeCase', () => {
@@ -391,7 +472,8 @@ describe('Decorator @property', () => {
         });
 
         const serialized = serialize(instance);
-        expect(serialized.test_property).toBe('aaa');
+        expect(serialized.test_property)
+          .toBe('aaa');
         expect(serialized).not.toHaveProperty('testProperty');
 
       });
@@ -401,7 +483,8 @@ describe('Decorator @property', () => {
         const deserialized = deserialize(Test, {
           test_property: 'aaa',
         });
-        expect(deserialized.testProperty).toBe('aaa');
+        expect(deserialized.testProperty)
+          .toBe('aaa');
         expect(deserialized).not.toHaveProperty('test_property');
 
       });
@@ -411,12 +494,16 @@ describe('Decorator @property', () => {
         const symbolKey = Symbol('property');
 
         class Test2 {
+
           @property(SnakeCaseExtractor)
           public [symbolKey]?: string;
+
         }
 
         expect(() => {
+
           deserialize(Test2, {});
+
         })
           .toThrow(
             new NotStringPropertyKeyError(symbolKey),
@@ -427,20 +514,29 @@ describe('Decorator @property', () => {
       describe('with value transformation', () => {
 
         class TestModifier extends Modifier {
+
           public override onSerialize(value: number): unknown {
+
             return value && String(value);
+
           }
+
           public override onDeserialize(value: unknown): number | undefined {
+
             return value
               ? Number(value)
               : undefined;
+
           }
+
         }
 
         class Test2 {
+
           @property(SnakeCaseExtractor)
           @modifier(TestModifier)
           public declare testProperty: number;
+
         }
 
         it('should transform property on serialize', () => {
@@ -450,7 +546,8 @@ describe('Decorator @property', () => {
           });
 
           const serialized = serialize(instance);
-          expect(serialized.test_property).toBe('123');
+          expect(serialized.test_property)
+            .toBe('123');
 
         });
 
@@ -459,29 +556,40 @@ describe('Decorator @property', () => {
           const deserialized = deserialize(Test2, {
             test_property: '123',
           });
-          expect(deserialized.testProperty).toBe(123);
+          expect(deserialized.testProperty)
+            .toBe(123);
 
         });
+
       });
 
       describe('with non-serializable class value transformation', () => {
 
         class DepartmentId {
+
           constructor(
             public value: string,
           ) {
           }
+
         }
 
         class DepartmentIdModifier extends Modifier {
+
           public override onSerialize(value: DepartmentId): unknown {
+
             return value && value.value;
+
           }
+
           public override onDeserialize(value: unknown): DepartmentId | undefined {
+
             return value
               ? new DepartmentId(value as string)
               : undefined;
+
           }
+
         }
 
         class Department {
@@ -499,7 +607,8 @@ describe('Decorator @property', () => {
           });
 
           const serialized = serialize(instance);
-          expect(serialized.id).toBe('123');
+          expect(serialized.id)
+            .toBe('123');
 
         });
 
@@ -508,10 +617,13 @@ describe('Decorator @property', () => {
           const deserialized = deserialize(Department, {
             id: '123',
           });
-          expect(deserialized.id).toBeInstanceOf(DepartmentId);
-          expect(deserialized.id.value).toBe('123');
+          expect(deserialized.id)
+            .toBeInstanceOf(DepartmentId);
+          expect(deserialized.id.value)
+            .toBe('123');
 
         });
+
       });
 
     });
@@ -532,7 +644,8 @@ describe('Decorator @property', () => {
         });
 
         const serialized = serialize(instance);
-        expect(serialized.department_id).toBe('123');
+        expect(serialized.department_id)
+          .toBe('123');
 
       });
 
@@ -541,27 +654,37 @@ describe('Decorator @property', () => {
         const deserialized = deserialize(Department, {
           department_id: '123',
         });
-        expect(deserialized.id).toBe('123');
+        expect(deserialized.id)
+          .toBe('123');
 
       });
 
       describe('with value transformation', () => {
 
         class DepartmentIdModifier extends Modifier {
+
           public override onSerialize(value: string): unknown {
+
             return value && String(value);
+
           }
+
           public override onDeserialize(value: unknown): number | undefined {
+
             return value
               ? Number(value)
               : undefined;
+
           }
+
         }
 
         class TestDepartment {
+
           @property(OverrideNameExtractor.use('department_id'))
           @modifier(DepartmentIdModifier)
           public declare id: number;
+
         }
 
         it('should transform property on serialize', () => {
@@ -571,7 +694,8 @@ describe('Decorator @property', () => {
           });
 
           const serialized = serialize(instance);
-          expect(serialized.department_id).toBe('123');
+          expect(serialized.department_id)
+            .toBe('123');
 
         });
 
@@ -580,9 +704,11 @@ describe('Decorator @property', () => {
           const deserialized = deserialize(TestDepartment, {
             department_id: '123',
           });
-          expect(deserialized.id).toBe(123);
+          expect(deserialized.id)
+            .toBe(123);
 
         });
+
       });
 
     });
@@ -590,21 +716,26 @@ describe('Decorator @property', () => {
   });
 
   describe('should handle property as constructor argument', () => {
+
     class Test {
+
       constructor(
         @property(SnakeCaseExtractor)
         public someValue: string,
       ) {
       }
+
     }
 
     class TestParent {
+
       constructor(
         @property(SnakeCaseExtractor)
         @propertyType(Test)
         public testProperty: Test,
       ) {
       }
+
     }
 
     const deserialized = deserialize(TestParent, {
@@ -613,16 +744,21 @@ describe('Decorator @property', () => {
       },
     });
 
-    expect(deserialized).toBeInstanceOf(TestParent);
-    expect(deserialized.testProperty).toBeInstanceOf(Test);
-    expect(deserialized.testProperty.someValue).toBe('value');
+    expect(deserialized)
+      .toBeInstanceOf(TestParent);
+    expect(deserialized.testProperty)
+      .toBeInstanceOf(Test);
+    expect(deserialized.testProperty.someValue)
+      .toBe('value');
 
     const serialized = serialize(deserialized);
-    expect(serialized).toMatchObject({
-      test_property: {
-        some_value: 'value',
-      },
-    });
+    expect(serialized)
+      .toMatchObject({
+        test_property: {
+          some_value: 'value',
+        },
+      });
+
   });
 
 });

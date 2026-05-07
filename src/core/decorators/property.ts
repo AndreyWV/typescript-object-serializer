@@ -1,8 +1,8 @@
 import { StraightExtractor } from '../../common/extractors/straight-extractor';
+import { DecoratorBase } from '../../utils/base-decorator';
 import { Constructor } from '../../utils/constructor';
 import { ExtractorsClassStore } from '../store/extractor-store';
 import { Extractor } from '../types/extractor';
-import { DecoratorBase } from '../../utils/base-decorator';
 
 /**
  * @function property Declares serialize/deserialize rules for current property
@@ -20,8 +20,10 @@ import { DecoratorBase } from '../../utils/base-decorator';
 export function property(
   ExtractorConstructor: Constructor<Extractor> = StraightExtractor,
 )/* : PropertyDecorator | ParameterDecorator */ {
+
   const decorator = new ExtractorDecorator(ExtractorConstructor);
   return decorator.decorate.bind(decorator);
+
 }
 
 class ExtractorDecorator extends DecoratorBase {
@@ -29,7 +31,9 @@ class ExtractorDecorator extends DecoratorBase {
   constructor(
     private readonly ExtractorConstructor: Constructor<Extractor>,
   ) {
+
     super();
+
   }
 
   public decorate(
@@ -50,6 +54,7 @@ class ExtractorDecorator extends DecoratorBase {
       propertyName,
       this.ExtractorConstructor,
     );
+
   }
 
 }

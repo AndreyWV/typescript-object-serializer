@@ -1,11 +1,11 @@
 {
     "extends": "./tsconfig.json",
     "include": [
-        "src"
+        "./src"
     ],
     "exclude": [
-        "playground",
-        "node_modules",
-        "tests"
+        "./playground",
+        "./node_modules",
+        "./tests"
     ]
 }
