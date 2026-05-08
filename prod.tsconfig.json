@@ -1,5 +1,10 @@
 {
     "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "types": [
+            "reflect-metadata"
+        ]
+    },
     "include": [
         "./src"
     ],
