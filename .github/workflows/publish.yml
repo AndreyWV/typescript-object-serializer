@@ -26,4 +26,4 @@ jobs:
       - run: npm test
       - run: |
           cd dist/
-          npm publish --provenance
+          npm publish --provenance --tag alpha
