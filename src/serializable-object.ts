@@ -12,9 +12,13 @@ import {
 } from './utils/recursive-type';
 
 export class NonArrayDataError extends Error {
+
   constructor() {
+
     super('[Serializer] Array data should be passed to deserializeArray method');
+
   }
+
 }
 
 /**
@@ -31,7 +35,9 @@ export class SerializableObject {
     this: Constructor<T>,
     data: RecursiveObject<T>,
   ): T {
+
     return create(this as never, data as never);
+
   }
 
   /**
@@ -45,7 +51,9 @@ export class SerializableObject {
     this: Constructor<T>,
     data: RecursivePartial<T> = {},
   ): T {
+
     return createPartial(this as never, data as never);
+
   }
 
   /**
@@ -57,7 +65,9 @@ export class SerializableObject {
     this: T,
     data: unknown,
   ): InstanceType<T> {
+
     return deserialize(this, data) as InstanceType<T>;
+
   }
 
   /**
@@ -69,13 +79,17 @@ export class SerializableObject {
     this: T,
     data: unknown[],
   ): InstanceType<T>[] {
+
     if (!Array.isArray(data)) {
+
       throw new NonArrayDataError();
+
     }
     return data
       .map(
         dataItem => deserialize(this, dataItem),
       ) as InstanceType<T>[];
+
   }
 
   /**
@@ -83,7 +97,9 @@ export class SerializableObject {
    * @returns { Record<string, unknown> } Object of serialized data
    */
   public serialize(): Record<string, unknown> {
+
     return serialize(this);
+
   }
 
   /**
@@ -91,6 +107,9 @@ export class SerializableObject {
    * @returns New instance of current instance class
    */
   public clone(): this {
+
     return clone(this);
+
   }
+
 }

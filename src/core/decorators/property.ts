@@ -1,12 +1,12 @@
 import { StraightExtractor } from '../../common/extractors/straight-extractor';
+import { DecoratorBase } from '../../utils/base-decorator';
 import { Constructor } from '../../utils/constructor';
 import { ExtractorsClassStore } from '../store/extractor-store';
 import { Extractor } from '../types/extractor';
-import { DecoratorBase } from '../../utils/base-decorator';
 
 /**
  * @function property Declares serialize/deserialize rules for current property
- * @param ExtractorConstructor { Extractor }
+ * @param extractorConstructor { Extractor }
  *   Extractor that extracts data from serialized data and applies data to serialized data
  * @example
  * class SomeClass extends SerializableObject {
@@ -18,10 +18,12 @@ import { DecoratorBase } from '../../utils/base-decorator';
  */
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export function property(
-  ExtractorConstructor: Constructor<Extractor> = StraightExtractor,
+  extractorConstructor: Constructor<Extractor> = StraightExtractor,
 )/* : PropertyDecorator | ParameterDecorator */ {
-  const decorator = new ExtractorDecorator(ExtractorConstructor);
+
+  const decorator = new ExtractorDecorator(extractorConstructor);
   return decorator.decorate.bind(decorator);
+
 }
 
 class ExtractorDecorator extends DecoratorBase {
@@ -29,7 +31,9 @@ class ExtractorDecorator extends DecoratorBase {
   constructor(
     private readonly ExtractorConstructor: Constructor<Extractor>,
   ) {
+
     super();
+
   }
 
   public decorate(
@@ -50,6 +54,7 @@ class ExtractorDecorator extends DecoratorBase {
       propertyName,
       this.ExtractorConstructor,
     );
+
   }
 
 }

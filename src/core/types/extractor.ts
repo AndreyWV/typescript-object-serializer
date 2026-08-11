@@ -1,11 +1,13 @@
 import { Modifier } from './modifier';
 
 export class ExtractionResult {
+
   constructor(
     public readonly data: unknown,
     public readonly path: string,
   ) {
   }
+
 };
 
 /**

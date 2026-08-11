@@ -14,13 +14,17 @@ export class ValidationError {
     public readonly message: string,
     path: string,
   ) {
+
     this.path = ValidationError.clearErrorPath(path);
+
   }
 
   protected static clearErrorPath(path: string): string {
+
     return path
       .replace(/\.\./g, '.')
       .replace(/(^\.|\.$)/g, '');
+
   }
 
 }

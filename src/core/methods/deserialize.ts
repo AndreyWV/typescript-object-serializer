@@ -12,111 +12,155 @@ import { TypesClassStore } from '../store/types-store';
  * @returns Instance of serializable class constructor
  */
 export function deserialize<T>(dataConstructor: Constructor<T>, data: unknown): T {
+
   return new Deserializer(dataConstructor)
     .deserialize(data);
+
 }
 
 class Deserializer<T> {
 
   private declare instance: T;
 
-  private declare keyTypesStore: TypesClassStore;
-  private declare extractorsStore?: ExtractorsClassStore;
-  private declare modifiersStore?: ModifiersClassStore;
+  private declare readonly keyTypesStore: TypesClassStore;
+
+  private declare readonly extractorsStore?: ExtractorsClassStore;
+
+  private declare readonly modifiersStore?: ModifiersClassStore;
 
   constructor(
     private readonly DataConstructor: Constructor<T>,
   ) {
+
     try {
+
       this.instance = new DataConstructor();
+
     } catch {
+
       throw new Error(`[Serializer] First argument should be constructor "${DataConstructor?.toString()}"`);
+
     }
     this.keyTypesStore = new TypesClassStore(DataConstructor as Constructor<never>);
     this.extractorsStore = new ExtractorsClassStore(this.DataConstructor as Constructor<never>);
     this.modifiersStore = new ModifiersClassStore(this.DataConstructor as Constructor<never>);
+
   }
 
   public deserialize(data: unknown): T {
-    Array.from(this.extractorsStore?.findStoreMap()?.keys() ?? []).forEach(
-      key => {
-        this.mapKey(key as keyof T, data);
-      },
-    );
+
+    Array.from(this.extractorsStore?.findStoreMap()
+      ?.keys() ?? [])
+      .forEach(
+        key => {
+
+          this.mapKey(key as keyof T, data);
+
+        },
+      );
 
     return this.instance;
+
   }
 
   private extractData(key: keyof T, data: unknown): unknown {
-    const ExtractorConstructor = this.extractorsStore!.findStoreMap()!.get(key);
-    const ModifierConstructor = this.modifiersStore?.findStoreMap()?.get(key);
 
-    return ExtractorConstructor
-      ? new ExtractorConstructor(
+    const extractorConstructor = this.extractorsStore!.findStoreMap()!.get(key);
+    const modifierConstructor = this.modifiersStore?.findStoreMap()
+      ?.get(key);
+
+    return extractorConstructor
+      ? new extractorConstructor(
         key as string,
-        ModifierConstructor
-          ? new ModifierConstructor()
+        modifierConstructor
+          ? new modifierConstructor()
           : undefined,
-      ).extract(data)
+      )
+        .extract(data)
         .data
       : undefined;
+
   }
 
   private mapKey(key: keyof T, data: unknown): void {
+
     const keyType = new KeyType(this.keyTypesStore, this.instance as object, key as string | number);
 
     const objectData = this.extractData(key, data);
 
     if (!objectData) {
+
       /* If objectData === undefined than instance[key] should have default value from class description */
       if (objectData !== undefined) {
+
         /* null / 0 / '' / false */
         this.applyValue(key, objectData);
+
       }
 
       /* Not override default value declared in class constructor */
       return;
+
     }
 
     if (Array.isArray(objectData)) {
-      this.applyValue(
-        key,
-        objectData
-          .map(item => {
-            const itemTypeConstructor = keyType.getTypeFromDecorator(item);
-            return itemTypeConstructor
-              ? new Deserializer(itemTypeConstructor).deserialize(item)
-              : item;
-          }),
-      );
+
+      this.deserializeArrayKey(key, objectData, keyType);
       return;
+
     }
 
     const keyTypeConstructor = keyType.getConstructorForObject(objectData);
 
     if (!keyTypeConstructor) {
+
       this.applyValue(key, objectData);
       return;
+
     }
 
     const isKeyHasSerializableProperties = Boolean(
-      new ExtractorsClassStore(keyTypeConstructor as never).findStoreMap(),
+      new ExtractorsClassStore(keyTypeConstructor as never)
+        .findStoreMap(),
     );
 
     this.applyValue(
       key,
       isKeyHasSerializableProperties
-        ? new Deserializer(keyTypeConstructor).deserialize(objectData)
+        ? new Deserializer(keyTypeConstructor)
+          .deserialize(objectData)
         : objectData,
     );
 
   }
 
-  private applyValue(key: keyof T, value: any): void {
+  private deserializeArrayKey(key: keyof T, objectData: unknown[], keyType: KeyType<{ [x: string]: object; }>): void {
+
+    this.applyValue(
+      key,
+      objectData
+        .map(item => {
+
+          const itemTypeConstructor = keyType.getTypeFromDecorator(item);
+          return itemTypeConstructor
+            ? new Deserializer(itemTypeConstructor)
+              .deserialize(item)
+            : item;
+
+        }),
+    );
+
+  }
+
+  private applyValue(key: keyof T, value: unknown): void {
+
     const descriptor = getPropertyDescriptor(this.instance, key);
     if (!descriptor || descriptor.writable || descriptor.set) {
-      this.instance[key as keyof T] = value;
+
+      this.instance[key as keyof T] = value as T[keyof T];
+
     }
+
   }
 
 }

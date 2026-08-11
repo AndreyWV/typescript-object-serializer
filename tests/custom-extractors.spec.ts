@@ -16,51 +16,74 @@ describe('Custom extractor', () => {
     class DeepExtractor extends Extractor {
 
       public static byPath(path: string): Constructor<DeepExtractor> {
+
         return class extends DeepExtractor {
+
           constructor(_: string, mod?: Modifier) {
+
             super(path, mod);
+
           }
+
         };
+
       }
 
       private static getObjectByPath(dataObject: unknown, keys: string[]): unknown {
+
         let extracted = dataObject;
         keys.forEach(key => {
+
           if (typeof extracted !== 'object' || extracted === null) {
+
             return undefined;
+
           }
           extracted = extracted[key as keyof typeof extracted];
+
         });
         return extracted;
+
       }
 
       private static getOrCreateObjectByPath(
         dataObject: Record<string, unknown>,
         keys: string[],
       ): Record<string, unknown> {
+
         let currentObject = dataObject;
         keys.forEach(key => {
+
           if (!Object.prototype.hasOwnProperty.call(currentObject, key)) {
+
             currentObject[key] = {};
+
           }
           currentObject = currentObject[key] as Record<string, unknown>;
+
         });
         return currentObject;
+
       }
 
       constructor(
         protected readonly key: string,
         mod?: Modifier,
       ) {
+
         super(key, mod);
+
       }
 
       public extract(data: unknown): ExtractionResult {
+
         if (typeof data !== 'object' || data === null) {
+
           return {
             data: undefined,
             path: this.key,
           };
+
         }
         return {
           data: this.modifier.onDeserialize(
@@ -68,15 +91,18 @@ describe('Custom extractor', () => {
           ),
           path: this.key,
         };
+
       }
 
       public apply(applyObject: unknown, value: unknown): void {
+
         const keys = this.key.split('.');
         const dataObject = DeepExtractor.getOrCreateObjectByPath(
           applyObject as Record<string, unknown>,
           keys.slice(0, -1),
         );
         dataObject[keys[keys.length - 1]] = this.modifier.onSerialize(value);
+
       }
 
     }
@@ -84,12 +110,17 @@ describe('Custom extractor', () => {
     class StringAgeModifier extends Modifier {
 
       public override onDeserialize(value: unknown): number {
+
         return Number(value);
+
       }
 
       public override onSerialize(value: unknown): string {
+
         return String(value);
+
       }
+
     }
 
     class TestPerson extends SerializableObject {
@@ -122,9 +153,12 @@ describe('Custom extractor', () => {
         },
       });
 
-      expect(deserializedPerson.age).toBe(20);
-      expect(deserializedPerson.firstName).toBe('First');
-      expect(deserializedPerson.lastName).toBe('Last');
+      expect(deserializedPerson.age)
+        .toBe(20);
+      expect(deserializedPerson.firstName)
+        .toBe('First');
+      expect(deserializedPerson.lastName)
+        .toBe('Last');
 
     });
 
@@ -137,16 +171,17 @@ describe('Custom extractor', () => {
         id: 555,
       });
 
-      expect(person.serialize()).toMatchObject({
-        id: 555,
-        data: {
-          person: {
-            last_name: 'Last',
-            first_name: 'First',
-            age: '25',
+      expect(person.serialize())
+        .toMatchObject({
+          id: 555,
+          data: {
+            person: {
+              last_name: 'Last',
+              first_name: 'First',
+              age: '25',
+            },
           },
-        },
-      });
+        });
 
     });
 
@@ -162,9 +197,12 @@ describe('Custom extractor', () => {
         },
       });
 
-      expect(deserializedPerson.age).toBe(20);
-      expect(deserializedPerson.firstName).toBe('First');
-      expect(deserializedPerson.lastName).toBe('Default');
+      expect(deserializedPerson.age)
+        .toBe(20);
+      expect(deserializedPerson.firstName)
+        .toBe('First');
+      expect(deserializedPerson.lastName)
+        .toBe('Default');
 
     });
 
@@ -176,15 +214,16 @@ describe('Custom extractor', () => {
         id: 555,
       });
 
-      expect(person.serialize()).toMatchObject({
-        id: 555,
-        data: {
-          person: {
-            last_name: 'Last',
-            age: '25',
+      expect(person.serialize())
+        .toMatchObject({
+          id: 555,
+          data: {
+            person: {
+              last_name: 'Last',
+              age: '25',
+            },
           },
-        },
-      });
+        });
 
     });
 
@@ -193,27 +232,37 @@ describe('Custom extractor', () => {
   describe('Only deserialize property', () => {
 
     class OnlyDeserializeSnakeCaseExtractor extends SnakeCaseExtractor {
+
       public apply(): void {
       }
+
     }
 
     class Test extends SerializableObject {
+
       @property(OnlyDeserializeSnakeCaseExtractor)
       public declare id: number;
+
     }
 
     it('should deserialize data', () => {
+
       const deserialized = Test.deserialize({
         id: 123,
       });
-      expect(deserialized.id).toBe(123);
+      expect(deserialized.id)
+        .toBe(123);
+
     });
 
     it('should not serialize property data', () => {
+
       const instance = Test.create({
         id: 123,
       });
-      expect(instance.serialize()).toMatchObject({});
+      expect(instance.serialize())
+        .toMatchObject({});
+
     });
 
   });

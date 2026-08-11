@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.1.0 (2026-08-12)
+- Enhancement: Issue 53 - Typescript v6 support
+- Enhancement: Internal optimization
+- Enhancement: Updated README, added section "For AI Agents and LLM"
+
 ## 2.0.1 (2025-12-15)
 - Bugfix: Issue 51 - Fixed cloning array of items as property with basic types (boolean | string | number).
 

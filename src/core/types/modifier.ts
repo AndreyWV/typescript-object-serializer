@@ -15,11 +15,15 @@
 export class Modifier {
 
   public onDeserialize(data: unknown): unknown {
+
     return data;
+
   }
 
   public onSerialize(data: unknown): unknown {
+
     return data;
+
   }
 
 }

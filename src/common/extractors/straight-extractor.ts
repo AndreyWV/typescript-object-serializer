@@ -15,27 +15,39 @@ import {
  * }
  */
 export class StraightExtractor extends Extractor {
+
   public extract(data: unknown): ExtractionResult {
+
     if (typeof data !== 'object' || data === null) {
+
       return new ExtractionResult(
         data,
         this.key,
       );
+
     }
     if (Array.isArray(data)) {
+
       return new ExtractionResult(
         undefined,
         this.key,
       );
+
     } else {
+
       return new ExtractionResult(
         this.modifier.onDeserialize(data[this.key as keyof typeof data]),
         this.key,
       );
+
     };
+
   }
 
   public apply(applyObject: Record<string, unknown>, value: unknown): void {
+
     applyObject[this.key] = this.modifier.onSerialize(value);
+
   }
+
 }

@@ -1,11 +1,16 @@
 {
     "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "types": [
+            "reflect-metadata"
+        ]
+    },
     "include": [
-        "src"
+        "./src"
     ],
     "exclude": [
-        "playground",
-        "node_modules",
-        "tests"
+        "./playground",
+        "./node_modules",
+        "./tests"
     ]
 }

@@ -19,8 +19,10 @@ import { Validator } from '../types/validator';
 export function propertyValidators(
   validators: Constructor<Validator>[],
 )/* : PropertyDecorator | ParameterDecorator */ {
+
   const decorator = new ValidatorsDecorator(validators);
   return decorator.decorate.bind(decorator);
+
 }
 
 class ValidatorsDecorator extends DecoratorBase {
@@ -28,7 +30,9 @@ class ValidatorsDecorator extends DecoratorBase {
   constructor(
     private readonly validators: Constructor<Validator>[],
   ) {
+
     super();
+
   }
 
   public decorate(
@@ -54,6 +58,7 @@ class ValidatorsDecorator extends DecoratorBase {
       );
 
     validatorsStore.set(propertyName, allValidators);
+
   }
 
 }

@@ -13,16 +13,21 @@ export class KeyType<T> {
   }
 
   public getConstructorForObject(objectData: unknown): Constructor<T> | undefined {
+
     return this.getTypeFromDecorator(objectData)
       ?? Reflect?.getMetadata?.('design:type', this.instance, this.key as string | symbol);
+
   }
 
   public getTypeFromDecorator(objectData: unknown): Constructor<T> | undefined {
+
     const typesMap = this.store.findStoreMap()
       ?.get(this.key);
 
     if (!typesMap) {
+
       return;
+
     }
 
     return Array.from(typesMap.keys())
@@ -38,8 +43,8 @@ export class KeyType<T> {
       )
       // Find matched type
       .find(
-        (KeyConstructor: Constructor<never>) => typesMap.get(KeyConstructor)!(objectData),
-    );
+        (keyConstructor: Constructor<never>) => typesMap.get(keyConstructor)!(objectData),
+      );
 
   }
 

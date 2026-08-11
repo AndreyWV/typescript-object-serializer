@@ -9,14 +9,13 @@ on:
       - master
 
 jobs:
-
   check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: "24"
       - name: Install dependencies
         run: npm ci
       - name: Lint
@@ -24,27 +23,112 @@ jobs:
       - name: Build
         run: npm run build
 
-  testV5Node22:
+  testV6Node24:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: "24"
       - name: Install dependencies
         run: npm ci
       - name: Test
         run: npm run test
 
-  testV5Node20:
+  testV6Node22:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "22"
       - name: Install dependencies
         run: npm ci
+      - name: Test
+        run: npm run test
+
+  testV6Node20:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Install dependencies
+        run: npm ci
+      - name: Test
+        run: npm run test
+
+  testV5Node24:
+    needs: testV6Node24
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Change dependency
+        run: |
+          sed -i 's/"typescript": ".*"/"typescript": "~5.x"/' package.json
+      - name: Install dependencies
+        run: npm i --force
+      - name: Build
+        run: npm run build
+      - name: Test
+        run: npm run test
+
+  testV5Node22:
+    needs: testV6Node22
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Change dependency
+        run: |
+          sed -i 's/"typescript": ".*"/"typescript": "~5.x"/' package.json
+      - name: Install dependencies
+        run: npm i --force
+      - name: Build
+        run: npm run build
+      - name: Test
+        run: npm run test
+
+  testV5Node20:
+    needs: testV6Node20
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Change dependency
+        run: |
+          sed -i 's/"typescript": ".*"/"typescript": "~5.x"/' package.json
+      - name: Install dependencies
+        run: npm i --force
+      - name: Build
+        run: npm run build
+      - name: Test
+        run: npm run test
+
+  testV4Node24:
+    needs: testV5Node24
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Change dependency
+        run: |
+          sed -i 's/"typescript": ".*"/"typescript": "~4.x"/' package.json
+          sed -i 's/"ts-jest": ".*"/"ts-jest": "~29.0"/' package.json
+      - name: Install dependencies
+        run: npm i --force
+      - name: Build
+        run: npm run build
       - name: Test
         run: npm run test
 
@@ -55,10 +139,11 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: "22"
       - name: Change dependency
         run: |
           sed -i 's/"typescript": ".*"/"typescript": "~4.x"/' package.json
+          sed -i 's/"ts-jest": ".*"/"ts-jest": "~29.0"/' package.json
       - name: Install dependencies
         run: npm i --force
       - name: Build
@@ -73,10 +158,29 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "20"
       - name: Change dependency
         run: |
           sed -i 's/"typescript": ".*"/"typescript": "~4.x"/' package.json
+          sed -i 's/"ts-jest": ".*"/"ts-jest": "~29.0"/' package.json
+      - name: Install dependencies
+        run: npm i --force
+      - name: Build
+        run: npm run build
+      - name: Test
+        run: npm run test
+
+  testV3Node24:
+    needs: testV4Node24
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Change dependency
+        run: |
+          sed -i 's/"typescript": "\~4.x"/"typescript": "~3.x"/' package.json
       - name: Install dependencies
         run: npm i --force
       - name: Build
@@ -91,7 +195,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: "22"
       - name: Change dependency
         run: |
           sed -i 's/"typescript": "\~4.x"/"typescript": "~3.x"/' package.json
@@ -109,7 +213,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "20"
       - name: Change dependency
         run: |
           sed -i 's/"typescript": "\~4.x"/"typescript": "~3.x"/' package.json

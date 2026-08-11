@@ -16,13 +16,17 @@ describe('Common', () => {
     it('child should not affect parent class', () => {
 
       class Test {
+
         @property(SnakeCaseExtractor)
         public stringValue?: string;
+
       }
 
       class TestChild extends Test {
+
         @property(SnakeCaseExtractor)
         public numberValue?: number;
+
       }
 
       const testDeserialized = deserialize(TestChild, {
@@ -30,7 +34,8 @@ describe('Common', () => {
         number_value: 123,
       });
 
-      expect(testDeserialized.numberValue).toBe(123);
+      expect(testDeserialized.numberValue)
+        .toBe(123);
 
       const parentInstance = deserialize(Test, {
         string_value: 'string',
@@ -42,9 +47,10 @@ describe('Common', () => {
       (parentInstance as any)['numberValue'] = 321;
 
       const serializedParent = serialize(parentInstance);
-      expect(serializedParent).toEqual({
-        string_value: 'string',
-      });
+      expect(serializedParent)
+        .toEqual({
+          string_value: 'string',
+        });
       expect(serializedParent).not.toHaveProperty('number_value');
 
     });
@@ -52,8 +58,10 @@ describe('Common', () => {
     it('should extend parent serializable properties even if class doesn\'t has own properties', () => {
 
       class Test {
+
         @property(SnakeCaseExtractor)
         public testProperty?: string;
+
       }
 
       class SubTest extends Test { }
@@ -64,14 +72,17 @@ describe('Common', () => {
         test_property: 'value',
       });
 
-      expect(deserialized.testProperty).toBe('value');
-      expect(deserialized).toBeInstanceOf(SubSubTest);
+      expect(deserialized.testProperty)
+        .toBe('value');
+      expect(deserialized)
+        .toBeInstanceOf(SubSubTest);
 
       const serialized = serialize(deserialized);
 
-      expect(serialized).toEqual({
-        test_property: 'value',
-      });
+      expect(serialized)
+        .toEqual({
+          test_property: 'value',
+        });
 
     });
 
@@ -89,27 +100,37 @@ describe('Common', () => {
 
           @property()
           public get fullName(): string {
+
             return this.firstName + ' ' + this.lastName;
+
           }
 
           public set fullName(value: string) {
-            const [firstName, lastName] = value.split(' ');
+
+            const [
+              firstName,
+              lastName,
+            ] = value.split(' ');
             this.firstName = firstName;
             this.lastName = lastName;
+
           }
 
         }
 
         const instance = new Person('John', 'Doe');
-        expect(serialize(instance)).toEqual({
-          fullName: 'John Doe',
-        });
+        expect(serialize(instance))
+          .toEqual({
+            fullName: 'John Doe',
+          });
 
         const deserialized = deserialize(Person, {
           fullName: 'John Doe',
         });
-        expect(deserialized.firstName).toBe('John');
-        expect(deserialized.lastName).toBe('Doe');
+        expect(deserialized.firstName)
+          .toBe('John');
+        expect(deserialized.lastName)
+          .toBe('Doe');
 
       });
 
@@ -125,22 +146,29 @@ describe('Common', () => {
 
           @property()
           public get fullName(): string {
+
             return this.firstName + ' ' + this.lastName;
+
           }
 
         }
 
         it('should serialize getter property', () => {
+
           const instance = new Person('John', 'Doe');
-          expect(serialize(instance)).toEqual({
-            fullName: 'John Doe',
-          });
+          expect(serialize(instance))
+            .toEqual({
+              fullName: 'John Doe',
+            });
+
         });
 
         it('should not throw error on deserialize getter property', () => {
+
           expect(() => deserialize(Person, {
             fullName: 'John Doe',
-          })).not.toThrowError();
+          })).not.toThrow();
+
         });
 
       });
@@ -157,29 +185,43 @@ describe('Common', () => {
 
           @property()
           public set fullName(value: string) {
-            const [firstName, lastName] = value.split(' ');
+
+            const [
+              firstName,
+              lastName,
+            ] = value.split(' ');
             this.firstName = firstName;
             this.lastName = lastName;
+
           }
 
         }
 
         it('should deserialize setter property', () => {
+
           const deserialized = deserialize(Person, {
             fullName: 'John Doe',
           });
-          expect(deserialized.firstName).toBe('John');
-          expect(deserialized.lastName).toBe('Doe');
+          expect(deserialized.firstName)
+            .toBe('John');
+          expect(deserialized.lastName)
+            .toBe('Doe');
+
         });
 
         it('should not serialize setter property', () => {
+
           const instance = new Person('John', 'Doe');
-          expect(serialize(instance)).toEqual({});
+          expect(serialize(instance))
+            .toEqual({});
+
         });
 
         it('should not throw error on serialize setter property', () => {
+
           const instance = new Person('John', 'Doe');
-          expect(() => serialize(instance)).not.toThrowError();
+          expect(() => serialize(instance)).not.toThrow();
+
         });
 
       });
@@ -193,13 +235,17 @@ describe('Common', () => {
     it('child should not affect parent class', () => {
 
       class Test extends SerializableObject {
+
         @property(SnakeCaseExtractor)
         public stringValue?: string;
+
       }
 
       class TestChild extends Test {
+
         @property(SnakeCaseExtractor)
         public numberValue?: number;
+
       }
 
       const testDeserialized = TestChild.deserialize({
@@ -207,7 +253,8 @@ describe('Common', () => {
         number_value: 123,
       });
 
-      expect(testDeserialized.numberValue).toBe(123);
+      expect(testDeserialized.numberValue)
+        .toBe(123);
 
       const parentInstance = Test.deserialize({
         string_value: 'string',
@@ -219,9 +266,10 @@ describe('Common', () => {
       (parentInstance as any)['numberValue'] = 321;
 
       const serializedParent = parentInstance.serialize();
-      expect(serializedParent).toEqual({
-        string_value: 'string',
-      });
+      expect(serializedParent)
+        .toEqual({
+          string_value: 'string',
+        });
       expect(serializedParent).not.toHaveProperty('number_value');
 
     });
@@ -229,8 +277,10 @@ describe('Common', () => {
     it('should extend parent serializable properties even if class doesn\'t has own properties', () => {
 
       class Test extends SerializableObject {
+
         @property(SnakeCaseExtractor)
         public testProperty?: string;
+
       }
 
       class SubTest extends Test { }
@@ -241,14 +291,17 @@ describe('Common', () => {
         test_property: 'value',
       });
 
-      expect(deserialized.testProperty).toBe('value');
-      expect(deserialized).toBeInstanceOf(SubSubTest);
+      expect(deserialized.testProperty)
+        .toBe('value');
+      expect(deserialized)
+        .toBeInstanceOf(SubSubTest);
 
       const serialized = deserialized.serialize();
 
-      expect(serialized).toEqual({
-        test_property: 'value',
-      });
+      expect(serialized)
+        .toEqual({
+          test_property: 'value',
+        });
 
     });
 
@@ -257,8 +310,11 @@ describe('Common', () => {
       it('should serialize and deserialize getter + setter properties', () => {
 
         class VoidModifier extends Modifier {
+
           public onSerialize(): void { }
+
           public onDeserialize(): void { }
+
         }
 
         class Person extends SerializableObject {
@@ -266,19 +322,27 @@ describe('Common', () => {
           @property(StraightExtractor)
           @modifier(VoidModifier)
           public firstName?: string;
+
           @property(StraightExtractor)
           @modifier(VoidModifier)
           public lastName?: string;
 
           @property()
           public get fullName(): string {
+
             return this.firstName + ' ' + this.lastName;
+
           }
 
           public set fullName(value: string) {
-            const [firstName, lastName] = value.split(' ');
+
+            const [
+              firstName,
+              lastName,
+            ] = value.split(' ');
             this.firstName = firstName;
             this.lastName = lastName;
+
           }
 
         }
@@ -287,22 +351,27 @@ describe('Common', () => {
           firstName: 'John',
           lastName: 'Doe',
         });
-        expect(instance.serialize()).toEqual({
-          fullName: 'John Doe',
-        });
+        expect(instance.serialize())
+          .toEqual({
+            fullName: 'John Doe',
+          });
 
         const deserialized = Person.deserialize({
           fullName: 'John Doe',
         });
-        expect(deserialized.firstName).toBe('John');
-        expect(deserialized.lastName).toBe('Doe');
+        expect(deserialized.firstName)
+          .toBe('John');
+        expect(deserialized.lastName)
+          .toBe('Doe');
 
       });
 
       describe('getter', () => {
 
         class MotSerializableModifier extends Modifier {
+
           public onSerialize(): void { }
+
         }
 
         class Person extends SerializableObject {
@@ -310,33 +379,41 @@ describe('Common', () => {
           @property(StraightExtractor)
           @modifier(MotSerializableModifier)
           public firstName?: string;
+
           @property(StraightExtractor)
           @modifier(MotSerializableModifier)
           public lastName?: string;
 
           @property()
           public get fullName(): string {
+
             return this.firstName + ' ' + this.lastName;
+
           }
 
         }
 
         it('should serialize getter property', () => {
+
           const instance = Person.createPartial({
             firstName: 'John',
             lastName: 'Doe',
           });
-          expect(instance.serialize()).toEqual({
-            fullName: 'John Doe',
-          });
+          expect(instance.serialize())
+            .toEqual({
+              fullName: 'John Doe',
+            });
+
         });
 
         it('should not throw error on deserialize getter property', () => {
+
           expect(() => Person.deserialize({
             fullName: 'John Doe',
           }))
             .not
             .toThrow();
+
         });
 
       });
@@ -344,8 +421,11 @@ describe('Common', () => {
       describe('setter', () => {
 
         class VoidModifier extends Modifier {
+
           public onSerialize(): void { }
+
           public onDeserialize(): void { }
+
         }
 
         class Person extends SerializableObject {
@@ -353,41 +433,56 @@ describe('Common', () => {
           @property(StraightExtractor)
           @modifier(VoidModifier)
           public firstName?: string;
+
           @property(StraightExtractor)
           @modifier(VoidModifier)
           public lastName?: string;
 
           @property()
           public set fullName(value: string) {
-            const [firstName, lastName] = value.split(' ');
+
+            const [
+              firstName,
+              lastName,
+            ] = value.split(' ');
             this.firstName = firstName;
             this.lastName = lastName;
+
           }
 
         }
 
         it('should deserialize setter property', () => {
+
           const deserialized = Person.deserialize({
             fullName: 'John Doe',
           });
-          expect(deserialized.firstName).toBe('John');
-          expect(deserialized.lastName).toBe('Doe');
+          expect(deserialized.firstName)
+            .toBe('John');
+          expect(deserialized.lastName)
+            .toBe('Doe');
+
         });
 
         it('should not serialize setter property', () => {
+
           const instance = Person.createPartial({
             firstName: 'John',
             lastName: 'Doe',
           });
-          expect(serialize(instance)).toEqual({});
+          expect(serialize(instance))
+            .toEqual({});
+
         });
 
         it('should not throw error on serialize setter property', () => {
+
           const instance = Person.createPartial({
             firstName: 'John',
             lastName: 'Doe',
           });
-          expect(() => serialize(instance)).not.toThrowError();
+          expect(() => serialize(instance)).not.toThrow();
+
         });
 
       });

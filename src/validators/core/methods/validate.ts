@@ -14,10 +14,12 @@ import { ValidationError } from '../types/validation-error';
  * @returns { ValidationError[] } List of validation errors. Returns empty array if object is valid.
  */
 export function validate<T>(constructor: Constructor<T>, data: unknown | unknown[]): ValidationError[] {
+
   const validator = new Validator(constructor);
   return Array.isArray(data)
     ? validator.validateArray(data)
     : validator.validate(data as T);
+
 }
 
 class Validator<T> {
@@ -26,28 +28,38 @@ class Validator<T> {
 
   private readonly instance?: T;
 
-  private declare keyTypesStore: TypesClassStore;
-  private declare extractorsStore?: ExtractorsClassStore;
-  private declare modifiersStore?: ModifiersClassStore;
-  private declare validatorsStore?: ValidatorsClassStore;
+  private declare readonly keyTypesStore: TypesClassStore;
+
+  private declare readonly extractorsStore?: ExtractorsClassStore;
+
+  private declare readonly modifiersStore?: ModifiersClassStore;
+
+  private declare readonly validatorsStore?: ValidatorsClassStore;
 
   constructor(
-    DataConstructor: Constructor<T>,
+    dataConstructor: Constructor<T>,
   ) {
+
     try {
-      this.instance = new DataConstructor();
+
+      this.instance = new dataConstructor();
+
     } catch { /* empty */ }
-    this.keyTypesStore = new TypesClassStore(DataConstructor as Constructor<never>);
-    this.extractorsStore = new ExtractorsClassStore(DataConstructor as Constructor<never>);
-    this.modifiersStore = new ModifiersClassStore(DataConstructor as Constructor<never>);
-    this.validatorsStore = new ValidatorsClassStore(DataConstructor as Constructor<never>);
+    this.keyTypesStore = new TypesClassStore(dataConstructor as Constructor<never>);
+    this.extractorsStore = new ExtractorsClassStore(dataConstructor as Constructor<never>);
+    this.modifiersStore = new ModifiersClassStore(dataConstructor as Constructor<never>);
+    this.validatorsStore = new ValidatorsClassStore(dataConstructor as Constructor<never>);
+
   }
 
   public validate(data: unknown): ValidationError[] {
+
     const extractors = this.extractorsStore?.findStoreMap();
 
     if (!this.instance || !extractors) {
+
       return [];
+
     }
 
     return Array.from(extractors.keys())
@@ -55,7 +67,9 @@ class Validator<T> {
         (errors, key) => {
 
           if (!this.isShouldValidateKey(key as keyof T)) {
+
             return errors;
+
           }
 
           const extractionResult = this.extractKey(data, key as keyof T);
@@ -65,6 +79,7 @@ class Validator<T> {
             this.validateKeyAsArray(key as keyof T, extractionResult),
             this.validateKeyDeepProperties(key as keyof T, extractionResult),
           );
+
         },
         [] as ValidationError[],
       );
@@ -72,51 +87,67 @@ class Validator<T> {
   }
 
   public validateArray(data: unknown[]): ValidationError[] {
+
     return data
       .map(item => this.validate(item))
       .map(
         (validationErrors, index) => {
+
           return validationErrors.map(
             validationError => {
+
               // TODO add method <cloneWith> and override path
               validationError.path = `[${index}]${Validator.PATH_SEPARATOR}${validationError.path}`;
               return validationError;
+
             },
           );
+
         },
       )
       .flat();
+
   }
 
   private isShouldValidateKey(key: keyof T): boolean {
+
     return Boolean(
-      this.extractorsStore?.findStoreMap()?.get(key as string),
+      this.extractorsStore?.findStoreMap()
+        ?.get(key as string),
     );
+
   }
 
   private extractKey(data: unknown, key: keyof T): ExtractionResult {
-    const KeyExtractor = this.extractorsStore!.findStoreMap()!.get(key as string)!;
-    const KeyModifier = this.modifiersStore?.findStoreMap()?.get(key as string);
 
-    return new KeyExtractor(
+    const keyExtractorConstructor = this.extractorsStore!.findStoreMap()!.get(key as string)!;
+    const keyModifierConstructor = this.modifiersStore?.findStoreMap()
+      ?.get(key as string);
+
+    return new keyExtractorConstructor(
       key as string,
-      KeyModifier
-        ? new KeyModifier()
+      keyModifierConstructor
+        ? new keyModifierConstructor()
         : undefined,
-    ).extract(data);
+    )
+      .extract(data);
+
   }
 
   private validateKeyItself(key: keyof T, extractionResult: ExtractionResult): ValidationError[] {
 
-    const keyValidators = this.validatorsStore?.findStoreMap()?.get(key);
+    const keyValidators = this.validatorsStore?.findStoreMap()
+      ?.get(key);
 
     if (!keyValidators) {
+
       return [];
+
     }
 
     return keyValidators
       .map(
-        KeyValidator => new KeyValidator()
+        keyValidatorConstructor => new keyValidatorConstructor()
           .validate(
             extractionResult.data,
             extractionResult.path,
@@ -125,11 +156,15 @@ class Validator<T> {
       .filter(
         e => e instanceof ValidationError,
       ) as ValidationError[];
+
   }
 
   private validateKeyAsArray(key: keyof T, extractionResult: ExtractionResult): ValidationError[] {
+
     if (!Array.isArray(extractionResult.data)) {
+
       return [];
+
     }
 
     const keyType = new KeyType(this.keyTypesStore, this.instance as object, key as string | number);
@@ -145,12 +180,14 @@ class Validator<T> {
       .map(
         item =>
           new Validator(item.itemType!)
-            .validate(item.itemData as any),
+            .validate(item.itemData as unknown),
       )
       .map(
         (itemErrors, itemIndex) => {
+
           return itemErrors.map(
             error => {
+
               error.path = [
                 extractionResult?.path ?? '',
                 `[${itemIndex}]`,
@@ -158,14 +195,18 @@ class Validator<T> {
               ]
                 .join(Validator.PATH_SEPARATOR);
               return error;
+
             },
           );
+
         },
       )
       .flat();
+
   }
 
   private validateKeyDeepProperties(key: keyof T, extractionResult: ExtractionResult): ValidationError[] {
+
     const value = extractionResult.data;
 
     const isObject = (() => Boolean(
@@ -173,26 +214,32 @@ class Validator<T> {
     ))();
 
     if (!isObject) {
+
       return [];
+
     }
 
-    const KeyTypeConstructor = new KeyType(this.keyTypesStore, this.instance as object, key as string | number)
+    const keyTypeConstructor = new KeyType(this.keyTypesStore, this.instance as object, key as string | number)
       .getConstructorForObject(value);
 
-    if (!KeyTypeConstructor) {
+    if (!keyTypeConstructor) {
+
       return [];
+
     }
 
     const isKeyHasSerializableProperties = Boolean(
-      new ExtractorsClassStore(KeyTypeConstructor as Constructor<never>)
+      new ExtractorsClassStore(keyTypeConstructor as Constructor<never>)
         .findStoreMap(),
     );
 
     if (!isKeyHasSerializableProperties) {
+
       return [];
+
     }
 
-    const validator = new Validator(KeyTypeConstructor as Constructor<never>);
+    const validator = new Validator(keyTypeConstructor as Constructor<never>);
 
     const errors = Array.isArray(value)
       ? validator.validateArray(value as never[])
@@ -200,11 +247,12 @@ class Validator<T> {
 
     return errors.map(
       error => {
+
         error.path = `${extractionResult?.path}${Validator.PATH_SEPARATOR}${error.path}`;
         return error;
+
       },
     );
-
 
   }
 

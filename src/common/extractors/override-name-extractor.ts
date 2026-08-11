@@ -18,14 +18,20 @@ export class OverrideNameExtractor extends StraightExtractor {
   public static use(
     property: string,
   ): Constructor<OverrideNameExtractor> {
+
     return class extends OverrideNameExtractor {
+
       constructor(_: string, modifier?: Modifier) {
+
         super(
           property,
           modifier,
         );
+
       }
+
     };
+
   }
 
 }
