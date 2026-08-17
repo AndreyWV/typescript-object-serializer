@@ -16,5 +16,20 @@ export default defineConfig({
       'src/**/*.{test,spec}.ts',
       'tests/**/*.{test,spec}.ts',
     ],
+    projects: [
+      {
+        extends: true,
+        test: {
+          name: 'node',
+        },
+      },
+      {
+        extends: true,
+        test: {
+          name: 'browser',
+          environment: 'jsdom',
+        },
+      },
+    ],
   },
 });

@@ -5,7 +5,8 @@
     "scripts": {
         "build": "tsc -p prod.tsconfig.json && npm run build:copy-files",
         "build:copy-files": "cp package.json dist && cp README.md dist && cp validators-package.json dist/validators/package.json",
-        "test": "vitest run",
+        "test:node": "vitest run --project node",
+        "test:browser": "vitest run --project browser",
         "test:watch": "vitest",
         "test:coverage": "vitest run --coverage",
         "lint": "eslint src tests",
@@ -40,6 +41,7 @@
         "eslint-plugin-import-newlines": "^2.0.0",
         "eslint-plugin-simple-import-sort": "^14.0.0",
         "globals": "^17.6.0",
+        "jsdom": "^30.0.1",
         "path-browserify": "~1.0.1",
         "reflect-metadata": "~0.2.2",
         "ts-loader": "~9.6.2",
