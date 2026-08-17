@@ -124,7 +124,6 @@ jobs:
       - name: Change dependency
         run: |
           sed -i 's/"typescript": ".*"/"typescript": "~4.x"/' package.json
-          sed -i 's/"ts-jest": ".*"/"ts-jest": "~29.0"/' package.json
       - name: Install dependencies
         run: npm i --force
       - name: Build
@@ -143,7 +142,6 @@ jobs:
       - name: Change dependency
         run: |
           sed -i 's/"typescript": ".*"/"typescript": "~4.x"/' package.json
-          sed -i 's/"ts-jest": ".*"/"ts-jest": "~29.0"/' package.json
       - name: Install dependencies
         run: npm i --force
       - name: Build
@@ -162,7 +160,6 @@ jobs:
       - name: Change dependency
         run: |
           sed -i 's/"typescript": ".*"/"typescript": "~4.x"/' package.json
-          sed -i 's/"ts-jest": ".*"/"ts-jest": "~29.0"/' package.json
       - name: Install dependencies
         run: npm i --force
       - name: Build
@@ -180,7 +177,7 @@ jobs:
           node-version: "24"
       - name: Change dependency
         run: |
-          sed -i 's/"typescript": "\~4.x"/"typescript": "~3.x"/' package.json
+          sed -i 's/"typescript": ".*"/"typescript": "~3.x"/' package.json
       - name: Install dependencies
         run: npm i --force
       - name: Build
@@ -198,7 +195,7 @@ jobs:
           node-version: "22"
       - name: Change dependency
         run: |
-          sed -i 's/"typescript": "\~4.x"/"typescript": "~3.x"/' package.json
+          sed -i 's/"typescript": ".*"/"typescript": "~3.x"/' package.json
       - name: Install dependencies
         run: npm i --force
       - name: Build
@@ -216,7 +213,7 @@ jobs:
           node-version: "20"
       - name: Change dependency
         run: |
-          sed -i 's/"typescript": "\~4.x"/"typescript": "~3.x"/' package.json
+          sed -i 's/"typescript": ".*"/"typescript": "~3.x"/' package.json
       - name: Install dependencies
         run: npm i --force
       - name: Build

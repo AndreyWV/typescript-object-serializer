@@ -715,7 +715,7 @@ describe('Decorator @property', () => {
 
   });
 
-  describe('should handle property as constructor argument', () => {
+  it('should handle property as constructor argument', () => {
 
     class Test {
 

@@ -497,7 +497,7 @@ describe('Serialize', () => {
 
       }
 
-      describe('should serialize data', () => {
+      it('should serialize data', () => {
 
         const instance = Test.create({
           property: [
@@ -595,7 +595,7 @@ describe('Serialize', () => {
 
       }
 
-      describe('should serialize data', () => {
+      it('should serialize data', () => {
 
         const instance = create(Test, {
           property: [
@@ -693,7 +693,7 @@ describe('Serialize', () => {
 
       }
 
-      describe('should serialize data', () => {
+      it('should serialize data', () => {
 
         const instance = Test.create({
           strings: [
@@ -746,7 +746,7 @@ describe('Serialize', () => {
 
       }
 
-      describe('should serialize data', () => {
+      it('should serialize data', () => {
 
         const instance = create(Test, {
           strings: [

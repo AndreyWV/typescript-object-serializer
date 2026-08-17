@@ -27,7 +27,7 @@
         "target": "es2015",
         "types": [
             "reflect-metadata",
-            "jest"
+            "vitest"
         ]
     },
     "exclude": [
@@ -36,6 +36,7 @@
     "include": [
         "./src",
         "./playground",
-        "./tests"
+        "./tests",
+        "./vitest.config.mts"
     ]
 }

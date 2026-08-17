@@ -30,7 +30,7 @@ export default [
         project: path.join(dirname, 'tsconfig.json'),
       },
       globals: {
-        ...globals.jest,
+        ...globals.vitest,
       },
     },
     plugins: {
